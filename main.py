@@ -20,7 +20,7 @@ import time
 
 
 LogLine = collections.namedtuple(
-    'LogLine', frozenset((
+    'LogLine', (
         'parsed_log_message',
         'raw_log_message',
         'datetime',
@@ -29,7 +29,7 @@ LogLine = collections.namedtuple(
         'line_number',
         'instance_id',
         'program_name',
-    ))
+    )
 )
 """
     L{LogLine} holds the data from a single Papertrail log line
@@ -65,12 +65,11 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
         Takes a L{raw_log_line} and metadata and returns a L{LogLine}
     """
     (
-        parsed_log_message,
-        raw_log_line,
-        log_datetime,
         papertrail_id,
+        log_datetime,
         instance_id,
         program_name,
+        parsed_log_message,
     ) = __parse_papertrail_log_line(raw_log_line)
 
     return LogLine(
@@ -119,12 +118,11 @@ def __parse_papertrail_log_line(raw_log_line):
     parsed_log_message = log_line_pieces[9]
 
     return (
-        parsed_log_message,
-        raw_log_line,
-        log_datetime,
         papertrail_id,
+        log_datetime,
         instance_id,
         program_name,
+        parsed_log_message,
     )
 
 
