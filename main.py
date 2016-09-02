@@ -27,12 +27,14 @@ LogLine = collections.namedtuple(
         'papertrail_id',
         'origin_papertrail_id',
         'line_number',
+        'instance_id',
+        'program_name',
     ))
 )
 """
-    LogLine holds the data from a single Papertrail log line
+    L{LogLine} holds the data from a single Papertrail log line
 
-    LogLines are related to each other via the concept of an "origin" line. We determine a line is
+    L{LogLine} are related to each other via the concept of an "origin" line. We determine a line is
     significant if it matches an error message we care about, like "AssertionError". The line
     containing the string "AssertionError" (or whatever) is the origin line. We then search
     backwards for related lines from the same instance_id and program name as the origin line.
@@ -41,23 +43,26 @@ LogLine = collections.namedtuple(
     before it will be line 1, etc.
 
     To help explain this relationship via an example of how this could be used: one could recreate
-    the logs as shown by papertrail by taking a set of LogLines that share an
+    the logs as shown by papertrail by taking a set of L{LogLine} that share an
     L{origin_papertrail_id} and arranging them in decending L{line_number} order.
 
-    parsed_log_message: string containing the parsed log message without any metadata
-    raw_log_message: string containing the original message as found in papertrail
-    datetime: string of the datetime reported by the message. utc. example: 2016-08-12T03:18:39
-    papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
-        700594297938165774
-    origin_papertrail_id: int id of the origin line assossicated with this L{LogLine}
-    line_number: how many lines previous to the origin "AssertionError" line this line was found.
-        the "origin" line is always 0
+    - parsed_log_message: string containing the parsed log message without any metadata
+    - raw_log_message: string containing the original message as found in papertrail
+    - datetime: string of the datetime reported by the message. utc. example: 2016-08-12T03:18:39
+    - papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
+      700594297938165774
+    - origin_papertrail_id: int id of the origin line assossicated with this L{LogLine}. Will be
+      None if this is the origin line
+    - line_number: how many lines previous to the origin "AssertionError" line this line was found.
+      the "origin" line is always 0
+    - instance_id: string of the parsed EC2 instance id of the log line
+    - program_name: string of the parsed program name from the log line
 """
 
 
 def __parse_log_line(log_line):
     """
-        Parse out interesting parts of the log line.
+        Parse out interesting parts of the log line into a L{LogLine}.
 
         Log lines take this form (I've replaced tabs with newlines):
             700594297938165774
@@ -72,24 +77,35 @@ def __parse_log_line(log_line):
             AssertionError
 
         We parse out the following parts:
-            - the log line id, the 1st column
+            - the papertrail log line id, the 1st column
+            - the log datetime, the 2st column
             - the instance id, the 5th column
             - the running program name, the 9th column
-            - the actual message, which is everything after the 9th column
+            - the actual log message, which is everything after the 9th column
 
-        Returns a 4-tuple of the above parts
+        Returns the above fields as a tuple.
     """
     log_line_pieces = log_line.split('\t', 9)
     assert len(log_line_pieces) == 10, log_line_pieces
-    log_line_id = log_line_pieces[0]
+    papertrail_id = log_line_pieces[0]
+    log_datetime = log_line_pieces[1]
     instance_id = log_line_pieces[4]
     program_name = log_line_pieces[8]
-    message = log_line_pieces[9]
+    parsed_log_message = log_line_pieces[9]
 
-    return (log_line_id, instance_id, program_name, message)
+    return LogLine(
+        parsed_log_message,
+        log_line,
+        log_datetime,
+        papertrail_id,
+        None,
+        None,
+        instance_id,
+        program_name,
+    )
 
 
-def __get_previous_log_lines(circular_buffer, origin_line, origin_program_name, origin_instance_id):
+def __get_previous_log_lines(circular_buffer, origin_line):
     """
         Searches backwards in L{circular_buffer} for lines that match the given specs.
 
@@ -97,34 +113,26 @@ def __get_previous_log_lines(circular_buffer, origin_line, origin_program_name, 
             - share the instance_id of L{origin_line}
             - share the program_name L{origin_program_name}
 
-        yields LogLines. All LogLines yielded will have the L{origin_papertrail_id} of
+        yields L{LogLine}s. All L{LogLine}s yielded will have the L{origin_papertrail_id} of
         L{origin_line} and a L{line_number} > 0.
     """
     line_number = 1
     for raw_line in list(circular_buffer)[::-1]:
-        (
-            papertrail_id,
-            instance_id,
-            program_name,
-            log_message,
-        ) = __parse_log_line(raw_line)
-        if ((instance_id == origin_instance_id) and
-            (program_name == origin_program_name)):
-            datetime_ = ""  # TODO
-            yield LogLine(
-                log_message,
-                raw_line,
-                datetime_,
-                papertrail_id,
-                origin_line.papertrail_id,
-                line_number
-            )
+        log_line = __parse_log_line(raw_line)
+        log_line.origin_papertrail_id = origin_line.papertrail_id
+        log_line.line_number = line_number
+        if ((log_line.instance_id == origin_line.instance_id) and
+            (log_line.program_name == origin_line.program_name)):
+            # This line matches our origin line!
+            yield log_line
             line_number += 1
 
 
 def parse(file_object):
     """
-        Returns a list of L{LogLine} found in L{file_object}
+        Returns a list of all the relevant L{LogLine} found in L{file_object}
+
+        A relevant log line is one that either has an AssertionError on it or is related to one.
 
         L{file_object} is expected to be an open file, but can be anything that generates lines of
         log files.
@@ -135,36 +143,26 @@ def parse(file_object):
     circular_buffer = collections.deque(maxlen=10000)
     log_lines = []
     for line in file_object:
+        assert len(line) > 1, line  # make sure we're getting real lines
+
         # see if this line has an important error
         if 'AssertionError' in line:
             # we found a match! add it to the list
-            papertrail_id, instance_id, program_name, assertion_error = __parse_log_line(line)
-            log_datetime = ""  # TODO
-            origin_line = LogLine(
-                assertion_error,
-                line,
-                log_datetime,
-                papertrail_id,
-                papertrail_id,
-                0
-            )
+            origin_line = __parse_log_line(line)
+            origin_line.line_number = 0
             log_lines.append(origin_line)
 
             # search backwards to grab the previous 10 traceback lines
             log_lines.extend(
                 itertools.islice(
-                    __get_previous_log_lines(
-                        circular_buffer,
-                        origin_line,
-                        program_name,
-                        instance_id
-                    ),
+                    __get_previous_log_lines(circular_buffer, origin_line),
                     10
                 )
             )
 
         # now that we're done processing this line, add it to the buffer
         circular_buffer.append(line)
+    return log_lines
 
 
 def parse_gzipped_file(zipped_filename):
