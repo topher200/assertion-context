@@ -51,8 +51,7 @@ LogLine = collections.namedtuple(
     - datetime: string of the datetime reported by the message. utc. example: 2016-08-12T03:18:39
     - papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
       700594297938165774
-    - origin_papertrail_id: int id of the origin line assossicated with this L{LogLine}. Will be
-      None if this is the origin line
+    - origin_papertrail_id: int id of the origin line assossicated with this L{LogLine}
     - line_number: how many lines previous to the origin "AssertionError" line this line was found.
       the "origin" line is always 0
     - instance_id: string of the parsed EC2 instance id of the log line
@@ -63,6 +62,9 @@ LogLine = collections.namedtuple(
 def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
     """
         Takes a L{raw_log_line} and metadata and returns a L{LogLine}
+
+        If L{origin_papertrail_id} is None, we're the origin! We use our own generated
+        L{papertrail_id} as the L{origin_papertrail_id}.
     """
     (
         papertrail_id,
@@ -77,7 +79,7 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
         raw_log_line,
         log_datetime,
         papertrail_id,
-        origin_papertrail_id,
+        origin_papertrail_id if origin_papertrail_id is not None else papertrail_id,
         line_number,
         instance_id,
         program_name,
