@@ -60,11 +60,36 @@ LogLine = collections.namedtuple(
 """
 
 
-def __parse_log_line(log_line):
+def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
     """
-        Parse out interesting parts of the log line into a L{LogLine}.
+        Takes a L{raw_log_line} and metadata and returns a L{LogLine}
+    """
+    (
+        parsed_log_message,
+        raw_log_line,
+        log_datetime,
+        papertrail_id,
+        instance_id,
+        program_name,
+    ) = __parse_papertrail_log_line(raw_log_line)
 
-        Log lines take this form (I've replaced tabs with newlines):
+    return LogLine(
+        parsed_log_message,
+        raw_log_line,
+        log_datetime,
+        papertrail_id,
+        origin_papertrail_id,
+        line_number,
+        instance_id,
+        program_name,
+    )
+
+
+def __parse_papertrail_log_line(raw_log_line):
+    """
+        Parse out interesting parts of a Papertrail log line
+
+        Papertrail log lines take this form (I've replaced tabs with newlines):
             700594297938165774
             2016-08-12T03:18:39
             2016-08-12T03:18:39Z
@@ -85,7 +110,7 @@ def __parse_log_line(log_line):
 
         Returns the above fields as a tuple.
     """
-    log_line_pieces = log_line.split('\t', 9)
+    log_line_pieces = raw_log_line.split('\t', 9)
     assert len(log_line_pieces) == 10, log_line_pieces
     papertrail_id = log_line_pieces[0]
     log_datetime = log_line_pieces[1]
@@ -93,13 +118,11 @@ def __parse_log_line(log_line):
     program_name = log_line_pieces[8]
     parsed_log_message = log_line_pieces[9]
 
-    return LogLine(
+    return (
         parsed_log_message,
-        log_line,
+        raw_log_line,
         log_datetime,
         papertrail_id,
-        None,
-        None,
         instance_id,
         program_name,
     )
@@ -118,9 +141,7 @@ def __get_previous_log_lines(circular_buffer, origin_line):
     """
     line_number = 1
     for raw_line in list(circular_buffer)[::-1]:
-        log_line = __parse_log_line(raw_line)
-        log_line.origin_papertrail_id = origin_line.papertrail_id
-        log_line.line_number = line_number
+        log_line = __generate_LogLine(raw_line, origin_line.papertrail_id, line_number)
         if ((log_line.instance_id == origin_line.instance_id) and
             (log_line.program_name == origin_line.program_name)):
             # This line matches our origin line!
@@ -148,8 +169,7 @@ def parse(file_object):
         # see if this line has an important error
         if 'AssertionError' in line:
             # we found a match! add it to the list
-            origin_line = __parse_log_line(line)
-            origin_line.line_number = 0
+            origin_line = __generate_LogLine(line, None, 0)
             log_lines.append(origin_line)
 
             # search backwards to grab the previous 10 traceback lines
