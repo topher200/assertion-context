@@ -10,13 +10,9 @@
     - Search backwards in the logs for the previous lines from that instance ID
     - Generate a list of all the lines found in this manner
 """
-
-import argparse
 import collections
-import datetime
 import itertools
 import gzip
-import time
 
 
 LogLine = collections.namedtuple(
@@ -189,24 +185,11 @@ def parse_gzipped_file(zipped_filename):
     """
         Opens the gzipped file given by L{zipped_filename} and calls L{parse} on it
 
-        Raises an assert if the filename doesn't match that of a gzipped file.
+        Doesn't perform any checks to confirm that it is a gzip'd file.
+
+        Returns a list of L{LogLine}s
     """
-    assert zipped_filename.endswith('.gz')
     with gzip.open(zipped_filename, 'r') as f:
-        parse(f)
+        return parse(f)
 
 
-def main():
-    start_time = time.time()
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filename', help='filename to parse')
-    args = parser.parse_args()
-    filename = args.filename
-
-    print "running with %s" % filename
-    parse_gzipped_file(filename)
-    print 'program executed in %s' % datetime.timedelta(seconds=time.time() - start_time)
-
-if __name__ == "__main__":
-    main()
