@@ -1,5 +1,7 @@
 import flask
 
+import main
+
 
 app = flask.Flask(__name__)
 
@@ -10,6 +12,7 @@ def parse_s3():
     app.logger.debug('req: %s', json_request)
     if not all(json_request.has_key(k) for k in ('bucket', 'key')):
         return 'missing params', 400
+    main.parse_s3_file(json_request['bucket'], json_request['key'])
     return 'success'
 
 
