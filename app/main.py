@@ -15,6 +15,15 @@ import boto3
 import file_parser
 
 
+def parse_s3_file(bucket, key):
+    s3 = boto3.client('s3')
+    with tempfile.NamedTemporaryFile('wb', delete=False) as local_file:
+        s3.download_fileobj(bucket, key, local_file)
+
+    print "running with temp file %s" % local_file.name
+    return file_parser.parse_gzipped_file(local_file.name)
+
+
 def main():
     start_time = time.time()
 
@@ -36,12 +45,7 @@ def main():
         file_parser.parse_gzipped_file(filename)
     else:
         print "running from s3: %s:%s" % (s3_bucket, s3_key)
-        s3 = boto3.client('s3')
-        with tempfile.NamedTemporaryFile('wb', delete=False) as local_file:
-            s3.download_fileobj(s3_bucket, s3_key, local_file)
-
-        print "running with %s" % local_file.name
-        print file_parser.parse_gzipped_file(local_file.name)
+        print parse_s3_file(s3_bucket, s3_key)[0]
 
     print 'program executed in %s' % datetime.timedelta(seconds=time.time() - start_time)
 
