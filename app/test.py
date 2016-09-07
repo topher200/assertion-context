@@ -1,9 +1,11 @@
+import os
 import unittest
 
 import file_parser
 
 
-TEST_FILENAME = 'test_data.tsv'
+ROOT = os.path.dirname(__file__)
+TEST_FILENAME = os.path.join(ROOT, 'test_data.tsv')
 
 
 class TestParse(unittest.TestCase):
