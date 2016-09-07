@@ -1,6 +1,6 @@
 import unittest
 
-import main
+import file_parser
 
 
 TEST_FILENAME = 'test_data.tsv'
@@ -15,10 +15,10 @@ class TestParse(unittest.TestCase):
         """
             Check that when we parse the test data we get a list of L{LogLine}s back
         """
-        log_lines = main.parse(self.test_data)
+        log_lines = file_parser.parse(self.test_data)
 
         self.assertGreater(len(log_lines), 0)
-        all([self.assertIsInstance(v, main.LogLine) for v in log_lines])
+        all([self.assertIsInstance(v, file_parser.LogLine) for v in log_lines])
 
 
 if __name__ == "__main__":
