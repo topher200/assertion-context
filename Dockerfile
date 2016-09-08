@@ -1,8 +1,9 @@
 # initial setup
 FROM ubuntu:16.04
 MAINTAINER Topher <topher200@gmail.com>
-WORKDIR /root
+WORKDIR /code
 RUN echo 'set -o vi' >> .bashrc
+ENV PYTHONUNBUFFERED=1
 
 # install dependencies
 RUN apt-get update && apt-get install -y \
@@ -12,8 +13,8 @@ ADD requirements.txt ./
 RUN pip install -r requirements.txt
 
 # setup app environment
-ADD .aws_credentials .aws/credentials
-ADD .aws_config .aws/config
+ADD .aws_credentials /root/.aws/credentials
+ADD .aws_config /root/.aws/config
 ADD app app
 
 CMD ["python", "app/server.py"]
