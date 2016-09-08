@@ -16,7 +16,4 @@ ADD .aws_credentials .aws/credentials
 ADD .aws_config .aws/config
 ADD app app
 
-# run our New Relic agent
 CMD ["python", "app/server.py"]
-# "--s3-bucket", "papertrail.wordstream.com", \
-# "--s3-key", "lambda-test/folder-1/test_data.tsv.gz" \

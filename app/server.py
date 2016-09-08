@@ -1,9 +1,15 @@
 import flask
+from flask_elasticsearch import FlaskElasticsearch
 
 import main
 
 
+# start app
 app = flask.Flask(__name__)
+app.config.from_object('config')
+
+# database
+es = FlaskElasticsearch(app)
 
 
 @app.route("/api/parse_s3", methods=['POST'])

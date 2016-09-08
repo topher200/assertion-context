@@ -3,8 +3,6 @@ Parse a given file. Takes a filename or s3 bucket/key combo.
 
 One of --filename or a --s3-bucket/--s3-key pair is required.
 """
-
-
 import argparse
 import datetime
 import tempfile
