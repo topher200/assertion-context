@@ -6,7 +6,8 @@ RUN echo 'set -o vi' >> .bashrc
 
 # install dependencies
 RUN apt-get update && apt-get install -y \
-    python-pip
+    python-pip \
+    python-psycopg2
 RUN pip install --upgrade pip
 ADD requirements.txt ./
 RUN pip install -r requirements.txt
