@@ -1,13 +1,6 @@
 version: '2'
 services:
-  db:
-    image: elasticsearch
   web:
     build: .
     ports:
-      - "5000:5000"
-    volumes:
-      - .:/root
-    depends_on:
-      - db
-
+      - "80:5000"
