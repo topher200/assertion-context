@@ -1,11 +1,9 @@
 import flask
-from flash.ext.sqlalchemy import SQLAlchemy
 
 import main
 
 
 app = flask.Flask(__name__)
-db = SQLAlchemy(app)
 
 
 @app.route("/api/parse_s3", methods=['POST'])
