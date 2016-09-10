@@ -2,6 +2,7 @@ import os
 import unittest
 
 from app import file_parser
+from app import logline
 
 
 ROOT = os.path.dirname(__file__)
@@ -20,7 +21,7 @@ class TestParse(unittest.TestCase):
         log_lines = list(file_parser.parse(self.test_data))
 
         self.assertGreater(len(log_lines), 0)
-        all([self.assertIsInstance(v, file_parser.LogLine) for v in log_lines])
+        all([self.assertIsInstance(v, logline.LogLine) for v in log_lines])
 
 
 if __name__ == "__main__":
