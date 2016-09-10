@@ -6,10 +6,12 @@ from flask_elasticsearch import FlaskElasticsearch
 
 from . import s3
 
+# configuration
+DEBUG = True
+ELASTICSEARCH_HOST = "localhost:9200"
 
 # start app
 flask_app = flask.Flask(__name__)
-flask_app.config.from_object('config')
 
 # database
 es = FlaskElasticsearch(flask_app)
