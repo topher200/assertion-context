@@ -1,3 +1,4 @@
+import datetime
 import os
 import unittest
 
@@ -22,6 +23,7 @@ class TestParse(unittest.TestCase):
 
         self.assertGreater(len(log_lines), 0)
         all([self.assertIsInstance(v, logline.LogLine) for v in log_lines])
+        all([self.assertIsInstance(v.datetime, datetime.datetime) for v in log_lines])
 
 
 if __name__ == "__main__":

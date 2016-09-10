@@ -16,8 +16,8 @@ class LogLine(object):
 
         - parsed_log_message: string containing the parsed log message without any metadata
         - raw_log_message: string containing the original message as found in papertrail
-        - datetime: string of the datetime reported by the message. utc. example:
-            2016-08-12T03:18:39
+        - datetime: datetime object (parsed from string) of the datetime the message was record. in
+            utc. example: 2016-08-12T03:18:39
         - papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
             700594297938165774
         - origin_papertrail_id: int id of the origin line assossicated with this L{LogLine}
