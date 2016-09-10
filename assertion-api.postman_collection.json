@@ -1,0 +1,31 @@
+{
+	"variables": [],
+	"info": {
+		"name": "assertion-api",
+		"_postman_id": "08edc0a3-db52-f90f-5fee-a5e0e07b8afe",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "good request",
+			"request": {
+				"url": "http://127.0.0.1:80/api/parse_s3",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"bucket\": \"papertrail.wordstream.com\",\n\"key\": \"lambda-test/folder-1/test_data.tsv.gz\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
