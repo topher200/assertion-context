@@ -4,7 +4,7 @@
 import flask
 from flask_elasticsearch import FlaskElasticsearch
 
-import s3
+from . import s3
 
 
 # start app
