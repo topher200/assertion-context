@@ -16,5 +16,6 @@ RUN pip install -r requirements.txt
 ADD .aws_credentials /root/.aws/credentials
 ADD .aws_config /root/.aws/config
 ADD app app
+ADD server.py server.py
 
-CMD ["python", "-m", "app.server"]
+CMD ["python", "server.py"]

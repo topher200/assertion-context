@@ -4,8 +4,8 @@
 import flask
 from flask_elasticsearch import FlaskElasticsearch
 
-from . import s3
-from .logline import LogLine
+from app import s3
+from app.logline import LogLine
 
 # configuration
 DEBUG = True
