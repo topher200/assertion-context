@@ -17,6 +17,14 @@ flask_app = flask.Flask(__name__)
 es = FlaskElasticsearch(flask_app)
 
 
+def save_log_line(log_line):
+    """
+    Takes a L{LogLine} and saves it to the database
+    """
+    assert isinstance(log_line, LogLine), (type(log_line), log_line)
+    print(es.ping())
+
+
 @flask_app.route("/api/parse_s3", methods=['POST'])
 def parse_s3():
     json_request = flask.request.get_json()
