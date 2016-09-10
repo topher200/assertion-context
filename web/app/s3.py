@@ -15,8 +15,7 @@ def parse_s3_file(bucket, key):
         Returns a list of L{file_parser.LogLine}s
     """
     s3 = boto3.client('s3')
-    with tempfile.NamedTemporaryFile('wb') as local_file:
+    with tempfile.NamedTemporaryFile('wb', delete=False) as local_file:
         s3.download_fileobj(bucket, key, local_file)
-        # NOTE: this may cause issues due to processing this file while it's still open. We may
-        # need to close the file then process.
-        return file_parser.parse_gzipped_file(local_file.name)
+    # TODO: delete the temp file
+    return file_parser.parse_gzipped_file(local_file.name)
