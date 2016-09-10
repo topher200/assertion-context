@@ -8,8 +8,9 @@ services:
     build: web/
     ports:
       - "80:5000"
-    depends_on:
+    links:
       - elasticsearch
+    depends_on:
       - logspout
 
   elasticsearch:
