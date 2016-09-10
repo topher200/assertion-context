@@ -46,6 +46,23 @@ class LogLine(object):
         self._instance_id = instance_id
         self._program_name = program_name
 
+    def document(self):
+        """
+            Returns the document form of this logline for ElasticSearch.
+
+            Document form is a dictionary of <field name>: <value> pairs.
+        """
+        return {
+            "parsed_log_message": self._parsed_log_message,
+            "raw_log_message": self._raw_log_message,
+            "datetime": self._datetime,
+            "papertrail_id": self._papertrail_id,
+            "origin_papertrail_id": self._origin_papertrail_id,
+            "line_number": self._line_number,
+            "instance_id": self._instance_id,
+            "program_name": self._program_name,
+        }
+
     @property
     def parsed_log_message(self):
         return self._parsed_log_message
