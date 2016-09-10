@@ -17,4 +17,4 @@ ADD .aws_credentials /root/.aws/credentials
 ADD .aws_config /root/.aws/config
 ADD app app
 
-CMD ["python", "app/server.py"]
+CMD ["python", "-m", "app.server"]

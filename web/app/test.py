@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from . import file_parser
-from . import logline
+import file_parser
+import logline
 
 
 ROOT = os.path.dirname(__file__)

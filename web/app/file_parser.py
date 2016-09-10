@@ -5,7 +5,7 @@ import collections
 import itertools
 import gzip
 
-from app.logline import LogLine
+from logline import LogLine
 
 
 def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
