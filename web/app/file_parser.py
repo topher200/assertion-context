@@ -143,7 +143,7 @@ def parse_gzipped_file(zipped_filename):
 
         Doesn't perform any checks to confirm that it is a gzip'd file.
 
-        Returns a generator of L{LogLine}s
+        Returns a list of L{LogLine}s
     """
     with gzip.open(zipped_filename, 'r') as f:
-        return parse(f)
+        return list(parse(f))
