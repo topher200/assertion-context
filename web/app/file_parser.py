@@ -2,6 +2,7 @@
     Generate L{logline.LogLine}s from gzipped Papertrail log files
 """
 import collections
+import datetime
 import itertools
 import gzip
 
@@ -58,6 +59,9 @@ def __parse_papertrail_log_line(raw_log_line):
             - the running program name, the 9th column
             - the actual log message, which is everything after the 9th column
 
+        In addition to parsing out the text for every field, we convert the datatime field to a
+        L{datetime}. Times in the logs are UTC (thanks Papertrail!)
+
         Returns the above fields as a tuple.
     """
     log_line_pieces = raw_log_line.split('\t', 9)
@@ -68,9 +72,11 @@ def __parse_papertrail_log_line(raw_log_line):
     program_name = log_line_pieces[8]
     parsed_log_message = log_line_pieces[9]
 
+    datetime_utc = datetime.datetime.strptime(log_datetime, '%Y-%m-%dT%H:%M:%S')
+
     return (
         papertrail_id,
-        log_datetime,
+        datetime_utc,
         instance_id,
         program_name,
         parsed_log_message,
