@@ -1,7 +1,7 @@
 import os
 import unittest
 
-import file_parser
+from app import file_parser
 
 
 ROOT = os.path.dirname(__file__)
