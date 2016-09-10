@@ -5,7 +5,7 @@ import tempfile
 
 import boto3
 
-from app import file_parser
+from . import file_parser
 
 
 def parse_s3_file(bucket, key):
