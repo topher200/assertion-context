@@ -5,3 +5,6 @@ host to get started. Installation instructions for setting up host:
  - mkvirtualenv python3 <virtualenv name>
  - pip install -r requirements.txt
  - Docker (docker-compose)
+
+Then to start it all up:
+ - ./server-start.sh
