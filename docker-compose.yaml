@@ -36,6 +36,6 @@ services:
   logspout:
     build: logspout/
     environment:
-      ROUTE_URIS: syslog+tls://logs4.papertrailapp.com:35625
+      ROUTE_URIS: syslog://logs4.papertrailapp.com:35625
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
