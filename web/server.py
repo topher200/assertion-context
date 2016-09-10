@@ -7,14 +7,15 @@ from flask_elasticsearch import FlaskElasticsearch
 from app import s3
 from app.logline import LogLine
 
-# configuration
-DEBUG = True
-ELASTICSEARCH_HOST = "localhost:9200"
 
 # start app
 flask_app = flask.Flask(__name__)
 
-# database
+# configuration
+flask_app.config['DEBUG'] = True
+flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
+
+# set up database
 es = FlaskElasticsearch(flask_app)
 
 
