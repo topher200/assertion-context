@@ -5,6 +5,7 @@ import flask
 from flask_elasticsearch import FlaskElasticsearch
 
 from . import s3
+from .logline import LogLine
 
 # configuration
 DEBUG = True
@@ -31,7 +32,8 @@ def parse_s3():
     flask_app.logger.debug('req: %s', json_request)
     if not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
-    s3.parse_s3_file(json_request['bucket'], json_request['key'])
+    for line in s3.parse_s3_file(json_request['bucket'], json_request['key']):
+        save_log_line(line)
     return 'success'
 
 
