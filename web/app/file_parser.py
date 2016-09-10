@@ -134,6 +134,9 @@ def __get_previous_log_lines(circular_buffer, origin_line):
 
         yields L{LogLine}s. All L{LogLine}s yielded will have the L{origin_papertrail_id} of
         L{origin_line} and a L{line_number} > 0.
+
+        This function has the possibility to return an infinite number of values; it's the caller's
+        responsibility to cut off the hose at some point.
     """
     line_number = 1
     for raw_line in list(circular_buffer)[::-1]:
@@ -147,7 +150,7 @@ def __get_previous_log_lines(circular_buffer, origin_line):
 
 def parse(file_object):
     """
-        Returns a list of all the relevant L{LogLine} found in L{file_object}
+        Yields a generator of all the relevant L{LogLine} found in L{file_object}
 
         A relevant log line is one that either has an AssertionError on it or is related to one.
 
@@ -158,27 +161,27 @@ def parse(file_object):
     # AssertionError, we search backwards in the log lines to find the lines previous from that
     # machine
     circular_buffer = collections.deque(maxlen=10000)
-    log_lines = []
     for line in file_object:
         assert len(line) > 1, line  # make sure we're getting real lines
 
         # see if this line has an important error
         if 'AssertionError' in line:
-            # we found a match! add it to the list
+            # we found a match! return it
             origin_line = __generate_LogLine(line, None, 0)
-            log_lines.append(origin_line)
+            yield origin_line
 
             # search backwards to grab the previous 10 traceback lines
-            log_lines.extend(
+            previous_10_lines = (
                 itertools.islice(
                     __get_previous_log_lines(circular_buffer, origin_line),
                     10
                 )
             )
+            for line in previous_10_lines:
+                yield line
 
         # now that we're done processing this line, add it to the buffer
         circular_buffer.append(line)
-    return log_lines
 
 
 def parse_gzipped_file(zipped_filename):
@@ -187,9 +190,7 @@ def parse_gzipped_file(zipped_filename):
 
         Doesn't perform any checks to confirm that it is a gzip'd file.
 
-        Returns a list of L{LogLine}s
+        Returns a generator of L{LogLine}s
     """
     with gzip.open(zipped_filename, 'r') as f:
         return parse(f)
-
-

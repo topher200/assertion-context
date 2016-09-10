@@ -15,9 +15,9 @@ class TestParse(unittest.TestCase):
 
     def test_parse(self):
         """
-            Check that when we parse the test data we get a list of L{LogLine}s back
+            Check that when we parse the test data we get a generator of L{LogLine}s back
         """
-        log_lines = file_parser.parse(self.test_data)
+        log_lines = list(file_parser.parse(self.test_data))
 
         self.assertGreater(len(log_lines), 0)
         all([self.assertIsInstance(v, file_parser.LogLine) for v in log_lines])
