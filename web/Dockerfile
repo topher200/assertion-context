@@ -2,7 +2,7 @@
 FROM ubuntu:16.04
 MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
-RUN echo 'set -o vi' >> .bashrc
+RUN echo 'set -o vi' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1
 
 # install dependencies
