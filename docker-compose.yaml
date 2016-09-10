@@ -23,15 +23,15 @@ services:
     depends_on:
       - logspout
 
-  kibana:
-    build: elk/kibana/
-    volumes:
-      - ./elk/kibana/config/:/opt/kibana/config/
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-      - logspout
+  # kibana:
+  #   build: elk/kibana/
+  #   volumes:
+  #     - ./elk/kibana/config/:/opt/kibana/config/
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - elasticsearch
+  #     - logspout
 
   logspout:
     build: logspout/
