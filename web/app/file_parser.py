@@ -18,7 +18,7 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
     """
     (
         papertrail_id,
-        log_datetime,
+        timestamp,
         instance_id,
         program_name,
         parsed_log_message,
@@ -27,7 +27,7 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
     return LogLine(
         parsed_log_message,
         raw_log_line,
-        log_datetime,
+        timestamp,
         papertrail_id,
         origin_papertrail_id if origin_papertrail_id is not None else papertrail_id,
         line_number,
@@ -54,12 +54,12 @@ def __parse_papertrail_log_line(raw_log_line):
 
         We parse out the following parts:
             - the papertrail log line id, the 1st column
-            - the log datetime, the 2st column
+            - the log timestamp, the 2st column
             - the instance id, the 5th column
             - the running program name, the 9th column
             - the actual log message, which is everything after the 9th column
 
-        In addition to parsing out the text for every field, we convert the datatime field to a
+        In addition to parsing out the text for every field, we convert the timestamp field to a
         L{datetime}. Times in the logs are UTC (thanks Papertrail!)
 
         Returns the above fields as a tuple.
@@ -67,16 +67,16 @@ def __parse_papertrail_log_line(raw_log_line):
     log_line_pieces = raw_log_line.split('\t', 9)
     assert len(log_line_pieces) == 10, log_line_pieces
     papertrail_id = log_line_pieces[0]
-    log_datetime = log_line_pieces[1]
+    timestamp_string = log_line_pieces[1]
     instance_id = log_line_pieces[4]
     program_name = log_line_pieces[8]
     parsed_log_message = log_line_pieces[9]
 
-    datetime_utc = datetime.datetime.strptime(log_datetime, '%Y-%m-%dT%H:%M:%S')
+    timestamp = datetime.datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S')
 
     return (
         papertrail_id,
-        datetime_utc,
+        timestamp,
         instance_id,
         program_name,
         parsed_log_message,
