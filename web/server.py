@@ -24,7 +24,12 @@ def save_log_line(log_line):
     Takes a L{LogLine} and saves it to the database
     """
     assert isinstance(log_line, LogLine), (type(log_line), log_line)
-    print(es.ping())
+    doc = log_line.document()
+    es.index(
+        index='logline-index',
+        doc_type='logline',
+        body=doc
+    )
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
