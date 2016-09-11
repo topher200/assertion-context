@@ -3,6 +3,7 @@
 """
 import flask
 from flask_elasticsearch import FlaskElasticsearch
+from gevent.wsgi import WSGIServer
 
 from app import s3
 from app.logline import LogLine
@@ -12,7 +13,7 @@ from app.logline import LogLine
 flask_app = flask.Flask(__name__)
 
 # configuration
-flask_app.config['DEBUG'] = True
+flask_app.config['DEBUG'] = False
 flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
@@ -53,4 +54,5 @@ def parse_s3():
 
 
 if __name__ == "__main__":
-    flask_app.run(host='0.0.0.0')
+    http_server = WSGIServer(('', 5000), flask_app)
+    http_server.serve_forever()
