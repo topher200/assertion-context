@@ -19,7 +19,7 @@ def build_keys():
     """
     for date_ in DATES_TO_PROCESS:
         for time_ in range(0, 24):
-            yield '%s/dt=%s-%s.tsv.gz' % (date_, date_, time_)
+            yield 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, time_)
 
 
 def main():
