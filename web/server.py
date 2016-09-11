@@ -1,5 +1,7 @@
 """
-    Run our API
+    Run our API.
+
+    Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
 import flask
 from flask_elasticsearch import FlaskElasticsearch
@@ -22,7 +24,7 @@ es = FlaskElasticsearch(flask_app)
 
 def save_log_line(log_line):
     """
-    Takes a L{LogLine} and saves it to the database
+        Takes a L{LogLine} and saves it to the database
     """
     assert isinstance(log_line, LogLine), (type(log_line), log_line)
     doc = log_line.document()
@@ -35,6 +37,18 @@ def save_log_line(log_line):
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
 def parse_s3():
+    """
+        POST request to parse the data from a Papertrail log hosted on s3.
+
+        Takes a JSON containing these fields:
+        - bucket: the name of the s3 bucket containing the file. string
+        - key: the filename of the file we should parse. must be in `bucket`. string
+
+        All fields are required.
+
+        Returns a 400 error on bad input. Returns a 502 if we get an error accessing s3. Returns a
+        200 on success.
+    """
     # parse our input
     json_request = flask.request.get_json()
     flask_app.logger.debug('req: %s', json_request)
