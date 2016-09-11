@@ -3,6 +3,8 @@
 
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
+import datetime
+
 from .logline import LogLine
 
 INDEX = 'logline-index'
@@ -31,6 +33,7 @@ def num_asserts_per_day(es, date_):
 
         Takes date_, a datetime.date
     """
+    assert isinstance(date_, datetime.date), (type(date_), date_)
     query = {
         "query": {
             "range": {
