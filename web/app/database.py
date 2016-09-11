@@ -65,9 +65,9 @@ def num_asserts_per_day(es, date_):
             }
         }
     }
-    res = es.search(
+    res = es.count(
         index=INDEX,
         doc_type=DOC_TYPE,
         body=query
     )
-    return res['hits']['total']
+    return res['count']
