@@ -18,6 +18,7 @@ def save_log_line(es, log_line):
     es.index(
         index=INDEX,
         doc_type=DOC_TYPE,
+        id=log_line.papertrail_id,
         body=doc
     )
 
