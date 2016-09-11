@@ -2,8 +2,14 @@ import datetime
 import os
 import unittest
 
-from . import file_parser
-from . import logline
+# We hack the sys path so our tester can see the app directory
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#pylint: disable=wrong-import-position
+import sys
+sys.path.append(ROOT)
+
+from app import file_parser
+from app import logline
 
 
 ROOT = os.path.dirname(__file__)
@@ -24,7 +30,3 @@ class TestParse(unittest.TestCase):
         self.assertGreater(len(log_lines), 0)
         all([self.assertIsInstance(v, logline.LogLine) for v in log_lines])
         all([self.assertIsInstance(v.timestamp, datetime.datetime) for v in log_lines])
-
-
-if __name__ == "__main__":
-    unittest.main()
