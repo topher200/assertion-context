@@ -27,10 +27,17 @@ def num_asserts_per_day(es, date_):
 
         Does this by counting the number of log lines on that day. Only counts lines that are the
         "origin" line.
+
+        Takes date_, a datetime.date
     """
     query = {
         "query": {
-            "match_all": {}
+            "range": {
+                "timestamp": {
+                    "gte": "%s||/d" % date_,
+                    "lt": "%s||+1d/d" % date_,
+                }
+            }
         }
     }
     res = es.search(
@@ -41,3 +48,4 @@ def num_asserts_per_day(es, date_):
 
     print('got %d hits' % res['hits']['total'])
     print(res)
+    return res['hits']['total']
