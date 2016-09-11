@@ -7,7 +7,7 @@ import flask
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
 
-from app import elasticsearch
+from app import database
 from app import s3
 
 
@@ -49,7 +49,7 @@ def parse_s3():
 
     # save the parser output to the database
     for line in log_line_generator:
-        elasticsearch.save_log_line(es, line)
+        database.save_log_line(es, line)
 
     return 'success'
 
