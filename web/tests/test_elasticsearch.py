@@ -28,6 +28,13 @@ class TestElasticSearch(unittest.TestCase):
             'manager.debug',
         )
 
+    def tearDown(self):
+        self.es.delete(
+            index=database.INDEX,
+            doc_type=database.DOC_TYPE,
+            id=self.log_line.papertrail_id,
+        )
+
     def test_save_log_line(self):
         """
             Check that when we save a log line to the DB we get no errors
