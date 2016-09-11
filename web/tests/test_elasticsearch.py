@@ -3,6 +3,7 @@ import os
 import unittest
 
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 
 # We hack the sys path so our tester can see the app directory
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,16 +40,22 @@ class TestElasticSearch(unittest.TestCase):
         )
 
     def tearDown(self):
-        self.es.delete(
-            index=database.INDEX,
-            doc_type=database.DOC_TYPE,
-            id=self.log_line0.papertrail_id,
-        )
-        self.es.delete(
-            index=database.INDEX,
-            doc_type=database.DOC_TYPE,
-            id=self.log_line2.papertrail_id,
-        )
+        try:
+            self.es.delete(
+                index=database.INDEX,
+                doc_type=database.DOC_TYPE,
+                id=self.log_line0.papertrail_id,
+            )
+        except NotFoundError:
+            pass
+        try:
+            self.es.delete(
+                index=database.INDEX,
+                doc_type=database.DOC_TYPE,
+                id=self.log_line2.papertrail_id,
+            )
+        except NotFoundError:
+            pass
 
     def test_save_log_line(self):
         self.assertTrue(database.save_log_line(self.es, self.log_line0))
