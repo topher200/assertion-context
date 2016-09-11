@@ -49,7 +49,4 @@ def num_asserts_per_day(es, date_):
         doc_type=DOC_TYPE,
         body=query
     )
-
-    print('got %d hits' % res['hits']['total'])
-    print(res)
     return res['hits']['total']

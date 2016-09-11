@@ -39,7 +39,7 @@ class TestElasticSearch(unittest.TestCase):
         """
             Check that when we search for our new log line we find it.
         """
-        self.assertGreaterEqual(
+        self.assertEqual(
             database.num_asserts_per_day(self.es, self.log_line.timestamp.date()),
             1
         )
