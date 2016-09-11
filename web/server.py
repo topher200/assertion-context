@@ -7,8 +7,8 @@ import flask
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
 
+from app import elasticsearch
 from app import s3
-from app.logline import LogLine
 
 
 # start app
@@ -20,19 +20,6 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
 es = FlaskElasticsearch(flask_app)
-
-
-def save_log_line(log_line):
-    """
-        Takes a L{LogLine} and saves it to the database
-    """
-    assert isinstance(log_line, LogLine), (type(log_line), log_line)
-    doc = log_line.document()
-    es.index(
-        index='logline-index',
-        doc_type='logline',
-        body=doc
-    )
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
@@ -62,9 +49,14 @@ def parse_s3():
 
     # save the parser output to the database
     for line in log_line_generator:
-        save_log_line(line)
+        elasticsearch.save_log_line(es, line)
 
     return 'success'
+
+
+@flask_app.route("/api/generate_chart", methods=['GET'])
+def generate_chart():
+    pass
 
 
 if __name__ == "__main__":
