@@ -63,6 +63,9 @@ class LogLine(object):
             "program_name": self._program_name,
         }
 
+    def __repr__(self):
+        return str(self.document())
+
     @property
     def parsed_log_message(self):
         return self._parsed_log_message
