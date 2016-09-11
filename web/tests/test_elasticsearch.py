@@ -23,7 +23,7 @@ class TestElasticSearch(unittest.TestCase):
             datetime.datetime(2000, 8, 12, 3, 18, 39),
             '700594297938165774',
             '700594297938165774',
-            0,
+            2,
             'i-2ee330b7',
             'manager.debug',
         )

@@ -39,18 +39,29 @@ def num_asserts_per_day(es, date_):
         Queries the database for number of asserts in a given day.
 
         Does this by counting the number of log lines on that day. Only counts lines that are the
-        "origin" line.
+        have a line_number of "2", to ensure we only get one line per real assert.
 
         Takes date_, a datetime.date
     """
     assert isinstance(date_, datetime.date), (type(date_), date_)
     query = {
         "filter": {
-            "range": {
-                "timestamp": {
-                    "gte": "%s||/d" % date_,
-                    "lt": "%s||+1d/d" % date_,
-                }
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "timestamp": {
+                                "gte": "%s||/d" % date_,
+                                "lt": "%s||+1d/d" % date_,
+                            }
+                        }
+                    },
+                    {
+                        "term": {
+                            "line_number": 2
+                        }
+                    }
+                ]
             }
         }
     }
