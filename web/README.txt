@@ -11,3 +11,4 @@ the lines on that machine previous to the offending line.
 ## Files
 - app/main.py: CLI and HTTP API entrypoints into this app
 - app/file_parser.py: the powerhouse that does our log file processing. has extensive docs!
+TODO
