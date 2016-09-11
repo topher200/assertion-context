@@ -1,4 +1,4 @@
 #!/bin/bash
 
-nosetests --py3where web/app
+nosetests --py3where web
 pylint --load-plugins pylint_flask web --reports n
