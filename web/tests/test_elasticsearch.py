@@ -39,8 +39,8 @@ class TestElasticSearch(unittest.TestCase):
         """
             Check that when we save a log line to the DB we get no errors
         """
-        # TODO No assertion to be made here?
         database.save_log_line(self.es, self.log_line)
+        # next test will confirm that we've actually saved something
 
     def test_num_asserts_per_day(self):
         """
