@@ -45,7 +45,7 @@ def num_asserts_per_day(es, date_):
     """
     assert isinstance(date_, datetime.date), (type(date_), date_)
     query = {
-        "query": {
+        "filter": {
             "range": {
                 "timestamp": {
                     "gte": "%s||/d" % date_,
