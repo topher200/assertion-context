@@ -38,7 +38,7 @@ def parse_s3():
     """
     # parse our input
     json_request = flask.request.get_json()
-    flask_app.logger.debug('req: %s', json_request)
+    flask_app.logger.info('req: %s', json_request)
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
 
@@ -49,6 +49,7 @@ def parse_s3():
 
     # save the parser output to the database
     for line in log_line_generator:
+        flask_app.logger.debug('saving log line: %s', line)
         database.save_log_line(es, line)
 
     return 'success'
