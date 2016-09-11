@@ -38,7 +38,7 @@ def parse_s3():
     # parse our input
     json_request = flask.request.get_json()
     flask_app.logger.debug('req: %s', json_request)
-    if not all(k in json_request for k in ('bucket', 'key')):
+    if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
 
     # use our powerful parser to check out the requested file
