@@ -4,6 +4,7 @@
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
 import datetime
+from typing import Sequence
 
 from .logline import LogLine
 
@@ -34,16 +35,19 @@ def refresh(es):
         index=INDEX
     )
 
-def num_asserts_per_day(es, date_):
+def get_loglines_from_date_range(
+        es,
+        start_date: datetime.date,
+        end_date: datetime.date,
+        line_numbers: Sequence[int]
+):
     """
-        Queries the database for number of asserts in a given day.
+        Queries the database for the asserts from a given date range with the given line numbers.
 
-        Does this by counting the number of log lines on that day. Only counts lines that are the
-        have a line_number of "2", to ensure we only get one line per real assert.
+        Both dates are inclusive.
 
-        Takes date_, a datetime.date
+        Only returns loglines whose line_numbers match the given list.
     """
-    assert isinstance(date_, datetime.date), (type(date_), date_)
     query = {
         "filter": {
             "bool": {
@@ -51,23 +55,23 @@ def num_asserts_per_day(es, date_):
                     {
                         "range": {
                             "timestamp": {
-                                "gte": "%s||/d" % date_,
-                                "lt": "%s||+1d/d" % date_,
+                                "gte": "%s||/d" % start_date,
+                                "lte": "%s||/d" % end_date,
                             }
                         }
                     },
                     {
-                        "term": {
-                            "line_number": 2
+                        "terms": {
+                            "line_number": line_numbers
                         }
                     }
                 ]
             }
         }
     }
-    res = es.count(
+    res = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
         body=query
     )
-    return res['count']
+    return res['hits']['hits']

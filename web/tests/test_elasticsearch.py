@@ -14,6 +14,9 @@ sys.path.append(ROOT)
 from app import database
 from app import logline
 
+# when searching, use a number larger than the number of possible loglines for a single assert
+MAX_LOG_LINES_PER_ASSERT = 10
+
 
 class TestElasticSearch(unittest.TestCase):
     def setUp(self):
@@ -22,7 +25,7 @@ class TestElasticSearch(unittest.TestCase):
             'AssertionError\n',
             '700594297938165774\t2016-08-12T03:18:39\t2016-08-12T03:18:39Z\t407484803\ti-2ee330b7\t107.21.188.48\tUser\tNotice\tmanager.debug\tAssertionError\n',  #pylint: disable=line-too-long
             datetime.datetime(2000, 8, 12, 3, 18, 39),
-            '700594297938165772',
+            '700594297938165770',
             '700594297938165770',
             0,
             'i-2ee330b7',
@@ -70,17 +73,38 @@ class TestElasticSearch(unittest.TestCase):
             )
         )
 
-    def test_num_asserts_per_day(self):
+    def test_get_loglines_from_date_range(self):
         """
-            Check that when we search for our new log line we find it.
+            Check that when we search for our new log lines we find them.
         """
-        # save the new line
+        # save the new lines
         self.assertTrue(database.save_log_line(self.es, self.log_line0))
         self.assertTrue(database.save_log_line(self.es, self.log_line2))
         database.refresh(self.es)
 
-        # test that it exists
-        self.assertEqual(
-            database.num_asserts_per_day(self.es, self.log_line2.timestamp.date()),
-            1
+        # test that we find them all. assumes that the timestamps are from the same day.
+        log_lines = database.get_loglines_from_date_range(
+            self.es,
+            self.log_line2.timestamp.date(),
+            self.log_line2.timestamp.date(),
+            list(range(-1, MAX_LOG_LINES_PER_ASSERT))
         )
+        self.assertEqual(len(log_lines), 2)
+
+    def test_get_loglines_from_date_range_for_specific_lines(self):
+        """
+            Check that when we search for our new log lines we find them.
+        """
+        # save the new lines
+        self.assertTrue(database.save_log_line(self.es, self.log_line0))
+        self.assertTrue(database.save_log_line(self.es, self.log_line2))
+        database.refresh(self.es)
+
+        # test that we find only one
+        log_lines = database.get_loglines_from_date_range(
+            self.es,
+            self.log_line2.timestamp.date(),
+            self.log_line2.timestamp.date(),
+            [self.log_line2.line_number]
+        )
+        self.assertEqual(len(log_lines), 1)
