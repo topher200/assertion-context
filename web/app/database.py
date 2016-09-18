@@ -82,7 +82,7 @@ def get_loglines(
 
 
     if len(params_list) > 0:
-        query = {
+        body = {
             "filter": {
                 "bool": {
                     "must": params_list
@@ -90,11 +90,15 @@ def get_loglines(
             }
         }
     else:
-        query = {}
+        body = {
+            "query": {
+                "match_all": {}
+            }
+        }
 
     res = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
-        body=query
+        body=body
     )
     return res['hits']['hits']
