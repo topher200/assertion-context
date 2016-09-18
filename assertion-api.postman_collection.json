@@ -8,7 +8,7 @@
 	},
 	"item": [
 		{
-			"name": "good request",
+			"name": "test s3 request",
 			"request": {
 				"url": "http://127.0.0.1:80/api/parse_s3",
 				"method": "POST",
@@ -19,6 +19,20 @@
 						"description": ""
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"bucket\": \"papertrail.wordstream.com\",\n\"key\": \"lambda-test/folder-1/test_data.tsv.gz\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get loglines",
+			"request": {
+				"url": "http://127.0.0.1:80/api/loglines",
+				"method": "GET",
+				"header": [],
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\"bucket\": \"papertrail.wordstream.com\",\n\"key\": \"lambda-test/folder-1/test_data.tsv.gz\"\n}"
