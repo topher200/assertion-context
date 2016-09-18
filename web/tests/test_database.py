@@ -74,7 +74,7 @@ class TestElasticSearch(unittest.TestCase):
             )
         )
 
-    def test_get_loglines(self):
+    def test_get_loglines_from_date_range(self):
         """
             Check that when we search for our new log lines we find them.
         """
@@ -109,3 +109,18 @@ class TestElasticSearch(unittest.TestCase):
             [self.log_line2.line_number]
         )
         self.assertEqual(len(log_lines), 1)
+
+    def test_get_loglines_no_params(self):
+        """
+            Check that when we search for all loglines, we find many
+        """
+        # save the new lines
+        self.assertTrue(database.save_log_line(self.es, self.log_line0))
+        self.assertTrue(database.save_log_line(self.es, self.log_line2))
+        database.refresh(self.es)
+
+        # test that we find only one
+        log_lines = database.get_loglines(
+            self.es,
+        )
+        self.assertGreaterEqual(len(log_lines), 2)
