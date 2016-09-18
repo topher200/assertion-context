@@ -3,10 +3,13 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import datetime
+
 import flask
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
 
+from app import analyzer
 from app import database
 from app import s3
 
@@ -57,7 +60,13 @@ def parse_s3():
 
 @flask_app.route("/api/generate_chart", methods=['GET'])
 def generate_chart():
-    pass
+    # TODO: not finished
+    for day in range(0, 7):
+        num_unique_assertions = analyzer.num_asserts_from_date(
+            loglines,
+            datetime.date.today() - datetime.timedelta(days=1)
+        )
+        print("Found %d unique assertions from %d days ago", num_unique_assertions, day)
 
 
 if __name__ == "__main__":
