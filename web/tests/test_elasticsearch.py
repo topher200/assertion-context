@@ -43,6 +43,7 @@ class TestElasticSearch(unittest.TestCase):
         )
 
     def tearDown(self):
+        # Clean up any created log lines after each test
         try:
             self.es.delete(
                 index=database.INDEX,
@@ -73,7 +74,7 @@ class TestElasticSearch(unittest.TestCase):
             )
         )
 
-    def test_get_loglines_from_date_range(self):
+    def test_get_loglines(self):
         """
             Check that when we search for our new log lines we find them.
         """
@@ -83,7 +84,7 @@ class TestElasticSearch(unittest.TestCase):
         database.refresh(self.es)
 
         # test that we find them all. assumes that the timestamps are from the same day.
-        log_lines = database.get_loglines_from_date_range(
+        log_lines = database.get_loglines(
             self.es,
             self.log_line2.timestamp.date(),
             self.log_line2.timestamp.date(),
@@ -93,7 +94,7 @@ class TestElasticSearch(unittest.TestCase):
 
     def test_get_loglines_from_date_range_for_specific_lines(self):
         """
-            Check that when we search for our new log lines we find them.
+            Check that when we search for a specific line number from a day we get it.
         """
         # save the new lines
         self.assertTrue(database.save_log_line(self.es, self.log_line0))
@@ -101,7 +102,7 @@ class TestElasticSearch(unittest.TestCase):
         database.refresh(self.es)
 
         # test that we find only one
-        log_lines = database.get_loglines_from_date_range(
+        log_lines = database.get_loglines(
             self.es,
             self.log_line2.timestamp.date(),
             self.log_line2.timestamp.date(),

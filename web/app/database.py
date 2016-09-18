@@ -35,7 +35,7 @@ def refresh(es):
         index=INDEX
     )
 
-def get_loglines_from_date_range(
+def get_loglines(
         es,
         start_date: datetime.date,
         end_date: datetime.date,
