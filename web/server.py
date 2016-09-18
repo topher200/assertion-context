@@ -6,6 +6,7 @@
 import flask
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
+from werkzeug.debug import DebuggedApplication
 
 from app import database
 from app import s3
@@ -61,5 +62,5 @@ def generate_chart():
 
 
 if __name__ == "__main__":
-    http_server = WSGIServer(('', 5000), flask_app)
+    http_server = WSGIServer(('', 5000), DebuggedApplication(flask_app))
     http_server.serve_forever()
