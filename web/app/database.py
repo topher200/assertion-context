@@ -37,38 +37,61 @@ def refresh(es):
 
 def get_loglines(
         es,
-        start_date: datetime.date,
-        end_date: datetime.date,
-        line_numbers: Sequence[int]
+        start_date: datetime.date=None,
+        end_date: datetime.date=None,
+        line_numbers: Sequence[int]=None,
 ):
     """
         Queries the database for the asserts from a given date range with the given line numbers.
 
         Both dates are inclusive.
 
+        All filtering params are optional. Any params that are None are ignored.
+
         Only returns loglines whose line_numbers match the given list.
     """
-    query = {
-        "filter": {
-            "bool": {
-                "must": [
-                    {
-                        "range": {
-                            "timestamp": {
-                                "gte": "%s||/d" % start_date,
-                                "lte": "%s||/d" % end_date,
-                            }
-                        }
-                    },
-                    {
-                        "terms": {
-                            "line_number": line_numbers
-                        }
+    params_list = []
+    if start_date is not None:
+        params_list.append(
+            {
+                "range": {
+                    "timestamp": {
+                        "gte": "%s||/d" % start_date,
                     }
-                ]
+                }
+            }
+        )
+    if end_date is not None:
+        params_list.append(
+            {
+                "range": {
+                    "timestamp": {
+                        "lte": "%s||/d" % end_date,
+                    }
+                }
+            }
+        )
+    if line_numbers is not None:
+        params_list.append(
+            {
+                "terms": {
+                    "line_number": line_numbers
+                }
+            }
+        )
+
+
+    if len(params_list) > 0:
+        query = {
+            "filter": {
+                "bool": {
+                    "must": params_list
+                }
             }
         }
-    }
+    else:
+        query = {}
+
     res = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
