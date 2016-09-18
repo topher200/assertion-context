@@ -16,7 +16,6 @@ from app import s3
 flask_app = flask.Flask(__name__)
 
 # configuration
-flask_app.config['DEBUG'] = False
 flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
