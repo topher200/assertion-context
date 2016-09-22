@@ -3,9 +3,6 @@
 
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
-import datetime
-from typing import Sequence
-
 from .logline import LogLine
 
 INDEX = 'logline-index'
@@ -35,18 +32,18 @@ def refresh(es):
         index=INDEX
     )
 
-def get_loglines(
-        es,
-        start_date: datetime.date=None,
-        end_date: datetime.date=None,
-        line_numbers: Sequence[int]=None,
-):
+def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
     """
         Queries the database for the asserts from a given date range with the given line numbers.
 
         Both dates are inclusive.
 
         All filtering params are optional. Any params that are None are ignored.
+
+        Params:
+        - start_date: must be a datetime.date
+        - end_date: must be a datetime.date
+        - line_numbers: must be a list of ints
 
         Only returns loglines whose line_numbers match the given list.
     """
