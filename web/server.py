@@ -3,6 +3,8 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import logging
+
 import flask
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
@@ -38,7 +40,7 @@ def parse_s3():
     """
     # parse our input
     json_request = flask.request.get_json()
-    flask_app.logger.info('req: %s', json_request)
+    flask_app.logger.info('parse s3 request: %s', json_request)
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
 
@@ -62,11 +64,16 @@ def generate_chart():
 
 @flask_app.route("/api/loglines", methods=['GET'])
 def get_loglines():
-    lines = database.get_loglines(es)
-    flask_app.logger.info(len(lines))
-    for line in lines:
-        flask_app.logger.info(line)
+    _ = database.get_loglines(es)
     return 'success'
+
+
+@flask_app.before_first_request
+def setup_logging():
+    if not flask_app.debug:
+        # In production mode, add log handler to sys.stderr.
+        flask_app.logger.addHandler(logging.StreamHandler())
+        flask_app.logger.setLevel(logging.INFO)
 
 
 if __name__ == "__main__":
