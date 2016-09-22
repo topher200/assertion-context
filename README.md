@@ -14,7 +14,8 @@ export PROJECT_HOME=$HOME/Devel
 source /usr/local/bin/virtualenvwrapper.sh
 ```
     - source .bashrc
- - mkvirtualenv python3 <virtualenv name>
+ - (if not installed) yum install -y python34-virtualenv
+ - mkvirtualenv -p python3 <virtualenv name>
  - pip install -r requirements.txt
  - fill out web/.aws_credentials. requires these fields:
 ```
@@ -25,6 +26,12 @@ aws_secret_access_key = ###
   - (optional) fill out web/.aws_config as well. defaults to us-east-1
 
 Then to start it all up:
- - ./server-start.sh
+  - ./server-start.sh
+
+Once servers are started, tests can be run with
+  - ./run-tests.sh
+    - Note that this requires python3
+
+---
 
 elk/ is adapted from https://github.com/deviantony/docker-elk
