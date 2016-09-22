@@ -8,12 +8,20 @@ host to get started. Installation instructions for setting up host:
  - pip install virtualenvwrapper
  - set up virtualenvwrapper
    - add this to your .bashrc:
+```
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/Devel
 source /usr/local/bin/virtualenvwrapper.sh
+```
     - source .bashrc
  - mkvirtualenv python3 <virtualenv name>
  - pip install -r requirements.txt
+ - fill out web/.aws_credentials. requires these fields:
+```
+[default]
+aws_access_key_id = ###
+aws_secret_access_key = ###
+```
 
 Then to start it all up:
  - ./server-start.sh
