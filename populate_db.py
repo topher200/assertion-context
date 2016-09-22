@@ -32,7 +32,7 @@ def main():
         if res.status_code == 200:
             print('Successfully parsed "%s"' % key)
         else:
-            print('Parse request! received %s. data: "%s"' % (res.status_code, payload))
+            print('Parse request received %s. data: "%s"' % (res.status_code, payload))
             time.sleep(1)  # rate limiting ourselves
 
 
