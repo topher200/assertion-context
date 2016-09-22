@@ -60,6 +60,11 @@ def generate_chart():
     pass
 
 
+@flask_app.route("/api/loglines", methods=['GET'])
+def get_loglines():
+    return database.get_loglines(es)
+
+
 if __name__ == "__main__":
     http_server = WSGIServer(('', 5000), DebuggedApplication(flask_app))
     http_server.serve_forever()
