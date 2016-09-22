@@ -22,6 +22,7 @@ source /usr/local/bin/virtualenvwrapper.sh
 aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
+  - (optional) fill out web/.aws_config as well. defaults to us-east-1
 
 Then to start it all up:
  - ./server-start.sh
