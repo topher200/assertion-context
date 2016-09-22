@@ -7,8 +7,8 @@ import requests
 API_REQUEST_URL = 'http://127.0.0.1:80/api/parse_s3'
 S3_BUCKET = "papertrail.wordstream.com"
 S3_KEY_PREFIX = 'papertrail/logs'
-DATES_TO_PROCESS = (
-    '2016-09-10',
+MONTHS_TO_PROCESS = (
+    '2016-09-%02d',
 )
 
 def build_keys():
@@ -17,9 +17,11 @@ def build_keys():
 
         Uses DATES_TO_PROCESS, and gets a key for each of the 24 hours in that day.
     """
-    for date_ in DATES_TO_PROCESS:
-        for time_ in range(0, 24):
-            yield 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, time_)
+    for month in MONTHS_TO_PROCESS:
+        for day in range(1, 32):
+            date_ = month % day
+            for time_ in range(0, 24):
+                yield 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, time_)
 
 
 def main():
