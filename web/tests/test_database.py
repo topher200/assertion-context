@@ -124,3 +124,18 @@ class TestElasticSearch(unittest.TestCase):
             self.es,
         )
         self.assertGreaterEqual(len(log_lines), 2)
+
+    def test_get_loglines_one_param(self):
+        """
+            Check that when we search for loglines with the given line_number, we find some
+        """
+        # save the new lines
+        self.assertTrue(database.save_log_line(self.es, self.log_line0))
+        self.assertTrue(database.save_log_line(self.es, self.log_line2))
+        database.refresh(self.es)
+
+        log_lines = database.get_loglines(
+            self.es,
+            line_numbers=[self.log_line0.line_number]
+        )
+        self.assertGreaterEqual(len(log_lines), 1)
