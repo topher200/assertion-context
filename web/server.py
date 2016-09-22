@@ -73,7 +73,7 @@ def setup_logging():
     if not flask_app.debug:
         # In production mode, add log handler to sys.stderr.
         flask_app.logger.addHandler(logging.StreamHandler())
-        flask_app.logger.setLevel(logging.INFO)
+        flask_app.logger.setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":
