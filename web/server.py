@@ -62,7 +62,10 @@ def generate_chart():
 
 @flask_app.route("/api/loglines", methods=['GET'])
 def get_loglines():
-    flask_app.logger.debug(database.get_loglines(es))
+    lines = database.get_loglines(es)
+    flask_app.logger.info(len(lines))
+    for line in lines:
+        flask_app.logger.info(line)
     return 'success'
 
 
