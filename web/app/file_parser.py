@@ -151,5 +151,5 @@ def parse_gzipped_file(zipped_filename):
 
         Returns a list of L{LogLine}s
     """
-    with gzip.open(zipped_filename, 'r') as f:
+    with gzip.open(zipped_filename, 'rt') as f:
         return list(parse(f))
