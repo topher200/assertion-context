@@ -4,6 +4,7 @@ TODO: describe each part here
 
 We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up host:
+ - yum install docker
  - pip install virtualenvwrapper
  - set up virtualenvwrapper
    - add this to your .bashrc:
@@ -13,8 +14,6 @@ source /usr/local/bin/virtualenvwrapper.sh
     - source .bashrc
  - mkvirtualenv python3 <virtualenv name>
  - pip install -r requirements.txt
- - yum install docker
- - pip install docker-compose
 
 Then to start it all up:
  - ./server-start.sh
