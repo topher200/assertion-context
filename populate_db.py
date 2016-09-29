@@ -30,6 +30,7 @@ def main():
             "bucket": S3_BUCKET,
             "key": '/'.join((S3_KEY_PREFIX, key)),
         }
+        print('Making request to "%s" with "%s"' % (API_REQUEST_URL, payload))
         res = requests.post(API_REQUEST_URL, json=payload)
         if res.status_code == 200:
             print('Successfully parsed "%s"' % key)

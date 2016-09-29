@@ -64,6 +64,8 @@ def __parse_papertrail_log_line(raw_log_line):
 
         Returns the above fields as a tuple.
     """
+    assert isinstance(raw_log_line, str), (type(raw_log_line), raw_log_line)
+
     log_line_pieces = raw_log_line.split('\t', 9)
     assert len(log_line_pieces) == 10, log_line_pieces
     papertrail_id = log_line_pieces[0]
@@ -99,6 +101,7 @@ def __get_previous_log_lines(circular_buffer, origin_line):
     """
     line_number = 1
     for raw_line in list(circular_buffer)[::-1]:
+        assert isinstance(raw_line, str), raw_line
         log_line = __generate_LogLine(raw_line, origin_line.papertrail_id, line_number)
         if ((log_line.instance_id == origin_line.instance_id) and
             (log_line.program_name == origin_line.program_name)):
@@ -122,6 +125,7 @@ def parse(file_object):
     circular_buffer = collections.deque(maxlen=10000)
     for line in file_object:
         assert len(line) > 1, line  # make sure we're getting real lines
+        assert isinstance(line, str), line
 
         # see if this line has an important error
         if 'AssertionError' in line:
@@ -140,6 +144,7 @@ def parse(file_object):
                 yield line
 
         # now that we're done processing this line, add it to the buffer
+        assert isinstance(line, str), line
         circular_buffer.append(line)
 
 
