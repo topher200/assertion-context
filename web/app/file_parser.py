@@ -134,14 +134,14 @@ def parse(file_object):
             yield origin_line
 
             # search backwards to grab the previous 10 traceback lines
-            previous_10_lines = (
+            previous_10_log_lines = (
                 itertools.islice(
                     __get_previous_log_lines(circular_buffer, origin_line),
                     10
                 )
             )
-            for line in previous_10_lines:
-                yield line
+            for log_line in previous_10_log_lines:
+                yield log_line
 
         # now that we're done processing this line, add it to the buffer
         assert isinstance(line, str), line
