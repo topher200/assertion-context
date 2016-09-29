@@ -72,7 +72,13 @@ def get_loglines():
 def setup_logging():
     if not flask_app.debug:
         # In production mode, add log handler to sys.stderr.
-        flask_app.logger.addHandler(logging.StreamHandler())
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            "%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+            "%H:%M:%S"
+        )
+        handler.setFormatter(formatter)
+        flask_app.logger.addHandler(handler)
         flask_app.logger.setLevel(logging.DEBUG)
 
 
