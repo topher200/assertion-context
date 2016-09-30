@@ -8,7 +8,7 @@ API_REQUEST_URL = 'http://127.0.0.1:80/api/parse_s3'
 S3_BUCKET = "papertrail.wordstream.com"
 S3_KEY_PREFIX = 'papertrail/logs'
 MONTHS_TO_PROCESS = (
-    '2016-09-%02d',
+    '2016-08-%02d',
 )
 
 def build_keys():
