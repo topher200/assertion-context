@@ -3,3 +3,4 @@
 .aws_credentials
 .env
 *.pyc
+run-populate-db.sh
