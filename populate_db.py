@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+"""Populate our elasticsearch db with Papertrail data from S3"""
+
+import argparse
 import time
 import requests
 
 
-API_REQUEST_URL = 'http://127.0.0.1:80/api/parse_s3'
-S3_BUCKET = "papertrail.wordstream.com"
-S3_KEY_PREFIX = 'papertrail/logs'
 MONTHS_TO_PROCESS = (
     '2016-08-%02d',
 )
@@ -25,13 +25,22 @@ def build_keys():
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--s3-bucket',
+                        help='s3 bucket to retrieve files from. example: "example.company.com"')
+    parser.add_argument('--s3-key-prefix',
+                        help='s3 key to retrieve files from. example: "path/to/logs"')
+    parser.add_argument('--api-request-url', help='the location of our API to hit',
+                        default='http://127.0.0.1:80/api/parse_s3')
+    args = parser.parse_args()
+
     for key in build_keys():
         payload = {
-            "bucket": S3_BUCKET,
-            "key": '/'.join((S3_KEY_PREFIX, key)),
+            "bucket": args.s3_bucket,
+            "key": '/'.join((args.s3_key_prefix, key)),
         }
-        print('Making request to "%s" with "%s"' % (API_REQUEST_URL, payload))
-        res = requests.post(API_REQUEST_URL, json=payload)
+        print('Making request to "%s" with "%s"' % (args.api_request_url, payload))
+        res = requests.post(args.api_request_url, json=payload)
         if res.status_code == 200:
             print('Successfully parsed "%s"' % key)
         else:
