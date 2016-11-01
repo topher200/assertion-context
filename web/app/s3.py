@@ -16,7 +16,7 @@ def parse_s3_file(bucket, key):
         Returns a list of L{file_parser.LogLine}s. Returns None on error.
     """
     s3 = boto3.client('s3')
-    with tempfile.NamedTemporaryFile('wb', delete=False) as local_file:
+    with tempfile.NamedTemporaryFile('wb') as local_file:
         try:
             s3.download_fileobj(bucket, key, local_file)
         except botocore.exceptions.ClientError as e:
@@ -30,5 +30,4 @@ def parse_s3_file(bucket, key):
                 return None
             print("failed to download file from s3 with unknown error")
             raise
-    # TODO: delete the temp file
-    return file_parser.parse_gzipped_file(local_file.name)
+        return file_parser.parse_gzipped_file(local_file.name)
