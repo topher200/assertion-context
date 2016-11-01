@@ -39,13 +39,15 @@ def main():
             "bucket": args.s3_bucket,
             "key": '/'.join((args.s3_key_prefix, key)),
         }
-        print('Making request to "%s" with "%s"' % (args.api_request_url, payload))
-        res = requests.post(args.api_request_url, json=payload)
-        if res.status_code == 200:
-            print('Successfully parsed "%s"' % key)
-        else:
-            print('Parse request received %s. data: "%s"' % (res.status_code, payload))
-            time.sleep(1)  # rate limiting ourselves
+        for _ in range(5):  # retry a few times on failure
+            print('Making request to "%s" with "%s"' % (args.api_request_url, payload))
+            res = requests.post(args.api_request_url, json=payload)
+            if res.status_code == 200:
+                print('Successfully parsed "%s"' % key)
+                break  # success! we're done with this one
+            else:
+                print('Parse request received %s. data: "%s"' % (res.status_code, payload))
+                time.sleep(1)  # rate limiting ourselves
 
 
 if __name__ == "__main__":
