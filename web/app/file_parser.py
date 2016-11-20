@@ -5,8 +5,24 @@ import collections
 import datetime
 import itertools
 import gzip
+import re
 
 from .logline import LogLine
+
+ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError')
+ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
+    '''(details = AssertionError)|(AssertionError.*can only join a child process)'''
+)
+KEY_ERROR_REGEX_NEGATIVE = re.compile(
+    '''threading.pyc|args:\['''
+)
+"""
+    Our regexes are by the Papertrail search we perform against production, which looks like this:
+        (AssertionError -"details = AssertionError" -"can only join a child process")
+            OR (KeyError -threading.pyc -args:[)
+            OR (NotImplementedError)
+            OR (ValueError)
+"""
 
 
 def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
@@ -109,6 +125,36 @@ def __get_previous_log_lines(circular_buffer, origin_line):
             yield log_line
             line_number += 1
 
+def log_line_contains_important_error(log_line):
+    """
+        Returns True if the log line contains an AssertionError (or other important error)
+
+        Defined by the Papertrail search we perform against production, which looks like this:
+            (AssertionError -"details = AssertionError" -"can only join a child process")
+                OR (KeyError -threading.pyc -args:[)
+                OR (NotImplementedError)
+                OR (ValueError)
+    """
+    # implementation note: since the regex contains "negative" fields, we check for the things we
+    # want then reject if it contains things we don't.
+
+    if re.search(ERROR_REGEX, log_line) is None:
+        return False
+
+    # We want the checks before this point to be super fast, since that part gets called a lot.
+    # It's OK if the checks after this point are more readable than efficient since this is the
+    # infrequently-traveled code path
+
+    if 'AssertionError' in log_line:
+        if re.search(ASSERTION_ERROR_REGEX_NEGATIVE, log_line) is not None:
+            return False
+
+    if 'KeyError' in log_line:
+        if re.search(KEY_ERROR_REGEX_NEGATIVE, log_line) is not None:
+            return False
+
+    return True
+
 
 def parse(file_object):
     """
@@ -127,8 +173,8 @@ def parse(file_object):
         assert len(line) > 1, line  # make sure we're getting real lines
         assert isinstance(line, str), line
 
-        # see if this line has an important error
-        if 'AssertionError' in line:
+        # see if this line has an error we care about
+        if log_line_contains_important_error(line):
             # we found a match! return it
             origin_line = __generate_LogLine(line, None, 0)
             yield origin_line
