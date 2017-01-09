@@ -57,24 +57,14 @@ def parse_s3():
     return 'success'
 
 
+@flask_app.route("/api/generate_chart", methods=['GET'])
+def generate_chart():
+    pass
+
+
 @flask_app.route("/api/loglines", methods=['GET'])
 def get_loglines():
     _ = database.get_loglines(es)
-    return 'success'
-
-
-@flask_app.route("/api/combine_loglines", methods=['PUT'])
-def combine_loglines():
-    origin_ids = database.get_unique_origin_ids(es)
-    counter = 0
-    for origin_id in origin_ids:
-        counter += 1
-        # flask_app.logger.error('origin_id: %s', origin_id)
-        # loglines = database.get_all_loglines_from_origin(origin_id)
-        # sort loglines by line_number
-        # create new "traceback" entity
-        # save "traceback" to database
-    flask_app.logger.error('counter: %s', counter)
     return 'success'
 
 
@@ -94,5 +84,4 @@ def setup_logging():
 
 if __name__ == "__main__":
     http_server = WSGIServer(('', 5000), DebuggedApplication(flask_app))
-    flask_app.logger.info('starting server')
     http_server.serve_forever()

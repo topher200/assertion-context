@@ -46,16 +46,16 @@ class TestElasticSearch(unittest.TestCase):
         # Clean up any created log lines after each test
         try:
             self.es.delete(
-                index=database.LOGLINE_INDEX,
-                doc_type=database.LOGLINE_DOC_TYPE,
+                index=database.INDEX,
+                doc_type=database.DOC_TYPE,
                 id=self.log_line0.papertrail_id,
             )
         except NotFoundError:
             pass
         try:
             self.es.delete(
-                index=database.LOGLINE_INDEX,
-                doc_type=database.LOGLINE_DOC_TYPE,
+                index=database.INDEX,
+                doc_type=database.DOC_TYPE,
                 id=self.log_line2.papertrail_id,
             )
         except NotFoundError:
@@ -65,8 +65,8 @@ class TestElasticSearch(unittest.TestCase):
         self.assertTrue(database.save_log_line(self.es, self.log_line0))
         self.assertTrue(
             self.es.exists(
-                index=database.LOGLINE_INDEX,
-                doc_type=database.LOGLINE_DOC_TYPE,
+                index=database.INDEX,
+                doc_type=database.DOC_TYPE,
                 id=self.log_line0.papertrail_id,
                 params={
                     'refresh': True,
@@ -139,8 +139,3 @@ class TestElasticSearch(unittest.TestCase):
             line_numbers=[self.log_line0.line_number]
         )
         self.assertGreaterEqual(len(log_lines), 1)
-
-    def test_get_unique_origin_ids(self):
-        res = database.get_unique_origin_ids(self.es)
-        for id_ in res:
-            assert isinstance(id_, int), (type(id_), id_)
