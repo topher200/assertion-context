@@ -90,7 +90,7 @@ class TestElasticSearch(unittest.TestCase):
             self.log_line2.timestamp.date(),
             list(range(-1, MAX_LOG_LINES_PER_ASSERT))
         )
-        self.assertEqual(len(log_lines), 2)
+        self.assertEqual(len(list(log_lines)), 2)
 
     def test_get_loglines_from_date_range_for_specific_lines(self):
         """
@@ -108,7 +108,7 @@ class TestElasticSearch(unittest.TestCase):
             self.log_line2.timestamp.date(),
             [self.log_line2.line_number]
         )
-        self.assertEqual(len(log_lines), 1)
+        self.assertEqual(len(list(log_lines)), 1)
 
     def test_get_loglines_no_params(self):
         """
@@ -123,7 +123,7 @@ class TestElasticSearch(unittest.TestCase):
         log_lines = database.get_loglines(
             self.es,
         )
-        self.assertGreaterEqual(len(log_lines), 2)
+        self.assertGreaterEqual(len(list(log_lines)), 2)
 
     def test_get_loglines_one_param(self):
         """
@@ -138,4 +138,4 @@ class TestElasticSearch(unittest.TestCase):
             self.es,
             line_numbers=[self.log_line0.line_number]
         )
-        self.assertGreaterEqual(len(log_lines), 1)
+        self.assertGreaterEqual(len(list(log_lines)), 1)

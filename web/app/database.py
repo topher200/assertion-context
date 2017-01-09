@@ -3,7 +3,7 @@
 
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
-from .logline import LogLine
+from .logline import LogLine, generate_logline_from_source
 
 INDEX = 'logline-index'
 DOC_TYPE = 'logline'
@@ -46,6 +46,8 @@ def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
         - line_numbers: must be a list of ints
 
         Only returns loglines whose line_numbers match the given list.
+
+        @rtype: generator
     """
     params_list = []
     if start_date is not None:
@@ -98,4 +100,5 @@ def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
         doc_type=DOC_TYPE,
         body=body
     )
-    return res['hits']['hits']
+    for raw_logline in res['hits']['hits']:
+        yield generate_logline_from_source(raw_logline['_source'])

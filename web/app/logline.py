@@ -97,3 +97,20 @@ class LogLine(object):
     @property
     def program_name(self):
         return self._program_name
+
+def generate_logline_from_source(source):
+    """
+        L{source} is a dictionary (from ElasticSearch) containing the fields of a LogLine
+    """
+    assert isinstance(source, dict), source
+
+    return LogLine(
+        source['parsed_log_message'],
+        source['raw_log_message'],
+        source['timestamp'],
+        source['papertrail_id'],
+        source['origin_papertrail_id'],
+        source['line_number'],
+        source['instance_id'],
+        source['program_name'],
+    )
