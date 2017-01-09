@@ -57,11 +57,6 @@ def parse_s3():
     return 'success'
 
 
-@flask_app.route("/api/generate_chart", methods=['GET'])
-def generate_chart():
-    pass
-
-
 @flask_app.route("/api/loglines", methods=['GET'])
 def get_loglines():
     _ = database.get_loglines(es)
