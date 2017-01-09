@@ -21,7 +21,7 @@ flask_app = flask.Flask(__name__)
 flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
-es = FlaskElasticsearch(flask_app)
+ES = FlaskElasticsearch(flask_app)
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
@@ -52,14 +52,14 @@ def parse_s3():
     # save the parser output to the database
     for line in log_line_generator:
         flask_app.logger.debug('saving log line: %s', line)
-        database.save_log_line(es, line)
+        database.save_log_line(ES, line)
 
     return 'success'
 
 
 @flask_app.route("/api/loglines", methods=['GET'])
 def get_loglines():
-    _ = database.get_loglines(es)
+    _ = database.get_loglines(ES)
     return 'success'
 
 
