@@ -4,6 +4,7 @@
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
 import collections
+import datetime
 import logging
 import os
 
@@ -29,13 +30,13 @@ ES = FlaskElasticsearch(flask_app)
 POST_SAVE_DIR = '/srv/posts'
 
 # jekyll post template
-POST_TEMPLATE = '''
----
+POST_TEMPLATE = '''---
 layout: post
 title: Traceback
 ---
+```
 %s
-'''
+```'''
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
@@ -98,9 +99,17 @@ def generate_posts():
         # create a post with the traceback
         post = POST_TEMPLATE % traceback
 
+        # create a title. the timestamp is expected to be in 2016-08-12T03:18:39 format
+        timestamp = datetime.datetime.strptime(
+            sorted_loglines[-1].timestamp,
+            '%Y-%m-%dT%H:%M:%S'
+        )
+        papertrail_id = sorted_loglines[-1].origin_papertrail_id
+        filename = '%s-%s.md' % (timestamp.strftime('%Y-%m-%d-%H_%M_%S'), papertrail_id)
+        flask_app.logger.debug('creating post "%s" with %s loglines', filename, len(loglines))
+
         # save post to disk
-        timestamp = sorted_loglines[-1].timestamp
-        with open(os.path.join(POST_SAVE_DIR, timestamp), 'w') as f:
+        with open(os.path.join(POST_SAVE_DIR, filename), 'w') as f:
             f.write(post)
 
     return 'success'

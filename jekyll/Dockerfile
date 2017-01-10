@@ -4,3 +4,11 @@ MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1
+
+# bring down our base jekyll repo
+COPY ./ /srv/jekyll
+
+# point the _posts dir to our loaded posts volume
+WORKDIR /srv/jekyll
+RUN rm -r _posts
+RUN ln -s /srv/posts _posts
