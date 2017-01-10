@@ -5,6 +5,7 @@
 """
 import collections
 import logging
+import os
 
 import flask
 from flask_elasticsearch import FlaskElasticsearch
@@ -23,6 +24,9 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
 ES = FlaskElasticsearch(flask_app)
+
+# location to save posts
+POST_SAVE_DIR = '/srv/posts'
 
 # jekyll post template
 POST_TEMPLATE = '''
@@ -95,7 +99,8 @@ def generate_posts():
         post = POST_TEMPLATE % traceback
 
         # save post to disk
-        with open('/tmp/post', 'w') as f:
+        timestamp = sorted_loglines[-1].timestamp
+        with open(os.path.join(POST_SAVE_DIR, timestamp), 'w') as f:
             f.write(post)
 
     return 'success'

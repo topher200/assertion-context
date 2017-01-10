@@ -2,6 +2,7 @@ version: '2'
 
 volumes:
   elasticsearch:
+  posts:
 
 services:
   web:
@@ -12,6 +13,8 @@ services:
       - elasticsearch
     depends_on:
       - logspout
+    volumes:
+      - posts:/srv/posts
 
   elasticsearch:
     image: elasticsearch:2
