@@ -8,9 +8,18 @@ services:
   web:
     build: web/
     ports:
-      - "80:5000"
+      - "8080:5000"
     links:
       - elasticsearch
+    depends_on:
+      - logspout
+    volumes:
+      - posts:/srv/posts
+
+  jekyll:
+    build: jekyll/
+    ports:
+      - "80:4000"
     depends_on:
       - logspout
     volumes:
