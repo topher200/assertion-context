@@ -3,6 +3,7 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import collections
 import logging
 
 import flask
@@ -22,6 +23,15 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
 ES = FlaskElasticsearch(flask_app)
+
+# jekyll post template
+POST_TEMPLATE = '''
+---
+layout: post
+title: Traceback
+---
+%s
+'''
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
@@ -62,6 +72,33 @@ def get_loglines():
     _ = database.get_loglines(ES)
     return 'success'
 
+
+@flask_app.route("/api/generate_posts", methods=['PUT'])
+def generate_posts():
+    # get all loglines
+    loglines = database.get_loglines(ES)
+
+    # group loglines by origin id
+    loglines_by_origin_id = collections.defaultdict(list)
+    for logline in loglines:
+        loglines_by_origin_id[logline.origin_papertrail_id].append(logline)
+
+    # for each set of loglines by origin id, create a traceback
+    for _, loglines in loglines_by_origin_id.items():
+        # sort the loglines in reverse order, so the bottom of the traceback is last
+        sorted_loglines = sorted(loglines, key=lambda x: x.line_number, reverse=True)
+
+        # combine the loglines into a cohesive traceback
+        traceback = ''.join((l.parsed_log_message for l in sorted_loglines))
+
+        # create a post with the traceback
+        post = POST_TEMPLATE % traceback
+
+        # save post to disk
+        with open('/tmp/post', 'w') as f:
+            f.write(post)
+
+    return 'success'
 
 @flask_app.before_first_request
 def setup_logging():
