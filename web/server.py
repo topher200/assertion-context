@@ -34,9 +34,9 @@ POST_TEMPLATE = '''---
 layout: post
 title: Traceback
 ---
-```
+{% highlight python %}
 %s
-```'''
+{% endhighlight %}'''
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
