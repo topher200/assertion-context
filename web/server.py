@@ -34,9 +34,9 @@ POST_TEMPLATE = '''---
 layout: post
 title: Traceback
 ---
-{% highlight python %}
-%s
-{% endhighlight %}'''
+{{% highlight python %}}
+{}
+{{% endhighlight %}}'''
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
@@ -97,7 +97,7 @@ def generate_posts():
         traceback = ''.join((l.parsed_log_message for l in sorted_loglines))
 
         # create a post with the traceback
-        post = POST_TEMPLATE % traceback
+        post = POST_TEMPLATE.format(traceback)
 
         # create a title. the timestamp is expected to be in 2016-08-12T03:18:39 format
         timestamp = datetime.datetime.strptime(
