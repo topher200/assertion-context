@@ -46,7 +46,7 @@ def main():
                 print('Successfully parsed "%s"' % key)
                 break  # success! we're done with this one
             else:
-                print('Parse request received %s. data: "%s"' % (res.status_code, payload))
+                print('Parse failed. status: %s. data: "%s"' % (res.status_code, payload))
                 time.sleep(1)  # rate limiting ourselves
 
 
