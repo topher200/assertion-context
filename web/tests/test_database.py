@@ -12,43 +12,34 @@ import sys
 sys.path.append(ROOT)
 
 from app import database
-from app import logline
-
-# when searching, use a number larger than the number of possible loglines for a single assert
-MAX_LOG_LINES_PER_ASSERT = 10
+from app import traceback
 
 
 class TestElasticSearch(unittest.TestCase):
     def setUp(self):
         self.es = Elasticsearch("localhost:9200")
-        self.log_line0 = logline.LogLine(
-            'AssertionError\n',
-            '700594297938165774\t2016-08-12T03:18:39\t2016-08-12T03:18:39Z\t407484803\ti-2ee330b7\t107.21.188.48\tUser\tNotice\tmanager.debug\tAssertionError\n',  #pylint: disable=line-too-long
-            datetime.datetime(2000, 8, 12, 3, 18, 39),
+        self.traceback_0 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             '700594297938165770',
-            '700594297938165770',
-            0,
-            'i-2ee330b7',
+            datetime.datetime(2000, 8, 12, 3, 18, 00),
+            'i-2ee330b0',
             'manager.debug',
         )
-        self.log_line2 = logline.LogLine(
-            'AssertionError\n',
-            '700594297938165774\t2016-08-12T03:18:39\t2016-08-12T03:18:39Z\t407484803\ti-2ee330b7\t107.21.188.48\tUser\tNotice\tmanager.debug\tAssertionError\n',  #pylint: disable=line-too-long
-            datetime.datetime(2000, 8, 12, 3, 18, 39),
-            '700594297938165772',
-            '700594297938165770',
-            2,
-            'i-2ee330b7',
-            'manager.debug',
+        self.traceback_1 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
+            '700594297938165771',
+            datetime.datetime(2000, 8, 12, 3, 18, 1),
+            'i-2ee330b1',
+            'server.debug',
         )
 
     def tearDown(self):
-        # Clean up any created log lines after each test
+        # Clean up any created tracebacks after each test
         try:
             self.es.delete(
                 index=database.INDEX,
                 doc_type=database.DOC_TYPE,
-                id=self.log_line0.papertrail_id,
+                id=self.traceback_0.origin_papertrail_id,
             )
         except NotFoundError:
             pass
@@ -56,86 +47,51 @@ class TestElasticSearch(unittest.TestCase):
             self.es.delete(
                 index=database.INDEX,
                 doc_type=database.DOC_TYPE,
-                id=self.log_line2.papertrail_id,
+                id=self.traceback_1.origin_papertrail_id,
             )
         except NotFoundError:
             pass
 
-    def test_save_log_line(self):
-        self.assertTrue(database.save_log_line(self.es, self.log_line0))
+    def test_save_traceback(self):
+        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
         self.assertTrue(
             self.es.exists(
                 index=database.INDEX,
                 doc_type=database.DOC_TYPE,
-                id=self.log_line0.papertrail_id,
+                id=self.traceback_0.origin_papertrail_id,
                 params={
                     'refresh': True,
                 }
             )
         )
 
-    def test_get_loglines_from_date_range(self):
+    def test_get_tracebacks_from_date_range(self):
         """
-            Check that when we search for our new log lines we find them.
+            Check that when we search for our new tracebacks we find them.
         """
-        # save the new lines
-        self.assertTrue(database.save_log_line(self.es, self.log_line0))
-        self.assertTrue(database.save_log_line(self.es, self.log_line2))
+        # save the tracebacks
+        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
+        self.assertTrue(database.save_traceback(self.es, self.traceback_1))
         database.refresh(self.es)
 
         # test that we find them all. assumes that the timestamps are from the same day.
-        log_lines = database.get_loglines(
+        tracebacks = database.get_tracebacks(
             self.es,
-            self.log_line2.timestamp.date(),
-            self.log_line2.timestamp.date(),
-            list(range(-1, MAX_LOG_LINES_PER_ASSERT))
+            self.traceback_0.origin_timestamp.date(),
+            self.traceback_0.origin_timestamp.date(),
         )
-        self.assertEqual(len(list(log_lines)), 2)
+        self.assertEqual(len(list(tracebacks)), 2)
 
-    def test_get_loglines_from_date_range_for_specific_lines(self):
+    def test_get_tracebacks_no_params(self):
         """
-            Check that when we search for a specific line number from a day we get it.
+            Check that when we search for all tracebacks, we find many
         """
-        # save the new lines
-        self.assertTrue(database.save_log_line(self.es, self.log_line0))
-        self.assertTrue(database.save_log_line(self.es, self.log_line2))
+        # save the new tracebacks
+        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
+        self.assertTrue(database.save_traceback(self.es, self.traceback_1))
         database.refresh(self.es)
 
-        # test that we find only one
-        log_lines = database.get_loglines(
-            self.es,
-            self.log_line2.timestamp.date(),
-            self.log_line2.timestamp.date(),
-            [self.log_line2.line_number]
-        )
-        self.assertEqual(len(list(log_lines)), 1)
-
-    def test_get_loglines_no_params(self):
-        """
-            Check that when we search for all loglines, we find many
-        """
-        # save the new lines
-        self.assertTrue(database.save_log_line(self.es, self.log_line0))
-        self.assertTrue(database.save_log_line(self.es, self.log_line2))
-        database.refresh(self.es)
-
-        # test that we find only one
-        log_lines = database.get_loglines(
+        tracebacks = database.get_tracebacks(
             self.es,
         )
-        self.assertGreaterEqual(len(list(log_lines)), 2)
-
-    def test_get_loglines_one_param(self):
-        """
-            Check that when we search for loglines with the given line_number, we find some
-        """
-        # save the new lines
-        self.assertTrue(database.save_log_line(self.es, self.log_line0))
-        self.assertTrue(database.save_log_line(self.es, self.log_line2))
-        database.refresh(self.es)
-
-        log_lines = database.get_loglines(
-            self.es,
-            line_numbers=[self.log_line0.line_number]
-        )
-        self.assertGreaterEqual(len(list(log_lines)), 1)
+        self.assertGreaterEqual(len(list(tracebacks)), 2)

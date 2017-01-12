@@ -33,7 +33,9 @@ class Traceback(object):
             instance_id,
             program_name,
     ):
-        assert isinstance(origin_timestamp, datetime), (type(origin_timestamp), origin_timestamp)
+        assert isinstance(origin_timestamp, datetime.datetime), (
+            type(origin_timestamp), origin_timestamp
+        )
 
         self._text = text
         self._origin_papertrail_id = origin_papertrail_id
