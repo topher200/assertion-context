@@ -31,7 +31,7 @@ def main():
     parser.add_argument('--s3-key-prefix',
                         help='s3 key to retrieve files from. example: "path/to/logs"')
     parser.add_argument('--api-request-url', help='the location of our API to hit',
-                        default='http://127.0.0.1:80/api/parse_s3')
+                        default='http://127.0.0.1:8080/api/parse_s3')
     args = parser.parse_args()
 
     for key in build_keys():
