@@ -99,11 +99,8 @@ def generate_posts():
         # create a post with the traceback
         post = POST_TEMPLATE.format(traceback)
 
-        # create a title. the timestamp is expected to be in 2016-08-12T03:18:39 format
-        timestamp = datetime.datetime.strptime(
-            sorted_loglines[-1].timestamp,
-            '%Y-%m-%dT%H:%M:%S'
-        )
+        # create a title using the origin id/timestamp
+        timestamp = sorted_loglines[-1].timestamp
         papertrail_id = sorted_loglines[-1].origin_papertrail_id
         filename = '%s-%s.md' % (timestamp.strftime('%Y-%m-%d-%H_%M_%S'), papertrail_id)
         flask_app.logger.debug('creating post "%s" with %s loglines', filename, len(loglines))

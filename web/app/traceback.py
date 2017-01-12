@@ -1,3 +1,6 @@
+import datetime
+
+
 class Traceback(object):
     """
         L{Traceback} holds the text of many log lines grouped together.
@@ -30,6 +33,8 @@ class Traceback(object):
             instance_id,
             program_name,
     ):
+        assert isinstance(origin_timestamp, datetime), (type(origin_timestamp), origin_timestamp)
+
         self._text = text
         self._origin_papertrail_id = origin_papertrail_id
         self._origin_timestamp = origin_timestamp
@@ -80,10 +85,16 @@ def generate_traceback_from_source(source):
     """
     assert isinstance(source, dict), source
 
+    # We get the datetime as a string, we need to parse it out
+    timestamp = datetime.datetime.strptime(
+        source["origin_timestamp"],
+        '%Y-%m-%dT%H:%M:%S'
+    )
+
     return Traceback(
         source["text"],
         source["origin_papertrail_id"],
-        source["origin_timestamp"],
+        timestamp,
         source["instance_id"],
         source["program_name"],
     )
