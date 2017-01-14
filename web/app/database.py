@@ -25,6 +25,7 @@ def save_traceback(es, traceback):
         body=doc
     )
 
+
 def refresh(es):
     """
         Performs an ES refresh. Required to see newly-inserted values when searching
@@ -32,6 +33,7 @@ def refresh(es):
     es.indices.refresh(
         index=INDEX
     )
+
 
 def get_tracebacks(es, start_date=None, end_date=None):
     """
