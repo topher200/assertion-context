@@ -9,8 +9,19 @@
 	"item": [
 		{
 			"name": "test s3 request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
-				"url": "http://127.0.0.1:80/api/parse_s3",
+				"url": "http://127.0.0.1:8080/api/parse_s3",
 				"method": "POST",
 				"header": [
 					{
@@ -28,9 +39,20 @@
 			"response": []
 		},
 		{
-			"name": "get loglines",
+			"name": "get tracebacks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 200\"] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
 			"request": {
-				"url": "http://127.0.0.1:80/api/loglines",
+				"url": "http://127.0.0.1:8080/api/tracebacks",
 				"method": "GET",
 				"header": [],
 				"body": {
