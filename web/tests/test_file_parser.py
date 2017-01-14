@@ -1,4 +1,3 @@
-import datetime
 import os
 import unittest
 
@@ -9,7 +8,7 @@ import sys
 sys.path.append(ROOT)
 
 from app import file_parser
-from app import logline
+from app import traceback
 
 
 ROOT = os.path.dirname(__file__)
@@ -23,10 +22,9 @@ class TestParse(unittest.TestCase):
 
     def test_parse(self):
         """
-            Check that when we parse the test data we get a generator of L{LogLine}s back
+            Check that when we parse the test data we get a generator of L{Traceback}s back
         """
-        log_lines = list(file_parser.parse(self.test_data))
+        tracebacks = list(file_parser.parse(self.test_data))
 
-        self.assertGreater(len(log_lines), 0)
-        all([self.assertIsInstance(v, logline.LogLine) for v in log_lines])
-        all([self.assertIsInstance(v.timestamp, datetime.datetime) for v in log_lines])
+        self.assertGreater(len(tracebacks), 0)
+        all([self.assertIsInstance(v, traceback.Traceback) for v in tracebacks])

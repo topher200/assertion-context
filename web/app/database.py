@@ -3,24 +3,25 @@
 
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
-from .logline import LogLine, generate_logline_from_source
-
-INDEX = 'logline-index'
-DOC_TYPE = 'logline'
+from .traceback import Traceback, generate_traceback_from_source
 
 
-def save_log_line(es, log_line):
+INDEX = 'traceback-index'
+DOC_TYPE = 'traceback'
+
+
+def save_traceback(es, traceback):
     """
-        Takes a L{LogLine} and saves it to the database
+        Takes a L{Traceback} and saves it to the database
 
-        Returns True if successfull
+        Returns True if successful
     """
-    assert isinstance(log_line, LogLine), (type(log_line), log_line)
-    doc = log_line.document()
+    assert isinstance(traceback, Traceback), (type(traceback), traceback)
+    doc = traceback.document()
     return es.index(
         index=INDEX,
         doc_type=DOC_TYPE,
-        id=log_line.papertrail_id,
+        id=traceback.origin_papertrail_id,
         body=doc
     )
 
@@ -32,29 +33,28 @@ def refresh(es):
         index=INDEX
     )
 
-def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
+def get_tracebacks(es, start_date=None, end_date=None):
     """
-        Queries the database for the asserts from a given date range with the given line numbers.
+        Queries the database for L{Traceback} from a given date range.
 
-        Both dates are inclusive.
+        Both dates are inclusive. Date filtering is done on the 'origin_timestamp' field of the
+        Traceback.
 
         All filtering params are optional. Any params that are None are ignored.
 
         Params:
         - start_date: must be a datetime.date
         - end_date: must be a datetime.date
-        - line_numbers: must be a list of ints
-
-        Only returns loglines whose line_numbers match the given list.
 
         @rtype: generator
+        @postcondition: all(isinstance(v, Traceback) for v in return)
     """
     params_list = []
     if start_date is not None:
         params_list.append(
             {
                 "range": {
-                    "timestamp": {
+                    "origin_timestamp": {
                         "gte": "%s||/d" % start_date,
                     }
                 }
@@ -64,21 +64,12 @@ def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
         params_list.append(
             {
                 "range": {
-                    "timestamp": {
+                    "origin_timestamp": {
                         "lte": "%s||/d" % end_date,
                     }
                 }
             }
         )
-    if line_numbers is not None:
-        params_list.append(
-            {
-                "terms": {
-                    "line_number": line_numbers
-                }
-            }
-        )
-
 
     if len(params_list) > 0:
         body = {
@@ -100,5 +91,5 @@ def get_loglines(es, start_date=None, end_date=None, line_numbers=None):
         doc_type=DOC_TYPE,
         body=body
     )
-    for raw_logline in res['hits']['hits']:
-        yield generate_logline_from_source(raw_logline['_source'])
+    for raw_traceback in res['hits']['hits']:
+        yield generate_traceback_from_source(raw_traceback['_source'])

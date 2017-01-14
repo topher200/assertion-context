@@ -13,7 +13,7 @@ def parse_s3_file(bucket, key):
     """
         Downloads the file given described by the params and parses it.
 
-        Returns a list of L{file_parser.LogLine}s. Returns None on error.
+        Returns a list of L{Traceback}s. Returns None on error.
     """
     s3 = boto3.client('s3')
     with tempfile.NamedTemporaryFile('wb') as local_file:
