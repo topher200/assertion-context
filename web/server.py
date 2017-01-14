@@ -59,8 +59,7 @@ def parse_s3():
 
 @flask_app.route("/api/tracebacks", methods=['GET'])
 def get_tracebacks():
-    _ = database.get_tracebacks(ES)
-    return 'not implemented', 500
+    return str({'tracebacks': list(map(str, database.get_tracebacks(ES)))})
 
 
 @flask_app.before_first_request
