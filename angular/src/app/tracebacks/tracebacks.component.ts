@@ -3,11 +3,11 @@ import { Race } from './race';
 import { RaceService } from './race.service';
 
 @Component({
-  selector: 'my-races',
-  templateUrl: './races.component.html',
-  styleUrls:['./races.component.css']
+  selector: 'tracebacks',
+  templateUrl: './tracebacks.component.html',
+  styleUrls:['./tracebacks.component.css']
 })
-export class RacesComponent {
+export class TracebacksComponent {
   heading = "Ultra Racing Schedule"
   cash = 10000;
   races: Race[];

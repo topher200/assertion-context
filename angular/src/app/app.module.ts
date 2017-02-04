@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { RacesComponent } from './races/races.component';
-import { RaceService } from './races/race.service';
+import { TracebacksComponent } from './tracebacks/tracebacks.component';
+import { RaceService } from './tracebacks/race.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    RacesComponent
+    TracebacksComponent
   ],
   imports: [
     BrowserModule,
