@@ -59,7 +59,8 @@ def parse_s3():
 
 @flask_app.route("/api/tracebacks", methods=['GET'])
 def get_tracebacks():
-    return str({'tracebacks': list(map(str, database.get_tracebacks(ES)))})
+    data = [tb.document() for tb in database.get_tracebacks(ES)]
+    return flask.jsonify({'tracebacks': data})
 
 
 @flask_app.before_first_request
