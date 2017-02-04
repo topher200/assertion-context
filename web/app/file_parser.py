@@ -28,6 +28,13 @@ KEY_ERROR_REGEX_NEGATIVE = re.compile(
             OR (ValueError)
 """
 
+NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
+"""
+    How many log lines previous to our AssertionError we should save.
+
+    I'm purposely going high with this number since it's easier to ignore data than re-query for it
+"""
+
 
 def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
     """
@@ -201,15 +208,15 @@ def parse(file_object):
             # we found a match! build a traceback out of it
             origin_line = __generate_LogLine(line, None, 0)
 
-            # search backwards to grab the previous 10 traceback lines
-            previous_10_log_lines = list(
+            # search backwards to grab the previous X traceback lines
+            previous_log_lines = list(
                 itertools.islice(
                     __get_previous_log_lines(lifo_buffer, origin_line),
-                    10
+                    NUM_PREVIOUS_LOG_LINES_TO_SAVE
                 )
             )
 
-            yield __generate_Traceback(origin_line, reversed(previous_10_log_lines))
+            yield __generate_Traceback(origin_line, reversed(previous_log_lines))
 
         # now that we're done processing this line, add it to the buffer
         assert isinstance(line, str), line
