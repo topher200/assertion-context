@@ -202,14 +202,14 @@ def parse(file_object):
             origin_line = __generate_LogLine(line, None, 0)
 
             # search backwards to grab the previous 10 traceback lines
-            previous_10_log_lines = (
+            previous_10_log_lines = list(
                 itertools.islice(
                     __get_previous_log_lines(lifo_buffer, origin_line),
                     10
                 )
             )
 
-            yield __generate_Traceback(origin_line, previous_10_log_lines)
+            yield __generate_Traceback(origin_line, reversed(previous_10_log_lines))
 
         # now that we're done processing this line, add it to the buffer
         assert isinstance(line, str), line
