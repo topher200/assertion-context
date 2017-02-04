@@ -12,7 +12,7 @@
         "images",
         "styles.css",
         "favicon.ico",
-        "app/races.json"
+        "app/tracebacks.json"
       ],
       "index": "index.html",
       "main": "main.ts",

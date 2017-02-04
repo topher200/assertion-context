@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { Race } from './race';
-import { RaceService } from './race.service';
+import { Traceback } from './traceback';
+import { TracebackService } from './traceback.service';
 
 @Component({
   selector: 'tracebacks',
@@ -10,22 +10,22 @@ import { RaceService } from './race.service';
 export class TracebacksComponent {
   heading = "Ultra Racing Schedule"
   cash = 10000;
-  races: Race[];
+  tracebacks: Traceback[];
 
-  constructor(private raceService: RaceService) { }
+  constructor(private tracebackService: TracebackService) { }
 
   ngOnInit() {
-    this.raceService.getRaces()
-        .subscribe(data => this.races = data);
+    this.tracebackService.getTracebacks()
+        .subscribe(data => this.tracebacks = data);
   }
 
   totalCost() {
     let sum = 0;
-    if (this.races) {
-      for (let race of this.races) {
-        if (race.isRacing) sum += race.entryFee;
-      }
-    }
+    // if (this.races) {
+    //   for (let race of this.races) {
+    //     if (race.isRacing) sum += race.entryFee;
+    //   }
+    // }
     return sum;
   }
 
@@ -39,14 +39,13 @@ export class TracebacksComponent {
 
   enterRace(race) {
     if (this.cashLeft() > race.entryFee) {
-      race.isRacing = true;
+      // race.isRacing = true;
     } else {
       alert("You don't have enough cash");
     }
   }
 
   cancelRace(race) {
-    race.isRacing = false;
+    // race.isRacing = false;
   }
-
 }

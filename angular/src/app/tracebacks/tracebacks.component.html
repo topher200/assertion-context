@@ -2,7 +2,7 @@
 <h2>Money for racing: <input type="text" class="cash" [(ngModel)]="cash"></h2>
 <h2>Cash left to enter races: <span>{{cashLeft() | currency:'USD':true}}</span> </h2>
 
-<section class="card" *ngFor="let race of races" [class.racing]="race.isRacing" >
+<section class="card" *ngFor="let race of tracebacks" >
   <div class="panel-body">
     <div class="photo">
       <img [src]="race.image" [alt]="race.imageDescription">
@@ -11,7 +11,7 @@
       <tr>
         <td>
           <h3>{{race.name}}</h3>
-          <p class="date">{{castDate(race.date) | date:'MMM d, y, h:mma'}}</p>
+          <p class="date">{{castDate(race.date)}}</p>
           <p class="description">{{race.about}}</p>
         </td>
         <td>

@@ -5,7 +5,7 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { TracebacksComponent } from './tracebacks/tracebacks.component';
-import { RaceService } from './tracebacks/race.service';
+import { TracebackService } from './tracebacks/traceback.service';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,7 @@ import { RaceService } from './tracebacks/race.service';
     FormsModule,
     HttpModule
   ],
-  providers: [ RaceService ],
+  providers: [ TracebackService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
