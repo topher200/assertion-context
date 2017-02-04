@@ -60,7 +60,10 @@ def __generate_Traceback(origin_logline, previous_loglines):
     """
         Combines L{LogLine}s into a L{Traceback}.
     """
-    parsed_text = ''.join(map(str, itertools.chain(previous_loglines, [origin_logline])))
+    parsed_text = ''.join(
+        logline.parsed_log_message for logline
+        in itertools.chain(previous_loglines, [origin_logline])
+    )
     return Traceback(
         parsed_text,
         origin_logline.papertrail_id,

@@ -28,3 +28,8 @@ class TestParse(unittest.TestCase):
 
         self.assertGreater(len(tracebacks), 0)
         all([self.assertIsInstance(v, traceback.Traceback) for v in tracebacks])
+
+        for t in tracebacks:
+            # check that our parsing and saving worked correctly
+            print (t.text)
+            self.assertNotIn('origin_papertrail_id', t.text)
