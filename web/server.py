@@ -6,6 +6,7 @@
 import logging
 
 import flask
+from flask_cors import CORS
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
 from werkzeug.debug import DebuggedApplication
@@ -16,6 +17,7 @@ from app import s3
 
 # start app
 flask_app = flask.Flask(__name__)
+CORS(flask_app)
 
 # configuration
 flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"

@@ -9,7 +9,7 @@ export class TracebackService {
   constructor(private http: Http) { }
 
   getTracebacks() {
-    return this.http.get('app/tracebacks.json')
-          .map(response => <Traceback[]>response.json().tracebacks);
+    return this.http.get('http://127.0.0.1:8080/api/tracebacks')
+      .map(response => <Traceback[]>response.json().tracebacks);
   }
 }
