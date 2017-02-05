@@ -24,6 +24,6 @@ header h1 {
   color: #66d9f7;
 }
 
-container {
-  max-width: 1100px;
+.container {
+  width: 100%;
 }

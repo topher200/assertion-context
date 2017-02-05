@@ -2,14 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'traceback-app',
-  template: `
-<header class="container">
-  <h1>{{heading}}</h1>
-</header>
-<tracebacks></tracebacks>
-`,
+  templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  heading = "Tracebacks"
-}
+export class AppComponent {}
