@@ -7,9 +7,6 @@ html {
 }
 
 body {
-  background: -webkit-linear-gradient(#0d263c,#030714) no-repeat fixed;
-  background: linear-gradient(#0d263c,#030714) no-repeat fixed;
-  color: #ffffff;
   height: 100%;
   margin: 0;
 }
@@ -27,6 +24,6 @@ header h1 {
   color: #66d9f7;
 }
 
-.container {
-  max-width: 900px;
+container {
+  max-width: 1100px;
 }
