@@ -6,12 +6,28 @@ volumes:
 services:
   web:
     build: web/
-    ports:
-      - "8080:5000"
+    expose:
+      - "8000"
     links:
       - elasticsearch
     depends_on:
       - logspout
+    volumes:
+      - /code/static
+
+  nginx:
+    restart:
+      always
+    build:
+      nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - /www/static
+    volumes_from:
+      - web
+    depends_on:
+      - web
 
   elasticsearch:
     image: elasticsearch:2
