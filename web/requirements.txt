@@ -2,3 +2,4 @@ boto3==1.4.0
 flask==0.11.1
 Flask-Elasticsearch==0.2.5
 gevent==1.1.2
+Gunicorn==19.6

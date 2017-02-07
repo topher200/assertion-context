@@ -18,4 +18,4 @@ ADD .aws_config /root/.aws/config
 ADD app app
 ADD server.py server.py
 
-CMD ["python3", "server.py"]
+CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
