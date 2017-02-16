@@ -1,0 +1,18 @@
+{%- extends "bootstrap/base.html" %}
+
+{% block title %}Tracebacks{% endblock %}
+
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block head %}
+    {{super()}}
+
+    {#- Docs: http://pythonhosted.org/Flask-Bootstrap/macros.html#fixes #}
+    {{fixes.ie8()}}
+{%- endblock %}
+
+{% block styles -%}
+    {{super()}}  {# required for Bootstrap's style elements #}
+    <link rel="stylesheet" type="text/css"
+        href="{{url_for('static', filename='css/traceback.css')}}">
+{% endblock %}

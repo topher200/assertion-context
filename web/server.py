@@ -7,6 +7,7 @@ import logging
 import os
 
 import flask
+from flask_bootstrap import Bootstrap
 from flask_elasticsearch import FlaskElasticsearch
 from gevent.wsgi import WSGIServer
 from werkzeug.debug import DebuggedApplication
@@ -23,6 +24,9 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
 ES = FlaskElasticsearch(flask_app)
+
+# add bootstrap
+Bootstrap(flask_app)
 
 
 @flask_app.route("/", methods=['GET'])

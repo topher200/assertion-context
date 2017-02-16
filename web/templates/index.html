@@ -1,5 +1,18 @@
-<!doctype html>
+{%- extends "base.html" %}
+{% import "bootstrap/utils.html" as utils %}
+
+{% block content %}
 <div class="container">
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+        {%- if messages %}
+            <div class="row">
+                <div class="col-md-12">
+                    {{utils.flashed_messages(messages)}}
+                </div>
+            </div>
+        {%- endif %}
+    {%- endwith %}
+
     <header>
         <div class="left-header col-md-3">
         </div>
@@ -8,17 +21,18 @@
         </div>
     </header>
 
-  <body>
-      {% for traceback in tracebacks %}
-      <div class="traceback-container">
-          <div class="traceback-metadata col-md-3">
-              <p>{{ traceback.origin_timestamp }}<br>
-                  <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
-          </div>
-          <div class="traceback-text col-md-9">
-              <pre class="prettyprint"><code class="language-py">{{ traceback.text }}</code></pre>
-          </div>
-      </div>
-      {% endfor %}
-  </body>
+    <body>
+        {% for traceback in tracebacks %}
+            <div class="traceback-container">
+                <div class="traceback-metadata col-md-3">
+                    <p>{{ traceback.origin_timestamp }}<br>
+                        <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
+                </div>
+                <div class="traceback-text col-md-9">
+                    <pre class="prettyprint"><code class="language-py">{{ traceback.text }}</code></pre>
+                </div>
+            </div>
+        {% endfor %}
+    </body>
 </div>
+{%- endblock %}
