@@ -30,8 +30,8 @@ TEMPLATES_DIR = os.path.join(ROOT_DIR, 'templates')
 
 @flask_app.route("/", methods=['GET'])
 def index():
-    # flask.render_template(os.path.join(TEMPLATES_DIR, 'index.html'))
-    flask.render_template('index.html')
+    flask_app.logger.debug('handling index request')
+    return flask.render_template('index.html', tracebacks=database.get_tracebacks(ES))
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
