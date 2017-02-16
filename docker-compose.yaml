@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 volumes:
   elasticsearch:
@@ -13,7 +13,7 @@ services:
     depends_on:
       - logspout
     volumes:
-      - /code/static
+      - ./web:/code
 
   nginx:
     restart:
@@ -23,9 +23,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /www/static
-    volumes_from:
-      - web
+      - ./web/static:/www/static
     depends_on:
       - web
 
