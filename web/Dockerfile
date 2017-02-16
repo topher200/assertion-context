@@ -16,11 +16,7 @@ RUN pip3 install -r requirements.txt
 COPY .aws_credentials /root/.aws/credentials
 COPY .aws_config /root/.aws/config
 
-# setup app environment
-COPY static static
-COPY templates templates
-COPY app app
-COPY server.py server.py
+# web app code is added by docker-compose volume
 
 # CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
 CMD ["python3", "server.py"]
