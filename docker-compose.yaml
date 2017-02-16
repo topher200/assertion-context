@@ -6,8 +6,8 @@ volumes:
 services:
   web:
     build: web/
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     links:
       - elasticsearch
     depends_on:
