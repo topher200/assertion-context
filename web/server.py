@@ -4,6 +4,7 @@
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
 import logging
+import os
 
 import flask
 from flask_elasticsearch import FlaskElasticsearch
@@ -22,6 +23,15 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 
 # set up database
 ES = FlaskElasticsearch(flask_app)
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES_DIR = os.path.join(ROOT_DIR, 'templates')
+
+
+@flask_app.route("/", methods=['GET'])
+def index():
+    flask_app.logger.debug('handling index request')
+    return flask.render_template('index.html', tracebacks=database.get_tracebacks(ES))
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])

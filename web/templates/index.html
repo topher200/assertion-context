@@ -1,0 +1,24 @@
+<!doctype html>
+<div class="container">
+    <header>
+        <div class="left-header col-md-3">
+        </div>
+        <div class="right-header col-md-9">
+            <h1>Tracebacks</h1>
+        </div>
+    </header>
+
+  <body>
+      {% for traceback in tracebacks %}
+      <div class="traceback-container">
+          <div class="traceback-metadata col-md-3">
+              <p>{{ traceback.origin_timestamp }}<br>
+                  <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
+          </div>
+          <div class="traceback-text col-md-9">
+              <pre class="prettyprint"><code class="language-py">{{ traceback.text }}</code></pre>
+          </div>
+      </div>
+      {% endfor %}
+  </body>
+</div>
