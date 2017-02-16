@@ -6,14 +6,14 @@ volumes:
 services:
   web:
     build: web/
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     links:
       - elasticsearch
     depends_on:
       - logspout
     volumes:
-      - /code/static
+      - ./web:/code
 
   nginx:
     restart:
@@ -23,9 +23,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /www/static
-    volumes_from:
-      - web
+      - ./web/static:/www/static
     depends_on:
       - web
 

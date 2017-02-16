@@ -12,10 +12,11 @@ RUN pip3 install --upgrade pip
 ADD requirements.txt ./
 RUN pip3 install -r requirements.txt
 
-# setup app environment
-ADD .aws_credentials /root/.aws/credentials
-ADD .aws_config /root/.aws/config
-ADD app app
-ADD server.py server.py
+# setup aws creds
+COPY .aws_credentials /root/.aws/credentials
+COPY .aws_config /root/.aws/config
 
-CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
+# web app code is added by docker-compose volume
+
+# CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
+CMD ["python3", "server.py"]

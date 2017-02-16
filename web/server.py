@@ -75,18 +75,16 @@ def get_tracebacks():
 
 @flask_app.before_first_request
 def setup_logging():
-    if not flask_app.debug:
-        # In production mode, add log handler to sys.stderr.
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            "%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
-            "%H:%M:%S"
-        )
-        handler.setFormatter(formatter)
-        flask_app.logger.addHandler(handler)
-        flask_app.logger.setLevel(logging.DEBUG)
+    # add log handler to sys.stderr.
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+        "%H:%M:%S"
+    )
+    handler.setFormatter(formatter)
+    flask_app.logger.addHandler(handler)
+    flask_app.logger.setLevel(logging.DEBUG)
 
 
 if __name__ == "__main__":
-    http_server = WSGIServer(('', 5000), DebuggedApplication(flask_app))
-    http_server.serve_forever()
+    flask_app.run(debug=True, host='0.0.0.0', port=8000)
