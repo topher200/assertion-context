@@ -24,9 +24,6 @@ flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
 # set up database
 ES = FlaskElasticsearch(flask_app)
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATES_DIR = os.path.join(ROOT_DIR, 'templates')
-
 
 @flask_app.route("/", methods=['GET'])
 def index():
