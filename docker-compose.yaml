@@ -13,7 +13,7 @@ services:
     depends_on:
       - logspout
     volumes:
-      - ./web:/code
+      - ./web:/code:ro
 
   nginx:
     restart:
@@ -23,7 +23,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./web/static:/www/static
+      - ./web/static:/www/static:ro
     depends_on:
       - web
 
