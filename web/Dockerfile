@@ -12,6 +12,10 @@ RUN pip3 install --upgrade pip
 ADD requirements.txt ./
 RUN pip3 install -r requirements.txt
 
+# setup aws creds
+COPY .aws_credentials /root/.aws/credentials
+COPY .aws_config /root/.aws/config
+
 # setup app environment
 ADD .aws_credentials /root/.aws/credentials
 ADD .aws_config /root/.aws/config
