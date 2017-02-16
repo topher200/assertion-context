@@ -29,7 +29,7 @@
                         <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
                 </div>
                 <div class="traceback-text col-md-9">
-                    <pre class="prettyprint"><code class="language-py">{{ traceback.text }}</code></pre>
+                    <pre class="prettyprint code">{{ traceback.text }}</pre>
                 </div>
             </div>
         {% endfor %}
