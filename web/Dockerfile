@@ -17,10 +17,10 @@ COPY .aws_credentials /root/.aws/credentials
 COPY .aws_config /root/.aws/config
 
 # setup app environment
-ADD .aws_credentials /root/.aws/credentials
-ADD .aws_config /root/.aws/config
-ADD app app
-ADD server.py server.py
+COPY static static
+COPY templates templates
+COPY app app
+COPY server.py server.py
 
 # CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
 CMD ["python3", "server.py"]
