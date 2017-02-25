@@ -10,8 +10,8 @@ import flask
 from flask_bootstrap import Bootstrap
 from elasticsearch import Elasticsearch
 
-from .app import database
-from .app import s3
+from app import database
+from app import s3
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
