@@ -120,7 +120,7 @@ def get_similar_tracebacks(es, traceback):
         index=INDEX,
         doc_type=DOC_TYPE,
         body=body,
-        # size=100
+        search_type='dfs_query_then_fetch',
     )
     ScoredTraceback = collections.namedtuple(
         'ScoredTraceback', 'traceback, score'
