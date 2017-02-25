@@ -35,11 +35,12 @@ ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 # add bootstrap
 Bootstrap(flask_app)
 
+
 import redis
 from flask_kvsession import KVSessionExtension
 from simplekv.memory.redisstore import RedisStore
 
-store = RedisStore(redis.StrictRedis())
+store = RedisStore(redis.StrictRedis(host='redis'))
 KVSessionExtension(store, flask_app)
 
 
