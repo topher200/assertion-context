@@ -27,12 +27,24 @@ class AutoReloadingFlask(flask.Flask):
 
 # start app
 flask_app = AutoReloadingFlask(__name__)
+flask_app.secret_key = ES_PASS
 
 # set up database
 ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 
 # add bootstrap
 Bootstrap(flask_app)
+
+
+@flask_app.route("/hide_traceback", methods=['POST'])
+def hide_traceback():
+    json_request = flask.request.get_json()
+    flask_app.logger.info('hide_traceback POST: %s', json_request)
+    if json_request is None or 'traceback_text' not in json_request:
+        return 'invalid json', 400
+    traceback_text = json_request['traceback_text']
+    flask.session['traceback_text'] = traceback_text
+    return 'success'
 
 
 @flask_app.route("/", methods=['GET'])
