@@ -51,7 +51,7 @@ def hide_traceback():
     if json_request is None or 'traceback_text' not in json_request:
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
-    flask.session['traceback_text'] = traceback_text
+    flask.session[traceback_text] = True
     return 'success'
 
 
@@ -59,6 +59,7 @@ def hide_traceback():
 def index():
     flask_app.logger.debug('handling index request')
     tracebacks = database.get_tracebacks(ES)
+    tracebacks = (t for t in tracebacks if t.traceback_text not in flask.session)
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks'
     )
