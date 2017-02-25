@@ -18,8 +18,14 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
     ES_PASS = str.strip(f.readline())
 
+# to work around https://github.com/pallets/flask/issues/1907
+class AutoReloadingFlask(flask.Flask):
+    def create_jinja_environment(self):
+        self.config['TEMPLATES_AUTO_RELOAD'] = True
+        return flask.Flask.create_jinja_environment(self)
+
 # start app
-flask_app = flask.Flask(__name__)
+flask_app = AutoReloadingFlask(__name__)
 
 # set up database
 ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
@@ -87,4 +93,5 @@ def setup_logging():
 
 
 if __name__ == "__main__":
+    flask_app.config['LOGGER_HANDLER_POLICY'] = 'never'
     flask_app.run(debug=True, host='0.0.0.0', port=8000)
