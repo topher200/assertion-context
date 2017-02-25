@@ -91,7 +91,8 @@ def get_tracebacks(es, start_date=None, end_date=None):
     res = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
-        body=body
+        body=body,
+        sort='origin_timestamp:desc'
     )
     for raw_traceback in res['hits']['hits']:
         yield generate_traceback_from_source(raw_traceback['_source'])
