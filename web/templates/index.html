@@ -1,14 +1,19 @@
 {%- extends "base.html" %}
 {% import "bootstrap/utils.html" as utils %}
 
-{% macro show_traceback(traceback) %}
+{% macro show_traceback(t) %}
 <div class="traceback-container">
     <div class="traceback-metadata col-md-3">
-        <p>{{ traceback.origin_timestamp }}<br>
-            <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
+        <p>{{ t.traceback.origin_timestamp }}<br>
+            <a href="https://papertrailapp.com/systems/{{ t.traceback.instance_id }}/events?focus={{ t.traceback.origin_papertrail_id }}">Papertrail logs</a></p>
+        <p>Similar tracebacks<br>
+            {% for similar in t.similar_tracebacks %}
+                <a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp, similar.score }}</a>
+            {% endfor %}
+        </p>
     </div>
     <div class="traceback-text col-md-9">
-        <pre class="prettyprint code">{{ traceback.traceback_text }}</pre>
+        <pre class="prettyprint code">{{ t.traceback.traceback_text }}</pre>
     </div>
 </div>
 {% endmacro %}
@@ -36,8 +41,8 @@
     <body>
         <div class="container">
             <div class="row">
-                {% for traceback in tracebacks %}
-                    {{ show_traceback(traceback) }}
+                {% for t in tb_meta %}
+                    {{ show_traceback(t) }}
                 {% endfor %}
             </div>
         </div>
