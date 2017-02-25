@@ -16,8 +16,7 @@ from app import s3
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
-    ES_PASS = f.readline()
-
+    ES_PASS = str.strip(f.readline())
 
 # start app
 flask_app = flask.Flask(__name__)
