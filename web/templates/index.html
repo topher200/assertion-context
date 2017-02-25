@@ -5,11 +5,15 @@
 <div class="traceback-container">
     <div class="traceback-metadata col-md-3">
         <p>{{ t.traceback.origin_timestamp }}<br>
-            <a href="https://papertrailapp.com/systems/{{ t.traceback.instance_id }}/events?focus={{ t.traceback.origin_papertrail_id }}">Papertrail logs</a></p>
-        <p>Similar tracebacks<br>
-            {% for similar in t.similar_tracebacks %}
-            <p><a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a></p>
-            {% endfor %}
+            <a href="https://papertrailapp.com/systems/{{ t.traceback.instance_id }}/events?focus={{ t.traceback.origin_papertrail_id }}">Papertrail log</a></p>
+        <p>Similar tracebacks
+            <ul>
+                {% for similar in t.similar_tracebacks %}
+                <li>
+                    <a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a>
+                </li>
+                {% endfor %}
+            </ul>
         </p>
     </div>
     <div class="traceback-text col-md-9">
