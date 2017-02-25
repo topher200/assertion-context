@@ -3,6 +3,8 @@
 
     For all functions, `es` must be an instance of FlaskElasticsearch
 """
+import collections
+
 from .traceback import Traceback, generate_traceback_from_source
 
 
@@ -97,3 +99,34 @@ def get_tracebacks(es, start_date=None, end_date=None):
     )
     for raw_traceback in res['hits']['hits']:
         yield generate_traceback_from_source(raw_traceback['_source'])
+
+
+def get_similar_tracebacks(es, traceback):
+    """
+        Queries the database for any tracebacks with similar traceback_text
+
+        @rtype: generator
+        @postcondition: all(isinstance(v, Traceback) for v in return)
+    """
+    body = {
+        "query": {
+            "match_phrase": {
+                "traceback_text": traceback.traceback_text
+            }
+        }
+    }
+
+    raw_es_response = es.search(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        body=body,
+        sort='origin_timestamp:desc',
+    )
+    ScoredTraceback = collections.namedtuple(
+        'ScoredTraceback', 'traceback, score'
+    )
+    for raw_traceback in raw_es_response['hits']['hits']:
+        yield ScoredTraceback(
+            generate_traceback_from_source(raw_traceback['_source']),
+            raw_traceback['_score']
+        )

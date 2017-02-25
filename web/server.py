@@ -3,6 +3,7 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import collections
 import logging
 import os
 
@@ -37,7 +38,12 @@ Bootstrap(flask_app)
 @flask_app.route("/", methods=['GET'])
 def index():
     flask_app.logger.debug('handling index request')
-    return flask.render_template('index.html', tracebacks=database.get_tracebacks(ES))
+    tracebacks = database.get_tracebacks(ES)
+    TracebackMetadata = collections.namedtuple(
+        'TracebackMetadata', 'traceback, similar_tracebacks'
+    )
+    tb_meta = [TracebackMetadata(t, database.get_similar_tracebacks(ES, t)) for t in tracebacks]
+    return flask.render_template('index.html', tb_meta=tb_meta)
 
 
 @flask_app.route("/api/parse_s3", methods=['POST'])
