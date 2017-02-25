@@ -14,14 +14,16 @@ from .app import database
 from .app import s3
 
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
+    ES_PASS = f.readline()
+
+
 # start app
 flask_app = flask.Flask(__name__)
 
-# configuration
-flask_app.config['ELASTICSEARCH_HOST'] = "elasticsearch:9200"
-
 # set up database
-ES = FlaskElasticsearch(flask_app)
+ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 
 # add bootstrap
 Bootstrap(flask_app)
