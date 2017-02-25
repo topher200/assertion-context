@@ -4,8 +4,6 @@
 {% macro show_traceback(t) %}
 <div class="traceback-container">
     <div class="traceback-metadata col-md-3">
-        <p>{{ t.traceback.origin_timestamp }}<br>
-            <a href="https://papertrailapp.com/systems/{{ t.traceback.instance_id }}/events?focus={{ t.traceback.origin_papertrail_id }}">Papertrail log</a></p>
         <p>Instances <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button>
             <ul>
                 {% for similar in t.similar_tracebacks %}
