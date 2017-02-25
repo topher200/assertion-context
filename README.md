@@ -25,6 +25,7 @@ aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
   - (optional) fill out web/.aws_config as well. defaults to us-east-1
+ - fill out web/.es_credentials. the file should be a single line containing only the Elasticsearch cluster password
 
 Then to start it all up:
   - ./start-servers.sh
