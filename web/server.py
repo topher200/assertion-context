@@ -35,6 +35,13 @@ ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 # add bootstrap
 Bootstrap(flask_app)
 
+import redis
+from flask_kvsession import KVSessionExtension
+from simplekv.memory.redisstore import RedisStore
+
+store = RedisStore(redis.StrictRedis())
+KVSessionExtension(store, flask_app)
+
 
 @flask_app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
