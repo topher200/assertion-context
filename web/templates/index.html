@@ -8,8 +8,7 @@
             <a href="https://papertrailapp.com/systems/{{ t.traceback.instance_id }}/events?focus={{ t.traceback.origin_papertrail_id }}">Papertrail logs</a></p>
         <p>Similar tracebacks<br>
             {% for similar in t.similar_tracebacks %}
-            <p><a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a><br>
-                {{ similar.score }}</p>
+            <p><a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a></p>
             {% endfor %}
         </p>
     </div>
