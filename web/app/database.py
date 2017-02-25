@@ -121,6 +121,7 @@ def get_similar_tracebacks(es, traceback):
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
+        size=1000
     )
     ScoredTraceback = collections.namedtuple(
         'ScoredTraceback', 'traceback, score'
