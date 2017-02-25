@@ -1,6 +1,18 @@
 {%- extends "base.html" %}
 {% import "bootstrap/utils.html" as utils %}
 
+{% macro show_traceback(traceback) %}
+<div class="traceback-container">
+    <div class="traceback-metadata col-md-3">
+        <p>{{ traceback.origin_timestamp }}<br>
+            <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
+    </div>
+    <div class="traceback-text col-md-9">
+        <pre class="prettyprint code">{{ traceback.traceback_text }}</pre>
+    </div>
+</div>
+{% endmacro %}
+
 {% block content %}
 <div class="container">
     {%- with messages = get_flashed_messages(with_categories=True) %}
@@ -25,15 +37,7 @@
         <div class="container">
             <div class="row">
                 {% for traceback in tracebacks %}
-                    <div class="traceback-container">
-                        <div class="traceback-metadata col-md-3">
-                            <p>{{ traceback.origin_timestamp }}<br>
-                                <a href="https://papertrailapp.com/systems/{{ traceback.instance_id }}/events?focus={{ traceback.origin_papertrail_id }}">Papertrail logs</a></p>
-                        </div>
-                        <div class="traceback-text col-md-9">
-                            <pre class="prettyprint code">{{ traceback.traceback_text }}</pre>
-                        </div>
-                    </div>
+                    {{ show_traceback(traceback) }}
                 {% endfor %}
             </div>
         </div>
