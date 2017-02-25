@@ -15,7 +15,8 @@ class Traceback(object):
         origin line's id and timestamp (in L{origin_papertrail_id} and L{origin_timestamp}).
 
         Fields:
-        - text: the traceback text parsed from individual log lines
+        - traceback_text: the traceback text (only the traceback) parsed from individual log lines
+        - raw_text: the traceback text, plus extra lines before the traceback
         - origin_papertrail_id: the int id papertrail gave the last log line in our traceback.
             assumed to be unique among all other Papertrail ids. example: 700594297938165774
         - origin_timestamp: datetime object (parsed from string) of the timestamp the final log
@@ -27,7 +28,8 @@ class Traceback(object):
     """
     def __init__(
             self,
-            text,
+            traceback_text,
+            raw_text,
             origin_papertrail_id,
             origin_timestamp,
             instance_id,
@@ -37,7 +39,8 @@ class Traceback(object):
             type(origin_timestamp), origin_timestamp
         )
 
-        self._text = text
+        self._traceback_text = traceback_text
+        self._raw_text = raw_text
         self._origin_papertrail_id = origin_papertrail_id
         self._origin_timestamp = origin_timestamp
         self._instance_id = instance_id
@@ -50,7 +53,8 @@ class Traceback(object):
             Document form is a dictionary of <field name>: <value> pairs.
         """
         return {
-            "text": self._text,
+            "traceback_text": self._traceback_text,
+            "raw_text": self._raw_text,
             "origin_papertrail_id": self._origin_papertrail_id,
             "origin_timestamp": self._origin_timestamp,
             "instance_id": self._instance_id,
@@ -61,8 +65,12 @@ class Traceback(object):
         return str(self.document())
 
     @property
-    def text(self):
-        return self._text
+    def traceback_text(self):
+        return self._traceback_text
+
+    @property
+    def raw_text(self):
+        return self._raw_text
 
     @property
     def origin_papertrail_id(self):
@@ -94,7 +102,8 @@ def generate_traceback_from_source(source):
     )
 
     return Traceback(
-        source["text"],
+        source["traceback_text"],
+        source["raw_text"],
         source["origin_papertrail_id"],
         timestamp,
         source["instance_id"],

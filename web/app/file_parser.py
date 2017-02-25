@@ -71,7 +71,9 @@ def __generate_Traceback(origin_logline, previous_loglines):
         logline.parsed_log_message for logline
         in itertools.chain(previous_loglines, [origin_logline])
     )
+    traceback_text = _get_last_traceback_text(parsed_text)
     return Traceback(
+        traceback_text,
         parsed_text,
         origin_logline.papertrail_id,
         origin_logline.timestamp,
@@ -79,6 +81,21 @@ def __generate_Traceback(origin_logline, previous_loglines):
         origin_logline.program_name,
     )
 
+def _get_last_traceback_text(parsed_log_text):
+    """
+        For the given parsed log text, filter out just the last traceback text.
+
+        All python tracebacks start with the string 'Traceback (most recent call last)'. We grab
+        the last one in the parsed text.
+
+        If we can't parse out the traceback, returns an empty string.
+    """
+    assert isinstance(parsed_log_text, str), (type(parsed_log_text), parsed_log_text)
+
+    _, sep, traceback_text = parsed_log_text.rpartition('Traceback (most recent call last)')
+    if len(sep) == 0:
+        print("unable to parse out Traceback")
+    return sep + traceback_text
 
 def __parse_papertrail_log_line(raw_log_line):
     """
