@@ -9,7 +9,11 @@
         <p>Instances <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button>
             <ul>
                 {% for similar in t.similar_tracebacks %}
-                <li>
+                <li
+                    {% if t.traceback.origin_papertrail_id == similar.traceback.origin_papertrail_id %}
+                    class="highlight"
+                    {% endif %}
+                >
                     <a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a>
                 </li>
                 {% endfor %}
