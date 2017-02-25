@@ -36,6 +36,14 @@ ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 Bootstrap(flask_app)
 
 
+import redis
+from flask_kvsession import KVSessionExtension
+from simplekv.memory.redisstore import RedisStore
+
+store = RedisStore(redis.StrictRedis(host='redis'))
+KVSessionExtension(store, flask_app)
+
+
 @flask_app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
     json_request = flask.request.get_json()
@@ -43,7 +51,7 @@ def hide_traceback():
     if json_request is None or 'traceback_text' not in json_request:
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
-    flask.session['traceback_text'] = traceback_text
+    flask.session[traceback_text] = True
     return 'success'
 
 
@@ -51,6 +59,7 @@ def hide_traceback():
 def index():
     flask_app.logger.debug('handling index request')
     tracebacks = database.get_tracebacks(ES)
+    tracebacks = (t for t in tracebacks if t.traceback_text not in flask.session)
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks'
     )
