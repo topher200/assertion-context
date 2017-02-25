@@ -8,12 +8,10 @@ import os
 
 import flask
 from flask_bootstrap import Bootstrap
-from flask_elasticsearch import FlaskElasticsearch
-from gevent.wsgi import WSGIServer
-from werkzeug.debug import DebuggedApplication
+from elasticsearch import Elasticsearch
 
-from app import database
-from app import s3
+from .app import database
+from .app import s3
 
 
 # start app
