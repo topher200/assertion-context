@@ -8,8 +8,11 @@ import logging
 import os
 
 import flask
+import redis
 from flask_bootstrap import Bootstrap
+from flask_kvsession import KVSessionExtension
 from elasticsearch import Elasticsearch
+from simplekv.memory.redisstore import RedisStore
 
 from app import database
 from app import s3
@@ -35,11 +38,7 @@ ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
 # add bootstrap
 Bootstrap(flask_app)
 
-
-import redis
-from flask_kvsession import KVSessionExtension
-from simplekv.memory.redisstore import RedisStore
-
+# use redis for our session storage (ie: server side cookies)
 store = RedisStore(redis.StrictRedis(host='redis'))
 KVSessionExtension(store, flask_app)
 
