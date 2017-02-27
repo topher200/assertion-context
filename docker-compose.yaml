@@ -6,8 +6,8 @@ volumes:
 services:
   web:
     build: web/
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     links:
       - elasticsearch
       - redis
@@ -21,8 +21,8 @@ services:
       always
     build:
       nginx/
-    ports:
-      - "80:80"
+    # ports:
+    #   - "80:80"
     volumes:
       - ./web/static:/www/static:ro
     depends_on:
@@ -48,8 +48,8 @@ services:
     mem_limit: 1g
     cap_add:
       - IPC_LOCK
-    ports:
-      - 9200:9200
+    # ports:
+    #   - 9200:9200
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data
     depends_on:
@@ -62,8 +62,8 @@ services:
       - logspout
     environment:
       - xpack.security.enabled=false
-    ports:
-      - "5601:5601"
+    # ports:
+    #   - "5601:5601"
 
   logspout:
     build: logspout/
