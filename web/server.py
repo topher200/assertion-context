@@ -33,7 +33,7 @@ flask_app = AutoReloadingFlask(__name__)
 flask_app.secret_key = ES_PASS
 
 # set up database
-ES = Elasticsearch(["elasticsearch:9200"], http_auth=('elastic', ES_PASS))
+ES = Elasticsearch(["elasticsearch:9200"])
 
 # add bootstrap
 Bootstrap(flask_app)
