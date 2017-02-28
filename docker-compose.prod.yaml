@@ -2,4 +2,4 @@ version: '2'
 
 services:
   web:
-    command: ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
+    command: ["gunicorn", "--workers", "4", "--bind", ":8000", "server:flask_app"]
