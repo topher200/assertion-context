@@ -2,6 +2,8 @@ Service to take Papertrail logs, parse out assertion information, and make cool 
 
 TODO: describe each part here
 
+Elasticsearch database must be externally hosted.
+
 We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up host:
  - install docker
@@ -25,9 +27,7 @@ aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
   - (optional) fill out web/.aws_config as well. defaults to us-east-1
-  - set the Elasticsearch password
-    - instructions here: https://www.elastic.co/guide/en/x-pack/current/security-getting-started.html
-  - fill out web/.es_credentials. the file should be a single line containing only the Elasticsearch cluster password
+  - fill out web/.es_credentials. the file should be a single line containing only the Elasticsearch URL
 
 Then to start it all up:
   - ./start-servers.sh

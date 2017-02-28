@@ -20,7 +20,7 @@ from app import s3
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
-    ES_PASS = str.strip(f.readline())
+    ES_ADDRESS = str.strip(f.readline())
 
 # to work around https://github.com/pallets/flask/issues/1907
 class AutoReloadingFlask(flask.Flask):
@@ -30,10 +30,10 @@ class AutoReloadingFlask(flask.Flask):
 
 # start app
 flask_app = AutoReloadingFlask(__name__)
-flask_app.secret_key = ES_PASS
+flask_app.secret_key = ES_ADDRESS
 
 # set up database
-ES = Elasticsearch(["elasticsearch:9200"])
+ES = Elasticsearch([ES_ADDRESS])
 
 # add bootstrap
 Bootstrap(flask_app)
