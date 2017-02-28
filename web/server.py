@@ -29,7 +29,7 @@ class AutoReloadingFlask(flask.Flask):
         self.config['TEMPLATES_AUTO_RELOAD'] = True
         return flask.Flask.create_jinja_environment(self)
 
-# start app
+# create app
 flask_app = AutoReloadingFlask(__name__)
 flask_app.secret_key = ES_ADDRESS
 
