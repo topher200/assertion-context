@@ -6,3 +6,4 @@ Flask-KVSession==0.6.2
 gevent==1.1.2
 Gunicorn==19.6
 redis==2.10.5
+certifi

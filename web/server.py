@@ -3,6 +3,7 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import certifi
 import collections
 import logging
 import os
