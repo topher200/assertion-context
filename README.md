@@ -2,8 +2,6 @@ Service to take Papertrail logs, parse out assertion information, and make cool 
 
 TODO: describe each part here
 
-Elasticsearch database must be externally hosted.
-
 We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up host:
  - install docker
@@ -35,6 +33,8 @@ Then to start it all up:
 Once servers are started, tests can be run with
   - ./run-tests.sh
     - Note that this requires python3
+
+Elasticsearch database must be externally hosted. The IP of this server must be whitelisted.
 
 ---
 

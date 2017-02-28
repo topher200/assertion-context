@@ -20,5 +20,4 @@ COPY .aws_config /root/.aws/config
 
 # web app code is added by docker-compose volume
 
-CMD ["gunicorn", "--workers", "2", "--bind", ":8000", "server:flask_app"]
-# CMD ["python3", "server.py"]
+CMD ["python3", "server.py"]
