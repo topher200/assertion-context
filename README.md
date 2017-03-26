@@ -6,6 +6,15 @@ At a high level, here's the steps we perform:
 - we download the log file and parse it for Python tracebacks. we save the tracebacks to ElasticSearch
 - we provide a Jinja templated site to show these tracebacks to our users
 
+= Parsing Papertrail logs
+
+We take the archived Papertrail logs in .tsv.gz format and unzip them. We search
+them for any errors. When an error is found, we go backwards in the logs to find
+the root cause (context) of the assertion, which includes the traceback and the
+log lines before the traceback. We do this by determining the instance ID of the
+machine that had the assertion and searching the logs for the lines on that
+machine previous to the offending line.
+
 = Getting it set up
 == Server installation instructions
 We run everything in Docker, but there's some things you need to set up on the
