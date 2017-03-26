@@ -6,18 +6,30 @@
 import collections
 
 from dogpile.cache import make_region
+import redis
 
 from .traceback import Traceback, generate_traceback_from_source
 
 
-DOGPILE_REGION = make_region().configure(
-    'dogpile.cache.redis',
-    arguments={
-        'host': 'redis',
-        'redis_expiration_time': 60*60*2,  # 2 hours
-    }
-)
-
+# if we don't see the remote (docker) redis, see if we're running locally instead
+try:
+    DOGPILE_REGION = make_region().configure(
+        'dogpile.cache.redis',
+        arguments={
+            'host': 'redis',
+            'redis_expiration_time': 60*60*2,  # 2 hours
+        }
+    )
+    DOGPILE_REGION.get('confirm_redis_connection')
+except redis.exceptions.ConnectionError:
+    DOGPILE_REGION = make_region().configure(
+        'dogpile.cache.redis',
+        arguments={
+            'host': 'localhost',
+            'redis_expiration_time': 60*60*2,  # 2 hours
+        }
+    )
+    DOGPILE_REGION.get('confirm_redis_connection')
 
 INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'
