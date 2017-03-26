@@ -6,6 +6,7 @@
 import collections
 import logging
 import os
+import time
 
 import certifi
 
@@ -117,6 +118,17 @@ def setup_logging():
     handler.setFormatter(formatter)
     flask_app.logger.addHandler(handler)
     flask_app.logger.setLevel(logging.DEBUG)
+
+
+@flask_app.before_request
+def before_request():
+    flask.g.start_time = time.time()
+
+
+@flask_app.teardown_request
+def teardown_request(_):
+    time_diff = time.time() - flask.g.start_time
+    flask_app.logger.debug('request took %.2fs', time_diff)
 
 
 if __name__ == "__main__":
