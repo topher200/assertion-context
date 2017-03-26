@@ -9,9 +9,11 @@ from dogpile.cache import make_region
 
 from .traceback import Traceback, generate_traceback_from_source
 
+
 DOGPILE_REGION = make_region().configure(
     'dogpile.cache.redis',
     arguments={
+        'host': 'redis',
         'redis_expiration_time': 60*60*2,  # 2 hours
     }
 )
