@@ -4,3 +4,7 @@ services:
   web:
     ports:
       - "8000:8000"
+
+  redis:
+    ports:
+      - "6379:6379"
