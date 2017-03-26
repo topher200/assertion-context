@@ -29,7 +29,7 @@ services:
 
   logspout:
     image:
-      gliderlabs/logspout
+      gliderlabs/logspout:v3.1
     restart:
       always
     environment:
