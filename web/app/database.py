@@ -5,7 +5,16 @@
 """
 import collections
 
+from dogpile.cache import make_region
+
 from .traceback import Traceback, generate_traceback_from_source
+
+DOGPILE_REGION = make_region().configure(
+    'dogpile.cache.redis',
+    arguments={
+        'redis_expiration_time': 60*60*2,  # 2 hours
+    }
+)
 
 
 INDEX = 'traceback-index'
@@ -20,12 +29,14 @@ def save_traceback(es, traceback):
     """
     assert isinstance(traceback, Traceback), (type(traceback), traceback)
     doc = traceback.document()
-    return es.index(
+    res = es.index(
         index=INDEX,
         doc_type=DOC_TYPE,
         id=traceback.origin_papertrail_id,
         body=doc
     )
+    DOGPILE_REGION.invalidate()
+    return res
 
 
 def refresh(es):
@@ -37,6 +48,7 @@ def refresh(es):
     )
 
 
+@DOGPILE_REGION.cache_on_arguments()
 def get_tracebacks(es, start_date=None, end_date=None):
     """
         Queries the database for L{Traceback} from a given date range.
@@ -101,6 +113,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
         yield generate_traceback_from_source(raw_traceback['_source'])
 
 
+@DOGPILE_REGION.cache_on_arguments()
 def get_similar_tracebacks(es, traceback):
     """
         Queries the database for any tracebacks with similar traceback_text
