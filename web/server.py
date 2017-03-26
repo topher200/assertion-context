@@ -43,6 +43,8 @@ Bootstrap(app)
 store = RedisStore(redis.StrictRedis(host='redis'))
 KVSessionExtension(store, app)
 
+TRACEBACK_TEXT_KV_PREFIX = 'hide-'
+
 
 @app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
@@ -51,7 +53,15 @@ def hide_traceback():
     if json_request is None or 'traceback_text' not in json_request:
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
-    flask.session[traceback_text] = True
+    flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
+    return 'success'
+
+
+@app.route("/restore_all", methods=['POST'])
+def restore_all_tracebacks():
+    for key in flask.session:
+        if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
+            flask.session[key] = False
     return 'success'
 
 
@@ -59,7 +69,11 @@ def hide_traceback():
 def index():
     app.logger.debug('handling index request')
     tracebacks = database.get_tracebacks(ES)
-    tracebacks = (t for t in tracebacks if t.traceback_text not in flask.session)
+    # get all tracebacks that the user hasn't hidden
+    tracebacks = (
+        t for t in tracebacks
+        if not flask.session.get(TRACEBACK_TEXT_KV_PREFIX + t.traceback_text, False)
+    )
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks'
     )
