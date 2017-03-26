@@ -12,3 +12,17 @@ function hide_traceback_text(traceback_button){
         contentType: "application/json"
     });
 }
+
+
+function restore_all(){
+    payload = {};
+    $.ajax({
+        type: "POST",
+        url: "/restore_all",
+        data: JSON.stringify(payload),
+        success: function() {
+            location.reload();
+        },
+        contentType: "application/json"
+    });
+}

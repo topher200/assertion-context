@@ -79,7 +79,20 @@ def index():
     )
     tb_meta = [TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
                for t in tracebacks]
-    return flask.render_template('index.html', tb_meta=tb_meta)
+    return flask.render_template('index.html',
+                                 tb_meta=tb_meta,
+                                 show_restore_button=__user_has_hidden_tracebacks()
+    )
+
+
+def __user_has_hidden_tracebacks():
+    """
+        Returns True if the user has hidden any tracebacks using /hide_traceback this session
+    """
+    for key in flask.session:
+        if key.startswith(TRACEBACK_TEXT_KV_PREFIX) and flask.session[key]:
+            return True
+    return False
 
 
 @app.route("/api/parse_s3", methods=['POST'])
