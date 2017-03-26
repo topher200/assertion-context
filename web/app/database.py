@@ -1,7 +1,7 @@
 """
     Utility functions for performing actions on our ES database.
 
-    For all functions, `es` must be an instance of FlaskElasticsearch
+    For all functions, `es` must be an instance of Elasticsearch
 """
 import collections
 
