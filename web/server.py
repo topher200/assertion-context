@@ -149,12 +149,13 @@ def setup_logging():
 @app.before_request
 def before_request():
     flask.g.start_time = time.time()
+    flask.g.endpoint = flask.request.endpoint
 
 
 @app.teardown_request
 def profile_request(_):
     time_diff = time.time() - flask.g.start_time
-    app.logger.debug('request took %.2fs', time_diff)
+    app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
 
 
 if __name__ == "__main__":
