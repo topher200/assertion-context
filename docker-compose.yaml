@@ -28,7 +28,10 @@ services:
     image: redis:3.0
 
   logspout:
-    build: logspout/
+    image:
+      gliderlabs/logspout
+    restart:
+      always
     environment:
       ROUTE_URIS: syslog://logs4.papertrailapp.com:31896
     volumes:
