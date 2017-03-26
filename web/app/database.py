@@ -60,11 +60,13 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
         All filtering params are optional. Any params that are None are ignored.
 
+        Returns a list (instead of a generator) so we can be cached
+
         Params:
         - start_date: must be a datetime.date
         - end_date: must be a datetime.date
 
-        @rtype: generator
+        @rtype: list
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
     params_list = []
@@ -104,15 +106,17 @@ def get_tracebacks(es, start_date=None, end_date=None):
             }
         }
 
-    res = es.search(
+    raw_tracebacks = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
         size=100
     )
-    for raw_traceback in res['hits']['hits']:
-        yield generate_traceback_from_source(raw_traceback['_source'])
+    res = []
+    for raw_traceback in raw_tracebacks['hits']['hits']:
+        res.append(generate_traceback_from_source(raw_traceback['_source']))
+    return res
 
 
 @DOGPILE_REGION.cache_on_arguments()
@@ -120,8 +124,10 @@ def get_similar_tracebacks(es, traceback_text):
     """
         Queries the database for any tracebacks with identical traceback_text
 
+        Returns a list (instead of a generator) so we can be cached
+
         @type traceback_text: str
-        @rtype: generator
+        @rtype: list
 
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
@@ -140,5 +146,7 @@ def get_similar_tracebacks(es, traceback_text):
         sort='origin_timestamp:desc',
         size=1000
     )
+    res = []
     for raw_traceback in raw_es_response['hits']['hits']:
-        yield generate_traceback_from_source(raw_traceback['_source'])
+        res.append(generate_traceback_from_source(raw_traceback['_source']))
+    return res
