@@ -63,7 +63,37 @@ Create an SNS topic to trigger a Lambda function whenever a Papertrail log file
 is added to your s3 archive. The Lambda function should call our api
 (/api/parse_s3) with the bucket and key of the log file.
 
-TODO: example here:
+Example lambda function:
 
-## References
-elk/ is adapted from https://github.com/deviantony/docker-elk
+```
+import json
+import requests
+import urllib
+import boto3
+
+print('Loading function')
+
+s3 = boto3.client('s3')
+
+API_HOST_URL = 'http://ec2-8-8-8-8.compute-1.amazonaws.com'
+API_ENDPOINT = '/api/parse_s3'
+API_REQUEST_URL = API_HOST_URL + API_ENDPOINT
+
+
+def lambda_handler(event, context):
+    # print("Received event: " + json.dumps(event, indent=2))
+
+    # Get the object from the event and show its content type
+    bucket = event['Records'][0]['s3']['bucket']['name']
+    key = urllib.unquote_plus(event['Records'][0]['s3']['object']['key'].encode('utf8'))
+    payload = {
+        "bucket": bucket,
+        "key": key,
+    }
+    print payload
+    res = requests.post(API_REQUEST_URL, json=payload)
+    if res.status_code == 200:
+        print('Successfully parsed "%s"' % key)
+    else:
+        print('Parse request received %s. data: "%s"' % (res.status_code, payload))
+```
