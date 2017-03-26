@@ -2,6 +2,8 @@ import datetime
 import os
 import unittest
 
+import certifi
+
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 
@@ -15,10 +17,16 @@ from app import database
 from app import traceback
 
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
+    ES_ADDRESS = str.strip(f.readline())
+
+
 class TestElasticSearch(unittest.TestCase):
     def setUp(self):
-        self.es = Elasticsearch("localhost:9200")
+        self.es = Elasticsearch(ES_ADDRESS, use_ssl=True)
         self.traceback_0 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             '700594297938165770',
             datetime.datetime(2000, 8, 12, 3, 18, 00),
@@ -26,6 +34,7 @@ class TestElasticSearch(unittest.TestCase):
             'manager.debug',
         )
         self.traceback_1 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
             '700594297938165771',
             datetime.datetime(2000, 8, 12, 3, 18, 1),
