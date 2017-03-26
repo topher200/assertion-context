@@ -8,8 +8,6 @@ import logging
 import os
 import time
 
-import certifi
-
 import flask
 import redis
 from flask_bootstrap import Bootstrap

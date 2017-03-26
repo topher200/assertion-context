@@ -2,8 +2,6 @@ import datetime
 import os
 import unittest
 
-import certifi
-
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 

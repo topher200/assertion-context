@@ -3,8 +3,6 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
-import collections
-
 from dogpile.cache import make_region
 import redis
 
