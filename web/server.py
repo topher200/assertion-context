@@ -65,7 +65,8 @@ def index():
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks'
     )
-    tb_meta = [TracebackMetadata(t, database.get_similar_tracebacks(ES, t)) for t in tracebacks]
+    tb_meta = [TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
+               for t in tracebacks]
     return flask.render_template('index.html', tb_meta=tb_meta)
 
 

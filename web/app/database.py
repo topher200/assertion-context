@@ -5,7 +5,18 @@
 """
 import collections
 
+from dogpile.cache import make_region
+
 from .traceback import Traceback, generate_traceback_from_source
+
+
+DOGPILE_REGION = make_region().configure(
+    'dogpile.cache.redis',
+    arguments={
+        'host': 'redis',
+        'redis_expiration_time': 60*60*2,  # 2 hours
+    }
+)
 
 
 INDEX = 'traceback-index'
@@ -20,12 +31,14 @@ def save_traceback(es, traceback):
     """
     assert isinstance(traceback, Traceback), (type(traceback), traceback)
     doc = traceback.document()
-    return es.index(
+    res = es.index(
         index=INDEX,
         doc_type=DOC_TYPE,
         id=traceback.origin_papertrail_id,
         body=doc
     )
+    DOGPILE_REGION.invalidate()
+    return res
 
 
 def refresh(es):
@@ -37,6 +50,7 @@ def refresh(es):
     )
 
 
+@DOGPILE_REGION.cache_on_arguments()
 def get_tracebacks(es, start_date=None, end_date=None):
     """
         Queries the database for L{Traceback} from a given date range.
@@ -46,11 +60,13 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
         All filtering params are optional. Any params that are None are ignored.
 
+        Returns a list (instead of a generator) so we can be cached
+
         Params:
         - start_date: must be a datetime.date
         - end_date: must be a datetime.date
 
-        @rtype: generator
+        @rtype: list
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
     params_list = []
@@ -90,28 +106,35 @@ def get_tracebacks(es, start_date=None, end_date=None):
             }
         }
 
-    res = es.search(
+    raw_tracebacks = es.search(
         index=INDEX,
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
         size=100
     )
-    for raw_traceback in res['hits']['hits']:
-        yield generate_traceback_from_source(raw_traceback['_source'])
+    res = []
+    for raw_traceback in raw_tracebacks['hits']['hits']:
+        res.append(generate_traceback_from_source(raw_traceback['_source']))
+    return res
 
 
-def get_similar_tracebacks(es, traceback):
+@DOGPILE_REGION.cache_on_arguments()
+def get_similar_tracebacks(es, traceback_text):
     """
-        Queries the database for any tracebacks with similar traceback_text
+        Queries the database for any tracebacks with identical traceback_text
 
-        @rtype: generator
+        Returns a list (instead of a generator) so we can be cached
+
+        @type traceback_text: str
+        @rtype: list
+
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
     body = {
         "query": {
             "match_phrase": {
-                "traceback_text": traceback.traceback_text
+                "traceback_text": traceback_text
             }
         }
     }
@@ -123,5 +146,7 @@ def get_similar_tracebacks(es, traceback):
         sort='origin_timestamp:desc',
         size=1000
     )
+    res = []
     for raw_traceback in raw_es_response['hits']['hits']:
-        yield generate_traceback_from_source(raw_traceback['_source'])
+        res.append(generate_traceback_from_source(raw_traceback['_source']))
+    return res
