@@ -114,17 +114,19 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_similar_tracebacks(es, traceback):
+def get_similar_tracebacks(es, traceback_text):
     """
-        Queries the database for any tracebacks with similar traceback_text
+        Queries the database for any tracebacks with identical traceback_text
 
+        @type traceback_text: str
         @rtype: generator
+
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
     body = {
         "query": {
             "match_phrase": {
-                "traceback_text": traceback.traceback_text
+                "traceback_text": traceback_text
             }
         }
     }
