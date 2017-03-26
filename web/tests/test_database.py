@@ -74,23 +74,6 @@ class TestElasticSearch(unittest.TestCase):
             )
         )
 
-    def test_get_tracebacks_from_date_range(self):
-        """
-            Check that when we search for our new tracebacks we find them.
-        """
-        # save the tracebacks
-        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
-        self.assertTrue(database.save_traceback(self.es, self.traceback_1))
-        database.refresh(self.es)
-
-        # test that we find them all. assumes that the timestamps are from the same day.
-        tracebacks = database.get_tracebacks(
-            self.es,
-            self.traceback_0.origin_timestamp.date(),
-            self.traceback_0.origin_timestamp.date(),
-        )
-        self.assertEqual(len(list(tracebacks)), 2)
-
     def test_get_tracebacks_no_params(self):
         """
             Check that when we search for all tracebacks, we find many
