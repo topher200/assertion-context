@@ -32,24 +32,24 @@ class AutoReloadingFlask(flask.Flask):
         return flask.Flask.create_jinja_environment(self)
 
 # create app
-flask_app = AutoReloadingFlask(__name__)
-flask_app.secret_key = ES_ADDRESS
+app = AutoReloadingFlask(__name__)
+app.secret_key = ES_ADDRESS
 
 # set up database
 ES = Elasticsearch([ES_ADDRESS])
 
 # add bootstrap
-Bootstrap(flask_app)
+Bootstrap(app)
 
 # use redis for our session storage (ie: server side cookies)
 store = RedisStore(redis.StrictRedis(host='redis'))
-KVSessionExtension(store, flask_app)
+KVSessionExtension(store, app)
 
 
-@flask_app.route("/hide_traceback", methods=['POST'])
+@app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
     json_request = flask.request.get_json()
-    flask_app.logger.info('hide_traceback POST: %s', json_request)
+    app.logger.info('hide_traceback POST: %s', json_request)
     if json_request is None or 'traceback_text' not in json_request:
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
@@ -57,9 +57,9 @@ def hide_traceback():
     return 'success'
 
 
-@flask_app.route("/", methods=['GET'])
+@app.route("/", methods=['GET'])
 def index():
-    flask_app.logger.debug('handling index request')
+    app.logger.debug('handling index request')
     tracebacks = database.get_tracebacks(ES)
     tracebacks = (t for t in tracebacks if t.traceback_text not in flask.session)
     TracebackMetadata = collections.namedtuple(
@@ -69,7 +69,7 @@ def index():
     return flask.render_template('index.html', tb_meta=tb_meta)
 
 
-@flask_app.route("/api/parse_s3", methods=['POST'])
+@app.route("/api/parse_s3", methods=['POST'])
 def parse_s3():
     """
         POST request to parse the data from a Papertrail log hosted on s3.
@@ -85,7 +85,7 @@ def parse_s3():
     """
     # parse our input
     json_request = flask.request.get_json()
-    flask_app.logger.info('parse s3 request: %s', json_request)
+    app.logger.info('parse s3 request: %s', json_request)
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
 
@@ -96,19 +96,19 @@ def parse_s3():
 
     # save the parser output to the database
     for traceback in traceback_generator:
-        flask_app.logger.debug('saving traceback: %s', traceback)
+        app.logger.debug('saving traceback: %s', traceback)
         database.save_traceback(ES, traceback)
 
     return 'success'
 
 
-@flask_app.route("/api/tracebacks", methods=['GET'])
+@app.route("/api/tracebacks", methods=['GET'])
 def get_tracebacks():
     data = [tb.document() for tb in database.get_tracebacks(ES)]
     return flask.jsonify({'tracebacks': data})
 
 
-@flask_app.before_first_request
+@app.before_first_request
 def setup_logging():
     # add log handler to sys.stderr.
     handler = logging.StreamHandler()
@@ -116,21 +116,21 @@ def setup_logging():
         "[%(asctime)s] | %(levelname)s | %(pathname)s:%(lineno)d | %(funcName)s | %(message)s"
     )
     handler.setFormatter(formatter)
-    flask_app.logger.addHandler(handler)
-    flask_app.logger.setLevel(logging.DEBUG)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.DEBUG)
 
 
-@flask_app.before_request
+@app.before_request
 def before_request():
     flask.g.start_time = time.time()
 
 
-@flask_app.teardown_request
+@app.teardown_request
 def teardown_request(_):
     time_diff = time.time() - flask.g.start_time
-    flask_app.logger.debug('request took %.2fs', time_diff)
+    app.logger.debug('request took %.2fs', time_diff)
 
 
 if __name__ == "__main__":
-    flask_app.config['LOGGER_HANDLER_POLICY'] = 'never'
-    flask_app.run(debug=True, host='0.0.0.0', port=8000)
+    app.config['LOGGER_HANDLER_POLICY'] = 'never'
+    app.run(debug=True, host='0.0.0.0', port=8000)
