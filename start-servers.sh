@@ -6,4 +6,4 @@
 docker-compose stop web
 
 # build and start all services
-docker-compose -f docker-compose.yaml up -d --build "$@"
+docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d --build "$@"

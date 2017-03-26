@@ -3,8 +3,6 @@ version: '2'
 services:
   web:
     build: web/
-    ports:
-      - "8000:8000"
     links:
       - redis
     depends_on:
