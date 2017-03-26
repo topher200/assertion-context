@@ -6,13 +6,13 @@
     <div class="traceback-metadata col-md-3">
         <p>Instances <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button>
             <ul>
-                {% for similar in t.similar_tracebacks %}
+                {% for similar_traceback in t.similar_tracebacks %}
                 <li
-                    {% if t.traceback.origin_papertrail_id == similar.traceback.origin_papertrail_id %}
+                    {% if t.traceback.origin_papertrail_id == similar_traceback.origin_papertrail_id %}
                     class="highlight"
                     {% endif %}
                 >
-                    <a href="https://papertrailapp.com/systems/{{ similar.traceback.instance_id }}/events?focus={{ similar.traceback.origin_papertrail_id }}">{{ similar.traceback.origin_timestamp }}</a>
+                    <a href="https://papertrailapp.com/systems/{{ similar_traceback.instance_id }}/events?focus={{ similar_traceback.origin_papertrail_id }}">{{ similar_traceback.origin_timestamp }}</a>
                 </li>
                 {% endfor %}
             </ul>

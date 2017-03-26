@@ -123,11 +123,5 @@ def get_similar_tracebacks(es, traceback):
         sort='origin_timestamp:desc',
         size=1000
     )
-    ScoredTraceback = collections.namedtuple(
-        'ScoredTraceback', 'traceback, score'
-    )
     for raw_traceback in raw_es_response['hits']['hits']:
-        yield ScoredTraceback(
-            generate_traceback_from_source(raw_traceback['_source']),
-            raw_traceback['_score']
-        )
+        yield generate_traceback_from_source(raw_traceback['_source'])
