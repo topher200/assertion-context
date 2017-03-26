@@ -111,8 +111,7 @@ def setup_logging():
     # add log handler to sys.stderr.
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        "%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
-        "%H:%M:%S"
+        "[%(asctime)s] | %(levelname)s | %(pathname)s:%(lineno)d | %(funcName)s | %(message)s"
     )
     handler.setFormatter(formatter)
     flask_app.logger.addHandler(handler)
