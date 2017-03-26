@@ -152,7 +152,7 @@ def before_request():
 
 
 @app.teardown_request
-def teardown_request(_):
+def profile_request(_):
     time_diff = time.time() - flask.g.start_time
     app.logger.debug('request took %.2fs', time_diff)
 
