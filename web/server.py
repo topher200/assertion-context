@@ -45,6 +45,8 @@ KVSessionExtension(store, app)
 
 TRACEBACK_TEXT_KV_PREFIX = 'hide-'
 
+# config
+DEBUG_TIMING = True
 
 @app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
@@ -68,7 +70,11 @@ def restore_all_tracebacks():
 @app.route("/", methods=['GET'])
 def index():
     app.logger.debug('handling index request')
+    if DEBUG_TIMING:
+        db_start_time = time.time()
     tracebacks = database.get_tracebacks(ES)
+    if DEBUG_TIMING:
+        flask.g.time_tracebacks = time.time() - db_start_time
     # get all tracebacks that the user hasn't hidden
     tracebacks = (
         t for t in tracebacks
@@ -77,8 +83,15 @@ def index():
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks'
     )
-    tb_meta = [TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
-               for t in tracebacks]
+
+    if DEBUG_TIMING:
+        meta_start_time = time.time()
+    tb_meta = [
+        TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
+        for t in tracebacks
+    ]
+    if DEBUG_TIMING:
+        flask.g.time_meta = time.time() - meta_start_time
     return flask.render_template('index.html',
                                  tb_meta=tb_meta,
                                  show_restore_button=__user_has_hidden_tracebacks()
@@ -148,14 +161,24 @@ def setup_logging():
 
 @app.before_request
 def before_request():
+    # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
 
 
 @app.teardown_request
 def profile_request(_):
-    time_diff = time.time() - flask.g.start_time
-    app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
+    try:
+        time_diff = time.time() - flask.g.start_time
+        app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
+        if DEBUG_TIMING:
+            app.logger.debug(
+                'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
+                flask.g.time_tracebacks, flask.g.time_meta
+            )
+    except AttributeError:
+        app.logger.warn('expected profiling data missing. flask.g keys: "%s"',
+                        ', '.join(key for key in flask.g))
 
 
 if __name__ == "__main__":
