@@ -11,7 +11,9 @@ from .traceback import Traceback, generate_traceback_from_source
 
 # if we don't see the remote (docker) redis, see if we're running locally instead
 try:
-    DOGPILE_REGION = make_region().configure(
+    DOGPILE_REGION = make_region(
+        key_mangler=lambda key: "dogpile:" + key
+    ).configure(
         'dogpile.cache.redis',
         arguments={
             'host': 'redis',
@@ -20,7 +22,9 @@ try:
     )
     DOGPILE_REGION.get('confirm_redis_connection')
 except redis.exceptions.ConnectionError:
-    DOGPILE_REGION = make_region().configure(
+    DOGPILE_REGION = make_region(
+        key_mangler=lambda key: "dogpile:" + key
+    ).configure(
         'dogpile.cache.redis',
         arguments={
             'host': 'localhost',
