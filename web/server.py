@@ -22,7 +22,7 @@ from app import s3
 
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(ROOT_DIR, '.credentials')) as f:
+with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
     ES_ADDRESS = str.strip(f.readline())
 OAUTH_CLIENT_ID = 'XXX'
 OAUTH_CLIENT_SECRET = 'XXX'
