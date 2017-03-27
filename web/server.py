@@ -168,17 +168,15 @@ def before_request():
 
 @app.teardown_request
 def profile_request(_):
+    time_diff = time.time() - flask.g.start_time
+    app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
     try:
-        time_diff = time.time() - flask.g.start_time
-        app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
-        if DEBUG_TIMING:
-            app.logger.debug(
-                'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
-                flask.g.time_tracebacks, flask.g.time_meta
-            )
+        app.logger.debug(
+            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
+            flask.g.time_tracebacks, flask.g.time_meta
+        )
     except AttributeError:
-        app.logger.warn('expected profiling data missing. flask.g keys: "%s"',
-                        ', '.join(key for key in flask.g))
+        pass  # info not present on this one
 
 
 if __name__ == "__main__":
