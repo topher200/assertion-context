@@ -54,16 +54,8 @@ authentication.add_login_handling(app)
 
 
 @app.route("/hide_traceback", methods=['POST'])
+@login_required
 def hide_traceback():
-
-    # # make sure we're logged in
-    # if get_google_oauth_token() is None:
-    #     return flask.redirect(flask.url_for('login'))
-
-    # # get user
-    # user = google.get('userinfo')
-    # app.logger.error('oauth: %s' % flask.jsonify({"data": user.data}))
-
     json_request = flask.request.get_json()
     app.logger.info('hide_traceback POST: %s', json_request)
     if json_request is None or 'traceback_text' not in json_request:
@@ -74,6 +66,7 @@ def hide_traceback():
 
 
 @app.route("/restore_all", methods=['POST'])
+@login_required
 def restore_all_tracebacks():
     for key in flask.session:
         if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
