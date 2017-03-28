@@ -5,6 +5,7 @@
 """
 import collections
 import logging
+import os
 import time
 
 import flask
@@ -28,9 +29,9 @@ class AutoReloadingFlask(flask.Flask):
         return flask.Flask.create_jinja_environment(self)
 
 # create app
-app = AutoReloadingFlask(__name__, instance_relative_config=True)
-app.config.from_object('config')
-app.config.from_pyfile('config.py')
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
+app.config.from_pyfile('instance/config.py')
 app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
