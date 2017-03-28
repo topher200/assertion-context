@@ -16,6 +16,7 @@ from flask_kvsession import KVSessionExtension
 from flask_oauthlib.client import OAuth
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
+from simplekv.decorator import PrefixDecorator
 
 from app import database
 from app import s3
@@ -46,9 +47,9 @@ Bootstrap(app)
 
 # use redis for our session storage (ie: server side cookies)
 store = RedisStore(redis.StrictRedis(host='redis'))
-KVSessionExtension(store, app)
-
-TRACEBACK_TEXT_KV_PREFIX = 'hide-'
+prefixed_store = PrefixDecorator('sessions_', store)
+KVSessionExtension(prefixed_store, app)
+TRACEBACK_TEXT_KV_PREFIX = 'hide_traceback:'
 
 # config
 DEBUG_TIMING = True
