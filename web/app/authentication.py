@@ -1,3 +1,5 @@
+import re
+
 import flask
 import flask_login
 import redis
@@ -18,6 +20,14 @@ class User(flask_login.UserMixin):
 
     def get_id(self):
         return self.__email
+
+    @property
+    def is_authenticated(self):
+        """
+            User is authorized if their email matches our configured regex
+        """
+        regex = flask.current_app.config['AUTHORIZED_EMAIL_REGEX']
+        return re.search(regex, self.__email) is not None
 
     @property
     def email(self):

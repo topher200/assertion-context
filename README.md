@@ -33,6 +33,7 @@ aws_secret_access_key = ###
 OAUTH_CLIENT_ID = <from your oauth provider>
 OAUTH_CLIENT_SECRET = <from your oauth provider>
 ES_ADDRESS = <url to ElasticSearch database>
+AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the user>
 ```
 
 Then to start it all up:
