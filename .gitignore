@@ -4,4 +4,4 @@
 .env
 *.pyc
 run-populate-db.sh
-web/.es_credentials
+instance/

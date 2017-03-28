@@ -12,16 +12,15 @@ import flask
 import redis
 from flask_bootstrap import Bootstrap
 from flask_kvsession import KVSessionExtension
+from flask_login import login_required
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
+from simplekv.decorator import PrefixDecorator
 
+from app import authentication
 from app import database
 from app import s3
 
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
-    ES_ADDRESS = str.strip(f.readline())
 
 # to work around https://github.com/pallets/flask/issues/1907
 class AutoReloadingFlask(flask.Flask):
@@ -30,25 +29,32 @@ class AutoReloadingFlask(flask.Flask):
         return flask.Flask.create_jinja_environment(self)
 
 # create app
-app = AutoReloadingFlask(__name__)
-app.secret_key = ES_ADDRESS
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
+app.config.from_pyfile('instance/config.py')
+app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
-ES = Elasticsearch([ES_ADDRESS])
+ES = Elasticsearch([app.config['ES_ADDRESS']])
 
 # add bootstrap
 Bootstrap(app)
 
 # use redis for our session storage (ie: server side cookies)
 store = RedisStore(redis.StrictRedis(host='redis'))
-KVSessionExtension(store, app)
-
-TRACEBACK_TEXT_KV_PREFIX = 'hide-'
+prefixed_store = PrefixDecorator('sessions_', store)
+KVSessionExtension(prefixed_store, app)
+TRACEBACK_TEXT_KV_PREFIX = 'hide_traceback:'
 
 # config
 DEBUG_TIMING = True
 
+# add a login handler
+authentication.add_login_handling(app)
+
+
 @app.route("/hide_traceback", methods=['POST'])
+@login_required
 def hide_traceback():
     json_request = flask.request.get_json()
     app.logger.info('hide_traceback POST: %s', json_request)
@@ -60,6 +66,7 @@ def hide_traceback():
 
 
 @app.route("/restore_all", methods=['POST'])
+@login_required
 def restore_all_tracebacks():
     for key in flask.session:
         if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
@@ -68,6 +75,7 @@ def restore_all_tracebacks():
 
 
 @app.route("/", methods=['GET'])
+@login_required
 def index():
     app.logger.debug('handling index request')
     if DEBUG_TIMING:
