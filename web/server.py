@@ -29,7 +29,8 @@ class AutoReloadingFlask(flask.Flask):
 
 # create app
 app = AutoReloadingFlask(__name__, instance_relative_config=True)
-app.config.from_object('config.py')
+app.config.from_object('config')
+app.config.from_pyfile('config.py')
 app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
