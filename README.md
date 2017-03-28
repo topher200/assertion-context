@@ -28,14 +28,11 @@ aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
   - (optional) fill out web/.aws_config as well. defaults to us-east-1
-  - fill out web/.credentials. requires these fields:
+  - fill out web/.es_credentials. the file should be a single line containing only the Elasticsearch URL
+  - fill out instance/config.py. requires these fields:
 ```
-[elasticsearch]
-db_url = <https://url_to_elasticsearch>
-
-[oauth2]
-client_id = <from your oauth provider>
-client_secret = <from your oauth provider>
+OAUTH_CLIENT_ID = <from your oauth provider>
+OAUTH_CLIENT_SECRET = <from your oauth provider>
 ```
 
 Then to start it all up:

@@ -11,13 +11,13 @@ import time
 import flask
 import redis
 from flask_bootstrap import Bootstrap
-from flask_cors import CORS
 from flask_kvsession import KVSessionExtension
-from flask_oauthlib.client import OAuth
+from flask_login import login_required
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
+from app import authentication
 from app import database
 from app import s3
 
@@ -25,8 +25,6 @@ from app import s3
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
     ES_ADDRESS = str.strip(f.readline())
-OAUTH_CLIENT_ID = 'XXX'
-OAUTH_CLIENT_SECRET = 'XXX'
 
 # to work around https://github.com/pallets/flask/issues/1907
 class AutoReloadingFlask(flask.Flask):
@@ -37,7 +35,6 @@ class AutoReloadingFlask(flask.Flask):
 # create app
 app = AutoReloadingFlask(__name__)
 app.secret_key = ES_ADDRESS
-CORS(app)
 
 # set up database
 ES = Elasticsearch([ES_ADDRESS])
@@ -54,35 +51,20 @@ TRACEBACK_TEXT_KV_PREFIX = 'hide_traceback:'
 # config
 DEBUG_TIMING = True
 
-# oauth setup
-# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-oauth = OAuth()
-google = oauth.remote_app(
-    'google',
-    request_token_params={
-        'scope': 'email',
-        'state': 'skdfjsdkjfsdkfsdjkf'
-    },
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    consumer_key=OAUTH_CLIENT_ID,
-    consumer_secret=OAUTH_CLIENT_SECRET,
-)
+# add a login handler
+authentication.add_login_handling(app)
 
 
 @app.route("/hide_traceback", methods=['POST'])
 def hide_traceback():
 
-    # make sure we're logged in
-    if get_google_oauth_token() is None:
-        return flask.redirect(flask.url_for('login'))
+    # # make sure we're logged in
+    # if get_google_oauth_token() is None:
+    #     return flask.redirect(flask.url_for('login'))
 
-    # get user
-    user = google.get('userinfo')
-    app.logger.error('oauth: %s' % flask.jsonify({"data": user.data}))
+    # # get user
+    # user = google.get('userinfo')
+    # app.logger.error('oauth: %s' % flask.jsonify({"data": user.data}))
 
     json_request = flask.request.get_json()
     app.logger.info('hide_traceback POST: %s', json_request)
@@ -102,6 +84,7 @@ def restore_all_tracebacks():
 
 
 @app.route("/", methods=['GET'])
+@login_required
 def index():
     app.logger.debug('handling index request')
     if DEBUG_TIMING:
@@ -198,37 +181,6 @@ def before_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
-
-
-@app.route('/login')
-def login():
-    response = google.authorize(callback=flask.url_for('authorized', _external=True))
-    response.headers['Access-Control-Allow-Origin'] = "localhost"
-    return response
-
-
-@app.route('/logout')
-def logout():
-    flask.session.pop('google_token', None)
-    return flask.redirect(flask.url_for('login'))
-
-
-@app.route('/login/authorized')
-def authorized():
-    resp = google.authorized_response()
-    if resp is None:
-        return 'Access denied: reason=%s error=%s' % (
-            flask.request.args['error_reason'],
-            flask.request.args['error_description']
-        )
-    flask.session['google_token'] = (resp['access_token'], '')
-    me = google.get('userinfo')
-    return flask.jsonify({"data": me.data})
-
-
-@google.tokengetter
-def get_google_oauth_token():
-    return flask.session.get('google_token')
 
 
 @app.teardown_request
