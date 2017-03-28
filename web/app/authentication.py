@@ -10,23 +10,6 @@ from simplekv.memory.redisstore import RedisStore
 persistent_storage = RedisStore(redis.StrictRedis(host='redis'))
 USER_DB = PrefixDecorator('user_', persistent_storage)
 
-# oauth setup
-oauth = OAuth()
-GOOGLE_OAUTH = oauth.remote_app(
-    'google',
-    request_token_params={
-        'scope': 'email',
-        'state': 'skdfjsdkjfsdkfsdjkf'
-    },
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    consumer_key=OAUTH_CLIENT_ID,
-    consumer_secret=OAUTH_CLIENT_SECRET,
-)
-
 
 class User(flask_login.UserMixin):
     def __init__(self, email, oauth_access_token):
@@ -80,6 +63,23 @@ def add_login_handling(app):
         between sessions.
     """
     login_manager = flask_login.LoginManager()
+
+    # oauth setup
+    oauth = OAuth()
+    GOOGLE_OAUTH = oauth.remote_app(
+        'google',
+        request_token_params={
+            'scope': 'email',
+            'state': 'skdfjsdkjfsdkfsdjkf'
+        },
+        base_url='https://www.googleapis.com/oauth2/v1/',
+        request_token_url=None,
+        access_token_method='POST',
+        access_token_url='https://accounts.google.com/o/oauth2/token',
+        authorize_url='https://accounts.google.com/o/oauth2/auth',
+        consumer_key=app.config['OAUTH_CLIENT_ID'],
+        consumer_secret=app.config['OAUTH_CLIENT_SECRET'],
+    )
 
     @login_manager.user_loader
     def load_user(email):  # pylint: disable=unused-variable

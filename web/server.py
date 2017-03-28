@@ -5,7 +5,6 @@
 """
 import collections
 import logging
-import os
 import time
 
 import flask
@@ -22,10 +21,6 @@ from app import database
 from app import s3
 
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
-    ES_ADDRESS = str.strip(f.readline())
-
 # to work around https://github.com/pallets/flask/issues/1907
 class AutoReloadingFlask(flask.Flask):
     def create_jinja_environment(self):
@@ -33,11 +28,12 @@ class AutoReloadingFlask(flask.Flask):
         return flask.Flask.create_jinja_environment(self)
 
 # create app
-app = AutoReloadingFlask(__name__)
-app.secret_key = ES_ADDRESS
+app = AutoReloadingFlask(__name__, instance_relative_config=True)
+app.config.from_object('config.py')
+app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
-ES = Elasticsearch([ES_ADDRESS])
+ES = Elasticsearch([app.config['ES_ADDRESS']])
 
 # add bootstrap
 Bootstrap(app)
