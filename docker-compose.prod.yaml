@@ -6,4 +6,4 @@ services:
 
   logspout:
     environment:
-      ROUTE_URIS: syslog://logs4.papertrailapp.com:35625
+      ROUTE_URIS: syslog+tls://logs4.papertrailapp.com:35625
