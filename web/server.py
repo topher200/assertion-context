@@ -188,8 +188,9 @@ def before_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
+    user = current_user.email if not current_user.is_anonymous else 'anonymous user'
     app.logger.debug(
-        "handling '%s' request from '%s'", flask.request.full_path, current_user.email
+        "handling '%s' request from '%s'", flask.request.full_path, user
     )
 
 
