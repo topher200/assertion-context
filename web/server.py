@@ -59,7 +59,7 @@ authentication.add_login_handling(app)
 @login_required
 def hide_traceback():
     json_request = flask.request.get_json()
-    app.logger.info('hide_traceback POST: %s', json_request)
+    app.logger.debug('/hide_traceback POST: %s', str(json_request)[:100])
     if json_request is None or 'traceback_text' not in json_request:
         app.logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
