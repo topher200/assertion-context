@@ -174,7 +174,7 @@ def setup_logging():
     # add log handler to sys.stderr.
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        "[%(asctime)s] | %(levelname)s | %(pathname)s:%(lineno)d | %(funcName)s | %(message)s"
+        "[%(asctime)s] | %(levelname)s | %(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
     )
     handler.setFormatter(formatter)
     app.logger.addHandler(handler)
