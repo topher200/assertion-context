@@ -17,6 +17,14 @@ from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
+
+class UsernameLogFilter(logging.Filter):
+    def filter(self, record):
+        record.username = flask_login.current_user
+        return True
+
+
+import app.log
 from app import authentication
 from app import database
 from app import s3
@@ -30,6 +38,7 @@ class AutoReloadingFlask(flask.Flask):
 
 # create app
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+logger = logging.getLogger(__name__)
 app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
 app.config.from_pyfile('instance/config.py')
 app.secret_key = app.config['OAUTH_CLIENT_SECRET']
@@ -77,7 +86,7 @@ def restore_all_tracebacks():
 @app.route("/", methods=['GET'])
 @login_required
 def index():
-    app.logger.debug('handling index request')
+    logger.error('handling index request')
     if DEBUG_TIMING:
         db_start_time = time.time()
     tracebacks = database.get_tracebacks(ES)
@@ -155,16 +164,16 @@ def get_tracebacks():
     return flask.jsonify({'tracebacks': data})
 
 
-@app.before_first_request
-def setup_logging():
-    # add log handler to sys.stderr.
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "[%(asctime)s] | %(levelname)s | %(pathname)s:%(lineno)d | %(funcName)s | %(message)s"
-    )
-    handler.setFormatter(formatter)
-    app.logger.addHandler(handler)
-    app.logger.setLevel(logging.DEBUG)
+# @app.before_first_request
+# def setup_logging():
+#     # add log handler to sys.stderr.
+#     handler = logging.StreamHandler()
+#     formatter = logging.Formatter(
+#         "[%(asctime)s] | %(levelname)s | %(pathname)s:%(lineno)d | %(funcName)s | %(message)s"
+#     )
+#     handler.setFormatter(formatter)
+#     app.logger.addHandler(handler)
+#     app.logger.setLevel(logging.DEBUG)
 
 
 @app.before_request
