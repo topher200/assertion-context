@@ -83,33 +83,17 @@ def get_tracebacks(es, start_date=None, end_date=None):
         @rtype: list
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
-    params_list = []
+    params_list = {}
     if start_date is not None:
-        params_list.append(
-            {
-                "range": {
-                    "origin_timestamp": {
-                        "gte": "%s||/d" % start_date,
-                    }
-                }
-            }
-        )
+        params_list['gte'] = "%s||/d" % start_date
     if end_date is not None:
-        params_list.append(
-            {
-                "range": {
-                    "origin_timestamp": {
-                        "lte": "%s||/d" % end_date,
-                    }
-                }
-            }
-        )
+        params_list['lte'] = "%s||/d" % end_date
 
     if len(params_list) > 0:
         body = {
-            "filter": {
-                "bool": {
-                    "must": params_list
+            "query": {
+                "range": {
+                    "origin_timestamp": params_list
                 }
             }
         }
