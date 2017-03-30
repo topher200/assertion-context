@@ -55,28 +55,6 @@ DEBUG_TIMING = True
 authentication.add_login_handling(app)
 
 
-@app.route("/hide_traceback", methods=['POST'])
-@login_required
-def hide_traceback():
-    json_request = flask.request.get_json()
-    app.logger.debug('/hide_traceback POST: %s', str(json_request)[:100])
-    if json_request is None or 'traceback_text' not in json_request:
-        app.logger.warning('invalid json detected: %s', json_request)
-        return 'invalid json', 400
-    traceback_text = json_request['traceback_text']
-    flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
-    return 'success'
-
-
-@app.route("/restore_all", methods=['POST'])
-@login_required
-def restore_all_tracebacks():
-    for key in flask.session:
-        if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
-            flask.session[key] = False
-    return 'success'
-
-
 @app.route("/", methods=['GET'])
 @login_required
 def index():
@@ -163,6 +141,28 @@ def parse_s3():
     for traceback in traceback_generator:
         database.save_traceback(ES, traceback)
 
+    return 'success'
+
+
+@app.route("/hide_traceback", methods=['POST'])
+@login_required
+def hide_traceback():
+    json_request = flask.request.get_json()
+    app.logger.debug('/hide_traceback POST: %s', str(json_request)[:100])
+    if json_request is None or 'traceback_text' not in json_request:
+        app.logger.warning('invalid json detected: %s', json_request)
+        return 'invalid json', 400
+    traceback_text = json_request['traceback_text']
+    flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
+    return 'success'
+
+
+@app.route("/restore_all", methods=['POST'])
+@login_required
+def restore_all_tracebacks():
+    for key in flask.session:
+        if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
+            flask.session[key] = False
     return 'success'
 
 
