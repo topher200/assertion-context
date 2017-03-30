@@ -32,9 +32,10 @@
             Tracebacks
         </a>
         <ul class="pager">
-            <li><a href="#">Yesterday</a></li>
-            <li>3/30/2017</li>
-            <li><a href="#">Tomorrow</a></li>
+            <li><a href="/?days_ago={{ days_ago + 1 }}">Previous</a></li>
+            <li>{{ date_to_analyze }}</li>
+            <li><a href="/?days_ago={{ days_ago - 1 }}">Next</a></li>
+            <li><a href="/">Today</a></li>
         </ul>
         {% if show_restore_button %}
         <button onclick="restore_all()">Restore all hidden Tracebacks</button>

@@ -65,20 +65,44 @@ def refresh(es):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_tracebacks(es):
+def get_tracebacks(es, start_date=None, end_date=None):
     """
-        Queries the database for a list of L{Traceback}
+        Queries the database for L{Traceback} from a given date range.
+
+        Both dates are inclusive. Date filtering is done on the 'origin_timestamp' field of the
+        Traceback.
+
+        All filtering params are optional. Any params that are None are ignored.
 
         Returns a list (instead of a generator) so we can be cached
+
+        Params:
+        - start_date: must be a datetime.date
+        - end_date: must be a datetime.date
 
         @rtype: list
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
-    body = {
-        "query": {
-            "match_all": {}
+    params_list = {}
+    if start_date is not None:
+        params_list['gte'] = "%s||/d" % start_date
+    if end_date is not None:
+        params_list['lte'] = "%s||/d" % end_date
+
+    if len(params_list) > 0:
+        body = {
+            "query": {
+                "range": {
+                    "origin_timestamp": params_list
+                }
+            }
         }
-    }
+    else:
+        body = {
+            "query": {
+                "match_all": {}
+            }
+        }
 
     raw_tracebacks = es.search(
         index=INDEX,
