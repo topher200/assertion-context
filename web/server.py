@@ -79,16 +79,23 @@ def restore_all_tracebacks():
 @app.route("/", methods=['GET'])
 @login_required
 def index():
+    # use the query params to determine the date_to_analyze
     days_ago = flask.request.args.get('days_ago')
-    date_to_analyze = None
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     if days_ago is not None:
+        try:
+            days_ago_int = int(days_ago)
+        except ValueError:
+            return 'bad params', 400
         # our papertrail logs are saved in Eastern Time
         today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
-        date_to_analyze = today - days_ago
+        date_to_analyze = today - datetime.timedelta(days=days_ago_int)
+    else:
+        date_to_analyze = today
 
     if DEBUG_TIMING:
         db_start_time = time.time()
-    tracebacks = database.get_tracebacks(ES, date_to_analyze)
+    tracebacks = database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
     if DEBUG_TIMING:
         flask.g.time_tracebacks = time.time() - db_start_time
     # get all tracebacks that the user hasn't hidden
@@ -110,7 +117,9 @@ def index():
         flask.g.time_meta = time.time() - meta_start_time
     return flask.render_template('index.html',
                                  tb_meta=tb_meta,
-                                 show_restore_button=__user_has_hidden_tracebacks()
+                                 show_restore_button=__user_has_hidden_tracebacks(),
+                                 date_to_analyze=date_to_analyze,
+                                 days_ago=days_ago_int
     )
 
 
