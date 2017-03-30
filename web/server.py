@@ -148,7 +148,6 @@ def parse_s3():
 @login_required
 def hide_traceback():
     json_request = flask.request.get_json()
-    app.logger.debug('/hide_traceback POST: %s', str(json_request)[:100])
     if json_request is None or 'traceback_text' not in json_request:
         app.logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
@@ -190,8 +189,10 @@ def before_request():
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
     user = current_user.email if not current_user.is_anonymous else 'anonymous user'
+    json_request = flask.request.get_json()
+    json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     app.logger.debug(
-        "handling '%s' request from '%s'", flask.request.full_path, user
+        "handling '%s' request from '%s'%s", flask.request.full_path, user, json_str
     )
 
 
