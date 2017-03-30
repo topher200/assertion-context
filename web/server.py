@@ -12,7 +12,7 @@ import flask
 import redis
 from flask_bootstrap import Bootstrap
 from flask_kvsession import KVSessionExtension
-from flask_login import login_required
+from flask_login import current_user, login_required
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
@@ -77,7 +77,6 @@ def restore_all_tracebacks():
 @app.route("/", methods=['GET'])
 @login_required
 def index():
-    app.logger.debug('handling index request')
     if DEBUG_TIMING:
         db_start_time = time.time()
     tracebacks = database.get_tracebacks(ES)
@@ -132,7 +131,6 @@ def parse_s3():
     """
     # parse our input
     json_request = flask.request.get_json()
-    app.logger.info('parse s3 request: %s', json_request)
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
 
@@ -143,7 +141,6 @@ def parse_s3():
 
     # save the parser output to the database
     for traceback in traceback_generator:
-        app.logger.debug('saving traceback: %s', traceback)
         database.save_traceback(ES, traceback)
 
     return 'success'
@@ -172,12 +169,15 @@ def before_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
+    app.logger.debug(
+        "handling '%s' request from '%s'", flask.request.full_path, current_user.email
+    )
 
 
 @app.teardown_request
 def profile_request(_):
     time_diff = time.time() - flask.g.start_time
-    app.logger.debug('"%s" request took %.2fs', flask.g.endpoint, time_diff)
+    app.logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
     try:
         app.logger.debug(
             'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
