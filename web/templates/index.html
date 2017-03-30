@@ -37,21 +37,22 @@
     {%- endwith %}
 
     <header>
-        <div class="left-header col-md-3">
-        </div>
-        <div class="left-header col-md-6">
-            <h1>Tracebacks</h1>
-        </div>
-        <div class="right-header col-md-3">
-            <br>
-            {% if show_restore_button %}
-            <button onclick="restore_all()">Restore all hidden Tracebacks</button>
-            {% endif %}
-        </div>
-        <div class="clearfix"></div>
+        <!-- <div class="left-header col-md-3">
+             </div>
+             <div class="left-header col-md-6">
+             <h1>Tracebacks</h1>
+             </div>
+             <div class="right-header col-md-3">
+             <br>
+             {% if show_restore_button %}
+             <button onclick="restore_all()">Restore all hidden Tracebacks</button>
+             {% endif %}
+             </div>
+             <div class="clearfix"></div> -->
     </header>
 
     <body>
+        {{nav.top.render()}}
         <div class="container">
             <div class="row">
                 {% for t in tb_meta %}

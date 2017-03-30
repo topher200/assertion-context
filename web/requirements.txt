@@ -1,6 +1,7 @@
 Flask-Elasticsearch==0.2.5
 Flask-KVSession==0.6.2
 Flask_Login==0.4.0
+Flask-Nav==0.6
 Flask-OAuthlib==0.9.3
 Gunicorn==19.6
 boto3==1.4.0

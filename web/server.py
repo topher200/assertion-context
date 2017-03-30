@@ -19,6 +19,7 @@ from simplekv.decorator import PrefixDecorator
 
 from app import authentication
 from app import database
+from app import navbar
 from app import s3
 
 
@@ -39,6 +40,7 @@ ES = Elasticsearch([app.config['ES_ADDRESS']])
 
 # add bootstrap
 Bootstrap(app)
+navbar.NAV.init_app(app)
 
 # use redis for our session storage (ie: server side cookies)
 store = RedisStore(redis.StrictRedis(host='redis'))
