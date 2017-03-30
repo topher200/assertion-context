@@ -93,7 +93,7 @@ def generate_traceback_from_source(source):
     """
         L{source} is a dictionary (from ElasticSearch) containing the fields of a L{Traceback}
     """
-    assert isinstance(source, dict), source
+    assert isinstance(source, dict), (type(source), source)
 
     # We get the datetime as a string, we need to parse it out
     timestamp = datetime.datetime.strptime(
