@@ -166,6 +166,7 @@ def restore_all_tracebacks():
 
 
 @app.route("/api/tracebacks", methods=['GET'])
+@login_required
 def get_tracebacks():
     data = [tb.document() for tb in database.get_tracebacks(ES)]
     return flask.jsonify({'tracebacks': data})
