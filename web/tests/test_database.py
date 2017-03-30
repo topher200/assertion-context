@@ -13,11 +13,7 @@ sys.path.append(ROOT)
 
 from app import database
 from app import traceback
-
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-with open(os.path.join(ROOT_DIR, '.es_credentials')) as f:
-    ES_ADDRESS = str.strip(f.readline())
+from instance.config import ES_ADDRESS
 
 
 class TestElasticSearch(unittest.TestCase):
