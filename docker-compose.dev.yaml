@@ -7,6 +7,8 @@ services:
   web:
     ports:
       - "8000:8000"
+    links:
+      - elasticsearch
 
   redis:
     ports:
