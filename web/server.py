@@ -61,6 +61,7 @@ def hide_traceback():
     json_request = flask.request.get_json()
     app.logger.info('hide_traceback POST: %s', json_request)
     if json_request is None or 'traceback_text' not in json_request:
+        app.logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
     flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
