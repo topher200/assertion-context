@@ -80,18 +80,17 @@ def restore_all_tracebacks():
 @login_required
 def index():
     # use the query params to determine the date_to_analyze
-    days_ago = flask.request.args.get('days_ago')
-    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
-    if days_ago is not None:
+    days_ago_raw = flask.request.args.get('days_ago')
+    if days_ago_raw is not None:
         try:
-            days_ago_int = int(days_ago)
+            days_ago_int = int(days_ago_raw)
         except ValueError:
             return 'bad params', 400
-        # our papertrail logs are saved in Eastern Time
-        today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
-        date_to_analyze = today - datetime.timedelta(days=days_ago_int)
     else:
-        date_to_analyze = today
+        days_ago_int = 0
+    # our papertrail logs are saved in Eastern Time
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+    date_to_analyze = today - datetime.timedelta(days=days_ago_int)
 
     if DEBUG_TIMING:
         db_start_time = time.time()
