@@ -4,7 +4,9 @@
 {% macro show_traceback(t) %}
 <div class="traceback-container">
     <div class="traceback-metadata col-md-3">
-        <p>Instances <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button>
+        <p>
+            <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button> |
+            <button onclick="create_jira_ticket(this)" value="{{ t.traceback }}">create jira ticket</button>
             <ul>
                 {% for similar_traceback in t.similar_tracebacks %}
                 <li
