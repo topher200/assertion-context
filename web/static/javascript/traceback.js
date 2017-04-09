@@ -16,7 +16,7 @@ function hide_traceback_text(traceback_button){
 
 function create_jira_ticket(traceback_button){
     payload = {
-        traceback: traceback_button.value
+        traceback_text: traceback_button.value
     };
     $.ajax({
         type: "POST",
