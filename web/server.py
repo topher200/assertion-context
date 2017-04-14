@@ -54,6 +54,8 @@ DEBUG_TIMING = True
 # add a login handler
 authentication.add_login_handling(app)
 
+logger = logging.getLogger()
+
 
 @app.route("/", methods=['GET'])
 @login_required
@@ -129,7 +131,7 @@ def parse_s3():
     json_request = flask.request.get_json()
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
-    app.logger.debug("parsing s3 file. bucket: '%s', key: '%s'",
+    logger.debug("parsing s3 file. bucket: '%s', key: '%s'",
                      json_request['bucket'], json_request['key'])
 
     # use our powerful parser to run checks on the requested file
@@ -149,7 +151,7 @@ def parse_s3():
 def hide_traceback():
     json_request = flask.request.get_json()
     if json_request is None or 'traceback_text' not in json_request:
-        app.logger.warning('invalid json detected: %s', json_request)
+        logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
     flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
@@ -180,8 +182,8 @@ def setup_logging():
         "[%(asctime)s] | %(levelname)s | %(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
     )
     handler.setFormatter(formatter)
-    app.logger.addHandler(handler)
-    app.logger.setLevel(logging.DEBUG)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
 
 
 @app.before_request
@@ -192,7 +194,7 @@ def before_request():
     user = current_user.email if not current_user.is_anonymous else 'anonymous user'
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
-    app.logger.debug(
+    logger.debug(
         "handling '%s' request from '%s'%s", flask.request.full_path, user, json_str
     )
 
@@ -200,9 +202,9 @@ def before_request():
 @app.teardown_request
 def profile_request(_):
     time_diff = time.time() - flask.g.start_time
-    app.logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
+    logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
     try:
-        app.logger.debug(
+        logger.debug(
             'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
             flask.g.time_tracebacks, flask.g.time_meta
         )
