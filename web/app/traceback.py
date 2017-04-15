@@ -25,6 +25,9 @@ class Traceback(object):
             instance_id. example: i-2ee330b7
         - program_name: string of the parsed program name. all our log lines shared the same
             program name. example: manager.debug
+        - traceback_plus_context_text: the traceback text PLUS an extra few lines before the start
+            of the traceback. WARNING: not present on historical data. will be equal to
+            traceback_text if not found
     """
     def __init__(
             self,
@@ -34,6 +37,7 @@ class Traceback(object):
             origin_timestamp,
             instance_id,
             program_name,
+            traceback_plus_context_text,
     ):
         assert isinstance(origin_timestamp, datetime.datetime), (
             type(origin_timestamp), origin_timestamp
@@ -45,6 +49,7 @@ class Traceback(object):
         self._origin_timestamp = origin_timestamp
         self._instance_id = instance_id
         self._program_name = program_name
+        self._traceback_plus_context_text = traceback_plus_context_text
 
     def document(self):
         """
@@ -59,6 +64,7 @@ class Traceback(object):
             "origin_timestamp": self._origin_timestamp,
             "instance_id": self._instance_id,
             "program_name": self._program_name,
+            "traceback_plus_context_text": self._traceback_plus_context_text,
         }
 
     def __repr__(self):
@@ -88,6 +94,13 @@ class Traceback(object):
     def program_name(self):
         return self._program_name
 
+    @property
+    def traceback_plus_context_text(self):
+        if self._traceback_plus_context_text is not None:
+            return self._traceback_plus_context_text
+        else:
+            return self.traceback_text
+
 
 def generate_traceback_from_source(source):
     """
@@ -108,4 +121,5 @@ def generate_traceback_from_source(source):
         timestamp,
         source["instance_id"],
         source["program_name"],
+        source.get("traceback_plus_context_text", None)
     )
