@@ -191,12 +191,14 @@ def create_jira_ticket():
     title = jira_util.create_title(traceback_text)
 
     # make API call to jira
-    # TODO: get data from call
-    jira_util.create_jira_ticket(title, description)
+    ticket = jira_util.create_jira_issue(title, description)
 
     # display new ticket data to user
-    # TODO: look up flask docs to find out how to send flash message
+    url = jira_util.get_link_to_issue(ticket)
 
+    # send flash message to user with the JIRA url
+    # TODO: format this message better
+    flask.flash(url)
     return 'success'
 
 

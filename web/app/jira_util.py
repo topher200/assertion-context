@@ -1,6 +1,7 @@
 import collections
 
-from jira import JIRA
+import jira
+import flask
 
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
@@ -21,6 +22,11 @@ More context around this error (from the latest hit):
 
 # TODO: look up the jira docs and find out how to format this
 SIMILAR_LIST_TEMPLATE = ''' - %s, %s'''
+
+JIRA_CLIENT = jira.JIRA(
+    server=flask.current_app.config['JIRA_SERVER'],
+    basic_auth=flask.current_app.config['JIRA_BASIC_AUTH'],
+)
 
 
 def create_title(traceback_text):
@@ -53,20 +59,28 @@ def create_description(similar_tracebacks):
     )
 
 
-def create_jira_ticket(title, description):
+def create_jira_issue(title, description):
     """
-        Creates a ticket in jira given the title/description text for the ticket.
+        Creates a issue in jira given the title/description text
 
-        Returns a link to the newly generated ticket
+        Returns the newly created issue
     """
     payload = {
         'fields': {
-            'project': {'id': 10000},
+            'project': {'id': 10001},
             'summary': title,
             'description': description,
-            'issuetype': {'id': 3}
+            'issuetype': {'name': 'Bug'},
         }
     }
-    # TODO: look up the jira API and determine how to make this call
-    # TODO: look up return values from the JIRA api
-    return 100
+    issue = JIRA_CLIENT.create_issue(fields=payload)
+    return issue.key
+
+def get_link_to_issue(issue):
+    """
+        Takes a jira issue and returns a URL to that issue
+
+        Returns the user-facing url, not the rest-api one
+    """
+    server = flask.current_app.config['JIRA_SERVER']
+    return '%s/browse/%s' % (server, issue.key)
