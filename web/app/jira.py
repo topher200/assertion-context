@@ -1,5 +1,7 @@
 import collections
 
+from jira import JIRA
+
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -53,10 +55,18 @@ def create_description(similar_tracebacks):
 
 def create_jira_ticket(title, description):
     """
-    Creates a ticket in jira given the title/description text for the ticket.
+        Creates a ticket in jira given the title/description text for the ticket.
 
-    Returns a link to the newly generated ticket
+        Returns a link to the newly generated ticket
     """
+    payload = {
+        'fields': {
+            'project': {'id': 10000},
+            'summary': title,
+            'description': description,
+            'issuetype': {'id': 3}
+        }
+    }
     # TODO: look up the jira API and determine how to make this call
     # TODO: look up return values from the JIRA api
     return 100
