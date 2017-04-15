@@ -22,7 +22,7 @@ from simplekv.decorator import PrefixDecorator
 
 from app import authentication
 from app import database
-from app import jira
+from app import jira_util
 from app import s3
 from app import traceback
 
@@ -185,14 +185,14 @@ def create_jira_ticket():
     similar_tracebacks = database.get_similar_tracebacks(ES, traceback_text)
 
     # create a description using the list of tracebacks
-    description = jira.create_description(similar_tracebacks)
+    description = jira_util.create_description(similar_tracebacks)
 
     # create a title using the traceback text
-    title = jira.create_title(traceback_text)
+    title = jira_util.create_title(traceback_text)
 
     # make API call to jira
     # TODO: get data from call
-    jira.create_jira_ticket(title, description)
+    jira_util.create_jira_ticket(title, description)
 
     # display new ticket data to user
     # TODO: look up flask docs to find out how to send flash message
