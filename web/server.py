@@ -95,11 +95,12 @@ def index():
     ]
     if DEBUG_TIMING:
         flask.g.time_meta = time.time() - meta_start_time
-    return flask.render_template('index.html',
-                                 tb_meta=tb_meta,
-                                 show_restore_button=__user_has_hidden_tracebacks(),
-                                 date_to_analyze=date_to_analyze,
-                                 days_ago=days_ago_int
+    return flask.render_template(
+        'index.html',
+        tb_meta=tb_meta,
+        show_restore_button=__user_has_hidden_tracebacks(),
+        date_to_analyze=date_to_analyze,
+        days_ago=days_ago_int
     )
 
 
