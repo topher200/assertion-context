@@ -177,7 +177,7 @@ def create_jira_ticket():
     # get the traceback text
     json_request = flask.request.get_json()
     if json_request is None or 'traceback_text' not in json_request:
-        app.logger.warning('invalid json detected: %s', json_request)
+        logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
 
