@@ -8,7 +8,7 @@ import requests
 
 
 MONTHS_TO_PROCESS = (
-    '2017-03-%02d',
+    '2017-04-%02d',
 )
 
 def build_keys():
