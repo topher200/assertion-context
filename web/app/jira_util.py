@@ -98,6 +98,7 @@ def create_jira_issue(title, description):
     logger.info('created jira issue: %s', issue.key)
     return issue
 
+
 def get_link_to_issue(issue):
     """
         Takes a jira issue and returns a URL to that issue
