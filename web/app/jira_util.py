@@ -1,4 +1,5 @@
-import collections
+import itertools
+import logging
 
 from instance import config
 import jira
@@ -46,7 +47,7 @@ def create_description(similar_tracebacks):
         selects instead.
     """
     # grab the first as the master, while leaving the "similar" generator intact
-    tracebacks, master_traceback_generator = collections.tee(similar_tracebacks)
+    tracebacks, master_traceback_generator = itertools.tee(similar_tracebacks)
     master_traceback = next(master_traceback_generator)
 
     list_of_tracebacks_string = '\n'.join(
