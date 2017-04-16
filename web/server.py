@@ -5,6 +5,7 @@
 """
 import collections
 import datetime
+import json
 import logging
 import os
 import time
@@ -21,7 +22,9 @@ from simplekv.decorator import PrefixDecorator
 
 from app import authentication
 from app import database
+from app import jira_util
 from app import s3
+from app import traceback
 
 
 # to work around https://github.com/pallets/flask/issues/1907
@@ -165,6 +168,36 @@ def restore_all_tracebacks():
     for key in flask.session:
         if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
             flask.session[key] = False
+    return 'success'
+
+
+@app.route("/create_jira_ticket", methods=['POST'])
+@login_required
+def create_jira_ticket():
+    # get the traceback text
+    json_request = flask.request.get_json()
+    if json_request is None or 'traceback_text' not in json_request:
+        logger.warning('invalid json detected: %s', json_request)
+        return 'invalid json', 400
+    traceback_text = json_request['traceback_text']
+
+    # find a list of tracebacks that use that text
+    similar_tracebacks = database.get_similar_tracebacks(ES, traceback_text)
+
+    # create a description using the list of tracebacks
+    description = jira_util.create_description(similar_tracebacks)
+
+    # create a title using the traceback text
+    title = jira_util.create_title(traceback_text)
+
+    # make API call to jira
+    ticket = jira_util.create_jira_issue(title, description)
+
+    # send flash message to user with the JIRA url
+    url = jira_util.get_link_to_issue(ticket)
+    flask.flash(flask.Markup(
+        'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
+    ))
     return 'success'
 
 

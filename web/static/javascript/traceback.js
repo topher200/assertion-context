@@ -26,3 +26,20 @@ function restore_all(){
         contentType: "application/json"
     });
 }
+
+
+function create_jira_ticket(traceback_button){
+    traceback_button.disabled = true;  // disable button during processing
+    payload = {
+        traceback_text: traceback_button.value
+    };
+    $.ajax({
+        type: "POST",
+        url: "/create_jira_ticket",
+        data: JSON.stringify(payload),
+        success: function() {
+            location.href = location.href;
+        },
+        contentType: "application/json"
+    });
+}
