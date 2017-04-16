@@ -89,7 +89,7 @@ def create_jira_issue(title, description):
         Returns the newly created issue
     """
     fields = {
-        'project': {'key': 'SAN'},
+        'project': {'key': 'PPC'},
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
