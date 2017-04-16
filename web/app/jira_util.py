@@ -1,7 +1,7 @@
 import collections
 
+from instance import config
 import jira
-import flask
 
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
@@ -24,8 +24,8 @@ More context around this error (from the latest hit):
 SIMILAR_LIST_TEMPLATE = ''' - %s, %s'''
 
 JIRA_CLIENT = jira.JIRA(
-    server=flask.current_app.config['JIRA_SERVER'],
-    basic_auth=flask.current_app.config['JIRA_BASIC_AUTH'],
+    server=config.JIRA_SERVER,
+    basic_auth=config.JIRA_BASIC_AUTH,
 )
 
 
@@ -82,5 +82,5 @@ def get_link_to_issue(issue):
 
         Returns the user-facing url, not the rest-api one
     """
-    server = flask.current_app.config['JIRA_SERVER']
+    server = config.JIRA_SERVER
     return '%s/browse/%s' % (server, issue.key)
