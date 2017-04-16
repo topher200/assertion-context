@@ -38,7 +38,7 @@ function create_jira_ticket(traceback_button){
         url: "/create_jira_ticket",
         data: JSON.stringify(payload),
         success: function() {
-            location.reload();
+            location.href = location.href;
         },
         contentType: "application/json"
     });
