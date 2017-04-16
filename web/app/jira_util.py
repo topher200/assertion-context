@@ -29,6 +29,8 @@ JIRA_CLIENT = jira.JIRA(
     basic_auth=config.JIRA_BASIC_AUTH,
 )
 
+logger = logging.getLogger()
+
 
 def create_title(traceback_text):
     """
@@ -66,16 +68,15 @@ def create_jira_issue(title, description):
 
         Returns the newly created issue
     """
-    payload = {
-        'fields': {
-            'project': {'id': 10001},
-            'summary': title,
-            'description': description,
-            'issuetype': {'name': 'Bug'},
-        }
+    fields = {
+        'project': {'key': 'SAN'},
+        'summary': title,
+        'description': description,
+        'issuetype': {'name': 'Bug'},
     }
-    issue = JIRA_CLIENT.create_issue(fields=payload)
-    return issue.key
+    issue = JIRA_CLIENT.create_issue(fields=fields)
+    logger.info('created jira issue: %s', issue.key)
+    return issue
 
 def get_link_to_issue(issue):
     """
