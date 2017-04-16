@@ -7,7 +7,6 @@ import jira
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
-Traceback:
 {noformat}
 %s
 {noformat}
@@ -20,9 +19,26 @@ More context around this error (from the latest hit):
 %s
 {noformat}
 '''
+"""
+    A template for the description to save in the ticket.
 
-# TODO: look up the jira docs and find out how to format this
-SIMILAR_LIST_TEMPLATE = ''' - %s, %s'''
+    Implementer needs to provide:
+        - the traceback
+        - a list of instances of this traceback
+        - a traceback + context text
+"""
+
+SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
+"""
+    A template for the list of hits on this traceback.
+
+    We list the date of the hit and have that text be a link to the traceback itself.
+
+    Implementer needs to provide:
+        - the timestamp of the hit
+        - the instance_id of the hit
+        - the id of the logline that we want to link to (ie: origin_papertrail_id)
+"""
 
 JIRA_CLIENT = jira.JIRA(
     server=config.JIRA_SERVER,
@@ -53,7 +69,11 @@ def create_description(similar_tracebacks):
     master_traceback = next(master_traceback_generator)
 
     list_of_tracebacks_string = '\n'.join(
-        SIMILAR_LIST_TEMPLATE % (t.origin_timestamp, t.origin_papertrail_id) for t in tracebacks
+        SIMILAR_LIST_TEMPLATE % (
+            t.origin_timestamp,
+            t.instance_id,
+            t.origin_papertrail_id
+        ) for t in tracebacks
     )
     return DESCRIPTION_TEMPLATE % (
         master_traceback.traceback_text,
