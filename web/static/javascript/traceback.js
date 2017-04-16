@@ -29,6 +29,7 @@ function restore_all(){
 
 
 function create_jira_ticket(traceback_button){
+    traceback_button.disabled = true;  // disable button during processing
     payload = {
         traceback_text: traceback_button.value
     };
