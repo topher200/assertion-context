@@ -76,7 +76,7 @@ def create_description(similar_tracebacks):
         ) for t in tracebacks
     )
     return DESCRIPTION_TEMPLATE % (
-        master_traceback.traceback_text,
+        master_traceback.traceback_plus_context_text,
         list_of_tracebacks_string,
         master_traceback.raw_text
     )
