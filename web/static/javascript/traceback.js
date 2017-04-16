@@ -14,13 +14,11 @@ function hide_traceback_text(traceback_button){
 }
 
 
-function create_jira_ticket(traceback_button){
-    payload = {
-        traceback_text: traceback_button.value
-    };
+function restore_all(){
+    payload = {};
     $.ajax({
         type: "POST",
-        url: "/create_jira_ticket",
+        url: "/restore_all",
         data: JSON.stringify(payload),
         success: function() {
             location.reload();
@@ -30,11 +28,13 @@ function create_jira_ticket(traceback_button){
 }
 
 
-function restore_all(){
-    payload = {};
+function create_jira_ticket(traceback_button){
+    payload = {
+        traceback_text: traceback_button.value
+    };
     $.ajax({
         type: "POST",
-        url: "/restore_all",
+        url: "/create_jira_ticket",
         data: JSON.stringify(payload),
         success: function() {
             location.reload();
