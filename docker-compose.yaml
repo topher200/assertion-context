@@ -9,6 +9,8 @@ services:
       - logspout
     volumes:
       - ./web:/code:ro
+    restart:
+      always
 
   nginx:
     restart:
@@ -24,6 +26,8 @@ services:
 
   redis:
     image: redis:3.2
+    restart:
+      always
 
   logspout:
     image:
