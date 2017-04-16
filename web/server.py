@@ -193,12 +193,11 @@ def create_jira_ticket():
     # make API call to jira
     ticket = jira_util.create_jira_issue(title, description)
 
-    # display new ticket data to user
-    url = jira_util.get_link_to_issue(ticket)
-
     # send flash message to user with the JIRA url
-    # TODO: format this message better
-    flask.flash(url)
+    url = jira_util.get_link_to_issue(ticket)
+    flask.flash(flask.Markup(
+        'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
+    ))
     return 'success'
 
 
