@@ -12,7 +12,7 @@ from .traceback import Traceback, generate_traceback_from_source
 # if we don't see the remote (docker) redis, see if we're running locally instead
 try:
     DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:" + key
+        key_mangler=lambda key: "dogpile:traceback:" + key
     ).configure(
         'dogpile.cache.redis',
         arguments={
@@ -23,7 +23,7 @@ try:
     DOGPILE_REGION.get('confirm_redis_connection')
 except redis.exceptions.ConnectionError:
     DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:" + key
+        key_mangler=lambda key: "dogpile:traceback:" + key
     ).configure(
         'dogpile.cache.redis',
         arguments={
@@ -40,6 +40,8 @@ DOC_TYPE = 'traceback'
 def save_traceback(es, traceback):
     """
         Takes a L{Traceback} and saves it to the database
+
+        Invalidates the dogpile cache.
 
         Returns True if successful
     """
