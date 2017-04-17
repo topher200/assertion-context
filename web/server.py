@@ -103,7 +103,7 @@ def index():
         tb_meta=tb_meta,
         show_restore_button=__user_has_hidden_tracebacks(),
         date_to_analyze=date_to_analyze,
-        days_ago=days_ago_int
+        days_ago=days_ago_int,
     )
 
 
