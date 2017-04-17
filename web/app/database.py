@@ -33,8 +33,8 @@ except redis.exceptions.ConnectionError:
     )
     DOGPILE_REGION.get('confirm_redis_connection')
 
-INDEX = 'traceback-index'
-DOC_TYPE = 'traceback'
+TRACEBACK_INDEX = 'traceback-index'
+TRACEBACK_DOC_TYPE = 'traceback'
 
 
 def save_traceback(es, traceback):
@@ -46,8 +46,8 @@ def save_traceback(es, traceback):
     assert isinstance(traceback, Traceback), (type(traceback), traceback)
     doc = traceback.document()
     res = es.index(
-        index=INDEX,
-        doc_type=DOC_TYPE,
+        index=TRACEBACK_INDEX,
+        doc_type=TRACEBACK_DOC_TYPE,
         id=traceback.origin_papertrail_id,
         body=doc
     )
@@ -60,7 +60,7 @@ def refresh(es):
         Performs an ES refresh. Required to see newly-inserted values when searching
     """
     es.indices.refresh(
-        index=INDEX
+        index=TRACEBACK_INDEX
     )
 
 
@@ -105,8 +105,8 @@ def get_tracebacks(es, start_date=None, end_date=None):
         }
 
     raw_tracebacks = es.search(
-        index=INDEX,
-        doc_type=DOC_TYPE,
+        index=TRACEBACK_INDEX,
+        doc_type=TRACEBACK_DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
         size=100
@@ -138,8 +138,8 @@ def get_similar_tracebacks(es, traceback_text):
     }
 
     raw_es_response = es.search(
-        index=INDEX,
-        doc_type=DOC_TYPE,
+        index=TRACEBACK_INDEX,
+        doc_type=TRACEBACK_DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
         size=1000
