@@ -4,6 +4,8 @@ import logging
 from instance import config
 import jira
 
+from .jira_issue import JiraIssue
+
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -101,9 +103,11 @@ def create_jira_issue(title, description):
 
 def get_issue(key):
     """
-    Get a jira issue given its key
+        Get a jira issue given its key
+
+        @rtype: JiraIssue
     """
-    return JIRA_CLIENT.issue(key)
+    return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
 
 
 def get_link_to_issue(issue):
@@ -114,3 +118,21 @@ def get_link_to_issue(issue):
     """
     server = config.JIRA_SERVER
     return '%s/browse/%s' % (server, issue.key)
+
+
+def jira_api_object_to_JiraIssue(jira_object):
+    """
+        Convert a jira issue object from the jira API to our home-grown JiraIssue class
+
+        @type jira_object: jira.resources.Issue
+        @rtype: JiraIssue
+    """
+    assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
+
+    return JiraIssue(
+        jira_object.key,
+        jira_object.fields.summary,
+        jira_object.fields.description,
+        jira_object.fields.issuetype.name,
+        jira_object.fields.status.name,
+    )
