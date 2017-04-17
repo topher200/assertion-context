@@ -143,8 +143,8 @@ def parse_s3():
         return 'error accessing s3', 502
 
     # save the parser output to the database
-    for traceback in traceback_generator:
-        traceback_database.save_traceback(ES, traceback)
+    for tb in traceback_generator:
+        traceback_database.save_traceback(ES, tb)
 
     return 'success'
 
