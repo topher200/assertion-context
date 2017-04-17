@@ -99,6 +99,13 @@ def create_jira_issue(title, description):
     return issue
 
 
+def get_issue(key):
+    """
+    Get a jira issue given its key
+    """
+    return JIRA_CLIENT.issue(key)
+
+
 def get_link_to_issue(issue):
     """
         Takes a jira issue and returns a URL to that issue

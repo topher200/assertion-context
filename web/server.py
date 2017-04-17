@@ -21,6 +21,7 @@ from simplekv.decorator import PrefixDecorator
 
 from app import authentication
 from app import traceback_database
+from app import jira_issue_db
 from app import jira_util
 from app import s3
 from app import traceback
@@ -205,6 +206,37 @@ def create_jira_ticket():
 def get_tracebacks():
     data = [tb.document() for tb in traceback_database.get_tracebacks(ES)]
     return flask.jsonify({'tracebacks': data})
+
+
+@app.route("/api/update_jira_cache", methods=['PUT'])
+@login_required
+def update_jira_cache():
+    """
+        Update our cache of jira issues.
+
+        Takes a JSON payload with the following fields:
+        - issue_key: if included, must be the key of the issue to update. if we see this key we
+          only update the specified issue. example: SAN-1234
+        - all: if included, must be the boolean value of True. if we see this key (and not
+          issue_key) we update all jira issues.
+
+        The JSON payload must have at least one field.
+    """
+    # parse our input
+    json_request = flask.request.get_json()
+    if json_request is None or not any(k in json_request for k in ('issue_key', 'all')):
+        return 'invalid json', 400
+
+    if 'issue_key' in json_request:
+        issue = json_request['issue_key']
+    else:
+        if json_request['all'] != True:
+            return 'invalid "all" json', 400
+        issue = None
+        raise NotImplementedError()
+
+    jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
+    return 'success'
 
 
 @app.before_first_request
