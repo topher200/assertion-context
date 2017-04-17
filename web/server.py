@@ -21,7 +21,7 @@ from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
 from app import authentication
-from app import database
+from app import traceback_database
 from app import jira_util
 from app import s3
 from app import traceback
@@ -78,7 +78,7 @@ def index():
 
     if DEBUG_TIMING:
         db_start_time = time.time()
-    tracebacks = database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
+    tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
     if DEBUG_TIMING:
         flask.g.time_tracebacks = time.time() - db_start_time
     # get all tracebacks that the user hasn't hidden
@@ -93,7 +93,7 @@ def index():
     if DEBUG_TIMING:
         meta_start_time = time.time()
     tb_meta = [
-        TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
+        TracebackMetadata(t, traceback_database.get_similar_tracebacks(ES, t.traceback_text))
         for t in tracebacks
     ]
     if DEBUG_TIMING:
@@ -145,7 +145,7 @@ def parse_s3():
 
     # save the parser output to the database
     for traceback in traceback_generator:
-        database.save_traceback(ES, traceback)
+        traceback_database.save_traceback(ES, traceback)
 
     return 'success'
 
@@ -182,7 +182,7 @@ def create_jira_ticket():
     traceback_text = json_request['traceback_text']
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = database.get_similar_tracebacks(ES, traceback_text)
+    similar_tracebacks = traceback_database.get_similar_tracebacks(ES, traceback_text)
 
     # create a description using the list of tracebacks
     description = jira_util.create_description(similar_tracebacks)
@@ -204,7 +204,7 @@ def create_jira_ticket():
 @app.route("/api/tracebacks", methods=['GET'])
 @login_required
 def get_tracebacks():
-    data = [tb.document() for tb in database.get_tracebacks(ES)]
+    data = [tb.document() for tb in traceback_database.get_tracebacks(ES)]
     return flask.jsonify({'tracebacks': data})
 
 

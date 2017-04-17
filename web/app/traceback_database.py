@@ -1,5 +1,5 @@
 """
-    Utility functions for performing actions on our ES database.
+    Utility functions for performing actions on our tracebacks ES database.
 
     For all functions, `es` must be an instance of Elasticsearch
 """
