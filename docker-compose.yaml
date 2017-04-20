@@ -5,12 +5,13 @@ services:
     build: web/
     links:
       - redis
-    depends_on:
-      - logspout
     volumes:
       - ./web:/code:ro
     restart:
       always
+    logging:
+        options:
+            tag: web
 
   nginx:
     restart:
@@ -23,18 +24,14 @@ services:
       - ./web/static:/www/static:ro
     depends_on:
       - web
+    logging:
+        options:
+            tag: nginx
 
   redis:
     image: redis:3.2
     restart:
       always
-
-  logspout:
-    image:
-      gliderlabs/logspout:v3.2.1
-    restart:
-      always
-    environment:
-      ROUTE_URIS: syslog+tls://logs4.papertrailapp.com:31896
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+        options:
+            tag: redis

@@ -3,7 +3,19 @@ version: '2'
 services:
   web:
     command: ["gunicorn", "--workers", "4", "--bind", ":8000", "server:app"]
+    logging:
+        driver: syslog
+        options:
+            syslog-address: "udp://logs4.papertrailapp.com:35625"
 
-  logspout:
-    environment:
-      ROUTE_URIS: syslog+tls://logs4.papertrailapp.com:35625
+  nginx:
+    logging:
+        driver: syslog
+        options:
+            syslog-address: "udp://logs4.papertrailapp.com:35625"
+
+  redis:
+    logging:
+        driver: syslog
+        options:
+            syslog-address: "udp://logs4.papertrailapp.com:35625"
