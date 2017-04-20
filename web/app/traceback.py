@@ -15,8 +15,14 @@ class Traceback(object):
         origin line's id and timestamp (in L{origin_papertrail_id} and L{origin_timestamp}).
 
         Fields:
-        - traceback_text: the traceback text (only the traceback) parsed from individual log lines
-        - raw_text: the traceback text, plus extra lines before the traceback
+        - traceback_text: the traceback text (only the traceback) parsed from individual log lines.
+            no papertrail metadata included - only the parsed 'message' lines from the logs
+        - traceback_plus_context_text: the traceback text PLUS an extra few lines before the start
+            of the traceback. WARNING: not present in all historical data. will be equal to
+            traceback_text if not found
+        - raw_traceback_text: the raw traceback text, including Papertrail metadata. no context text
+        - raw_full_text: the raw traceback text, plus many extra lines before the traceback.
+            includes Papertrail metadata
         - origin_papertrail_id: the int id papertrail gave the last log line in our traceback.
             assumed to be unique among all other Papertrail ids. example: 700594297938165774
         - origin_timestamp: datetime object (parsed from string) of the timestamp the final log
@@ -25,31 +31,30 @@ class Traceback(object):
             instance_id. example: i-2ee330b7
         - program_name: string of the parsed program name. all our log lines shared the same
             program name. example: manager.debug
-        - traceback_plus_context_text: the traceback text PLUS an extra few lines before the start
-            of the traceback. WARNING: not present on historical data. will be equal to
-            traceback_text if not found
     """
     def __init__(
             self,
             traceback_text,
-            raw_text,
+            traceback_plus_context_text,
+            raw_traceback_text,
+            raw_full_text,
             origin_papertrail_id,
             origin_timestamp,
             instance_id,
             program_name,
-            traceback_plus_context_text,
     ):
         assert isinstance(origin_timestamp, datetime.datetime), (
             type(origin_timestamp), origin_timestamp
         )
 
         self._traceback_text = traceback_text
-        self._raw_text = raw_text
+        self._traceback_plus_context_text = traceback_plus_context_text
+        self._raw_traceback_text = raw_traceback_text
+        self._raw_full_text = raw_full_text
         self._origin_papertrail_id = origin_papertrail_id
         self._origin_timestamp = origin_timestamp
         self._instance_id = instance_id
         self._program_name = program_name
-        self._traceback_plus_context_text = traceback_plus_context_text
 
     def document(self):
         """
@@ -59,7 +64,7 @@ class Traceback(object):
         """
         return {
             "traceback_text": self._traceback_text,
-            "raw_text": self._raw_text,
+            "raw_full_text": self._raw_full_text,
             "origin_papertrail_id": self._origin_papertrail_id,
             "origin_timestamp": self._origin_timestamp,
             "instance_id": self._instance_id,
@@ -75,8 +80,20 @@ class Traceback(object):
         return self._traceback_text
 
     @property
-    def raw_text(self):
-        return self._raw_text
+    def traceback_plus_context_text(self):
+        # not guaranteed to exist
+        if self._traceback_plus_context_text is not None:
+            return self._traceback_plus_context_text
+        else:
+            return self.traceback_text
+
+    @property
+    def raw_traceback_text(self):
+        return self._raw_full_text
+
+    @property
+    def raw_full_text(self):
+        return self._raw_full_text
 
     @property
     def origin_papertrail_id(self):
@@ -94,13 +111,6 @@ class Traceback(object):
     def program_name(self):
         return self._program_name
 
-    @property
-    def traceback_plus_context_text(self):
-        if self._traceback_plus_context_text is not None:
-            return self._traceback_plus_context_text
-        else:
-            return self.traceback_text
-
 
 def generate_traceback_from_source(source):
     """
@@ -116,10 +126,11 @@ def generate_traceback_from_source(source):
 
     return Traceback(
         source["traceback_text"],
-        source["raw_text"],
+        source.get("traceback_plus_context_text", None),  # not guaranteed to exist
+        source["raw_traceback_text"],
+        source["raw_full_text"],
         source["origin_papertrail_id"],
         timestamp,
         source["instance_id"],
         source["program_name"],
-        source.get("traceback_plus_context_text", None)
     )

@@ -67,6 +67,11 @@ def __generate_Traceback(origin_logline, previous_loglines):
     """
         Combines L{LogLine}s into a L{Traceback}.
     """
+    raw_full_text = ''.join(
+        logline.raw_log_message for logline
+        in itertools.chain(previous_loglines, [origin_logline])
+    )
+    raw_traceback_text = _get_last_traceback_text_raw(raw_full_text)
     parsed_text = ''.join(
         logline.parsed_log_message for logline
         in itertools.chain(previous_loglines, [origin_logline])
@@ -74,13 +79,15 @@ def __generate_Traceback(origin_logline, previous_loglines):
     traceback_text, traceback_plus_context_text = _get_last_traceback_text(parsed_text)
     return Traceback(
         traceback_text,
-        parsed_text,
+        traceback_plus_context_text,
+        raw_traceback_text,
+        raw_full_text,
         origin_logline.papertrail_id,
         origin_logline.timestamp,
         origin_logline.instance_id,
         origin_logline.program_name,
-        traceback_plus_context_text,
     )
+
 
 def _get_last_traceback_text(parsed_log_text):
     """
@@ -91,9 +98,11 @@ def _get_last_traceback_text(parsed_log_text):
 
         If we can't parse out the traceback, returns an empty string.
 
-        Returns a two-tuple. The first element is just the traceback. The second element is the
-        traceback plus the last few lines before the start of the traceback (to give a little
-        context).
+        Returns a two-tuple:
+            - the traceback, parsed remove the metadata and show just the message
+            - the parsed traceback (so no metadata) plus the last few lines before the start of the
+                traceback (to give a little context); the extra lines are also parsed (include no
+                metadata).
     """
     assert isinstance(parsed_log_text, str), (type(parsed_log_text), parsed_log_text)
 
@@ -104,6 +113,37 @@ def _get_last_traceback_text(parsed_log_text):
         print("unable to parse out Traceback")
     context_lines = '\n'.join(previous_text.splitlines()[-3:])
     return sep + traceback_text, context_lines + sep + traceback_text
+
+
+def _get_last_traceback_text_raw(raw_log_text):
+    """
+        For the given parsed log text, filter out just the last traceback text.
+
+        All python tracebacks start with the string 'Traceback (most recent call last)'. We grab
+        the last one in the text.
+
+        If we can't parse out the traceback, returns an empty string.
+
+        Returns the traceback text in its 'raw' form, including the log metadata (so it's exactly
+        what you see in papertrail).
+    """
+    assert isinstance(raw_log_text, str), (type(raw_log_text), raw_log_text)
+
+    # find the line that has the 'Traceback' label in it. start from the bottom (so if there's more
+    # than one, we get the last one)
+    index = None
+    lines = raw_log_text.splitlines()
+    for index, line in enumerate(reversed(lines)):
+        if 'Traceback (most recent call last)' in line:
+            break
+
+    # 'index' is now the line number of the start of our traceback, counting from the bottom. get
+    # it and all the lines after it
+    if index is None:
+        return ''
+    else:
+        return '\n'.join(lines[-(index + 1):])
+
 
 def __parse_papertrail_log_line(raw_log_line):
     """
