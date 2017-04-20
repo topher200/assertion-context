@@ -94,16 +94,25 @@ def index():
     JiraIssueMetadata = collections.namedtuple(
         'JiraIssueMetadata', 'issue, url'
     )
-    if DEBUG_TIMING:
-        meta_start_time = time.time()
     tb_meta = []
     for t in tracebacks:
+        if DEBUG_TIMING:
+            similar_tracebacks_start_time = time.time()
+        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
+        if DEBUG_TIMING:
+            flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
+
+        if DEBUG_TIMING:
+            jira_issues_start_time = time.time()
         similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
         jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
         issues_meta = [
             JiraIssueMetadata(issue, jira_util.get_link_to_issue(issue))
             for issue in jira_issues
         ]
+        if DEBUG_TIMING:
+            flask.g.jira_issues_time = time.time() - jira_issues_start_time
+
         tb_meta.append(
             TracebackMetadata(
                 t,
@@ -111,8 +120,6 @@ def index():
                 issues_meta,
             )
         )
-    if DEBUG_TIMING:
-        flask.g.time_meta = time.time() - meta_start_time
 
     return flask.render_template(
         'index.html',
@@ -286,8 +293,8 @@ def profile_request(_):
     logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
     try:
         logger.debug(
-            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
-            flask.g.time_tracebacks, flask.g.time_meta
+            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs, get jira issues: %.2fs',
+            flask.g.time_tracebacks, flask.g.similar_tracebacks_time, flask.g.jira_issues_time
         )
     except AttributeError:
         pass  # info not present on this one
