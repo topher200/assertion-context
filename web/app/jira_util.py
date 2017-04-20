@@ -46,6 +46,7 @@ JIRA_CLIENT = jira.JIRA(
     server=config.JIRA_SERVER,
     basic_auth=config.JIRA_BASIC_AUTH,
 )
+JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
 
 logger = logging.getLogger()
 
@@ -88,10 +89,12 @@ def create_jira_issue(title, description):
     """
         Creates a issue in jira given the title/description text
 
+        Creates the issue in the project specified by JIRA_PROJECT_KEY.
+
         Returns the newly created issue
     """
     fields = {
-        'project': {'key': 'PPC'},
+        'project': {'key': JIRA_PROJECT_KEY},
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
@@ -108,6 +111,19 @@ def get_issue(key):
         @rtype: JiraIssue
     """
     return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+
+
+def get_all_issues():
+    """
+        Get a jira issues.
+
+        Searches for all issues for the configured JIRA_PROJECT_KEY.
+
+        @rtype: generator
+
+        @postcondition: all(isinstance(r, JiraIssue) for r in return)
+    """
+    return JIRA_CLIENT.search_issues('project=%s' % JIRA_PROJECT_KEY)
 
 
 def get_link_to_issue(issue):

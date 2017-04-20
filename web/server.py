@@ -251,14 +251,21 @@ def update_jira_cache():
         return 'invalid json', 400
 
     if 'issue_key' in json_request:
+        # save the given issue to ES
         issue = json_request['issue_key']
+        jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
     else:
         if json_request['all'] != True:
             return 'invalid "all" json', 400
-        issue = None
-        raise NotImplementedError()
+        # iterate through all issues and save them to ES
+        count = 0
+        for issue in jira_util.get_all_issues():
+            count += 1
+            if count > 50:
+                logger.warning("reached max 'ALL'")
+                break
+            jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
 
-    jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
     return 'success'
 
 
