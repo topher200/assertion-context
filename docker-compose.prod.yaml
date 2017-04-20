@@ -7,15 +7,18 @@ services:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:35625"
+            tag: web
 
   nginx:
     logging:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:35625"
+            tag: nginx
 
   redis:
     logging:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:35625"
+            tag: redis
