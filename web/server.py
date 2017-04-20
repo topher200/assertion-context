@@ -158,7 +158,7 @@ def parse_s3():
     json_request = flask.request.get_json()
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
-    logger.debug("parsing s3 file. bucket: '%s', key: '%s'",
+    logger.info("parsing s3 file. bucket: '%s', key: '%s'",
                      json_request['bucket'], json_request['key'])
 
     # use our powerful parser to run checks on the requested file
@@ -262,7 +262,7 @@ def update_jira_cache():
         for issue in jira_util.get_all_issues():
             count += 1
             jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
-        logger.debug("saved %s issues", count)
+        logger.info("saved %s issues", count)
 
     return 'success'
 
@@ -276,7 +276,7 @@ def setup_logging():
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
 
 @app.before_request
@@ -287,7 +287,7 @@ def before_request():
     user = current_user.email if not current_user.is_anonymous else 'anonymous user'
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
-    logger.debug(
+    logger.info(
         "handling '%s' request from '%s'%s", flask.request.full_path, user, json_str
     )
 
@@ -295,9 +295,9 @@ def before_request():
 @app.teardown_request
 def profile_request(_):
     time_diff = time.time() - flask.g.start_time
-    logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
+    logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
     try:
-        logger.debug(
+        logger.info(
             'get tracebacks: %.2fs, get similar_tracebacks: %.2fs, get jira issues: %.2fs',
             flask.g.time_tracebacks, flask.g.similar_tracebacks_time, flask.g.jira_issues_time
         )

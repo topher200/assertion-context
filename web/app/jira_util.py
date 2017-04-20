@@ -135,7 +135,7 @@ def get_all_issues():
             maxResults=BATCH_SIZE
         )
         if len(new_results) > 0:
-            logger.debug('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
+            logger.info('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
             for r in new_results:
                 yield r
             start_at += BATCH_SIZE

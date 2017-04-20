@@ -105,20 +105,20 @@ def add_login_handling(app):
     @app.route('/login')
     @login_manager.unauthorized_handler
     def login():  # pylint: disable=unused-variable
-        logger.debug('login is sending user to google auth')
+        logger.info('login is sending user to google auth')
         response = GOOGLE_OAUTH.authorize(callback=flask.url_for('authorized', _external=True))
         return response
 
     @app.route('/logout')
     def logout():  # pylint: disable=unused-variable
-        logger.debug('logging user out')
+        logger.info('logging user out')
         USER_DB.delete(flask_login.current_user.email)
         flask_login.logout_user()
         return flask.redirect(flask.url_for('index'))
 
     @app.route('/login/authorized')
     def authorized():  # pylint: disable=unused-variable
-        logger.debug('received /authorized from google')
+        logger.info('received /authorized from google')
         resp = GOOGLE_OAUTH.authorized_response()
         if resp is None:
             return 'Access denied: reason=%s error=%s' % (
@@ -127,21 +127,21 @@ def add_login_handling(app):
             )
 
         # we save a temp token, get user information, then delete it and save the real user
-        logger.debug('setting temp token')
+        logger.info('setting temp token')
         flask.session['temp_oauth_token'] = (resp['access_token'], '')
         me = GOOGLE_OAUTH.get('userinfo')
         flask.session.pop('temp_oauth_token')
 
         # create the user
         email_address = me.data['email']
-        logger.debug('creating user with email %s', email_address)
+        logger.info('creating user with email %s', email_address)
         user = User(email_address, (resp['access_token'], ''))
 
         # check if the user is authorized and log them in. if they're not authorized, send an error
         if user.is_authenticated:
             flask_login.login_user(user, remember=True)
             USER_DB.put(user.email, simplejson.dumps(user.document()))
-            logger.debug('redirecting to user to index')
+            logger.info('redirecting to user to index')
             return flask.redirect(flask.url_for('index'))
         else:
             logger.warning('user "%s" not authorized', email_address)
@@ -155,14 +155,14 @@ def add_login_handling(app):
         """ Returns the oauth token for a logged in user. Returns None if we're not logged in"""
         # if we're in the user signin flow, return their temp token
         if 'temp_oauth_token' in flask.session:
-            logger.debug('getting temp oauth token')
+            logger.info('getting temp oauth token')
             return flask.session.get('temp_oauth_token')
 
         # normal path - return the auth'd user token
         if flask_login.current_user and flask_login.current_user.is_authenticated:
-            logger.debug("getting auth'd user token")
+            logger.info("getting auth'd user token")
             return flask_login.current_user.oauth_access_token
-        logger.debug("unable to find oauth token for user")
+        logger.info("unable to find oauth token for user")
         return None
 
     login_manager.init_app(app)
