@@ -86,18 +86,34 @@ def index():
         t for t in tracebacks
         if not flask.session.get(TRACEBACK_TEXT_KV_PREFIX + t.traceback_text, False)
     )
-    TracebackMetadata = collections.namedtuple(
-        'TracebackMetadata', 'traceback, similar_tracebacks'
-    )
 
+    # for each traceback, get all similar tracebacks and any matching jira tickets
+    TracebackMetadata = collections.namedtuple(
+        'TracebackMetadata', 'traceback, similar_tracebacks, jira_issues'
+    )
+    JiraIssueMetadata = collections.namedtuple(
+        'JiraIssueMetadata', 'issue, url'
+    )
     if DEBUG_TIMING:
         meta_start_time = time.time()
-    tb_meta = [
-        TracebackMetadata(t, traceback_database.get_similar_tracebacks(ES, t.traceback_text))
-        for t in tracebacks
-    ]
+    tb_meta = []
+    for t in tracebacks:
+        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
+        jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
+        issues_meta = [
+            JiraIssueMetadata(issue, jira_util.get_link_to_issue(issue))
+            for issue in jira_issues
+        ]
+        tb_meta.append(
+            TracebackMetadata(
+                t,
+                similar_tracebacks,
+                issues_meta,
+            )
+        )
     if DEBUG_TIMING:
         flask.g.time_meta = time.time() - meta_start_time
+
     return flask.render_template(
         'index.html',
         tb_meta=tb_meta,

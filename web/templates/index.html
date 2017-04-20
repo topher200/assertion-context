@@ -5,6 +5,13 @@
 <div class="traceback-container">
     <div class="traceback-metadata col-md-3">
         <p>
+            <ul>
+                {% for issue_meta in t.jira_issues %}
+                <li>
+                    <a href="{{ issue_meta.url }}">{{ issue_meta.issue.key }}</a>
+                </li>
+                {% endfor %}
+            </ul>
             <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button> |
             <button onclick="create_jira_ticket(this)" value="{{ t.traceback.traceback_text }}">create jira ticket</button>
             <ul>
