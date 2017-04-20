@@ -5,7 +5,6 @@
 """
 import collections
 import datetime
-import json
 import logging
 import os
 import time
@@ -21,7 +20,8 @@ from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
 from app import authentication
-from app import database
+from app import traceback_database
+from app import jira_issue_db
 from app import jira_util
 from app import s3
 from app import traceback
@@ -78,7 +78,7 @@ def index():
 
     if DEBUG_TIMING:
         db_start_time = time.time()
-    tracebacks = database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
+    tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
     if DEBUG_TIMING:
         flask.g.time_tracebacks = time.time() - db_start_time
     # get all tracebacks that the user hasn't hidden
@@ -86,24 +86,47 @@ def index():
         t for t in tracebacks
         if not flask.session.get(TRACEBACK_TEXT_KV_PREFIX + t.traceback_text, False)
     )
-    TracebackMetadata = collections.namedtuple(
-        'TracebackMetadata', 'traceback, similar_tracebacks'
-    )
 
-    if DEBUG_TIMING:
-        meta_start_time = time.time()
-    tb_meta = [
-        TracebackMetadata(t, database.get_similar_tracebacks(ES, t.traceback_text))
-        for t in tracebacks
-    ]
-    if DEBUG_TIMING:
-        flask.g.time_meta = time.time() - meta_start_time
+    # for each traceback, get all similar tracebacks and any matching jira tickets
+    TracebackMetadata = collections.namedtuple(
+        'TracebackMetadata', 'traceback, similar_tracebacks, jira_issues'
+    )
+    JiraIssueMetadata = collections.namedtuple(
+        'JiraIssueMetadata', 'issue, url'
+    )
+    tb_meta = []
+    for t in tracebacks:
+        if DEBUG_TIMING:
+            similar_tracebacks_start_time = time.time()
+        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
+        if DEBUG_TIMING:
+            flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
+
+        if DEBUG_TIMING:
+            jira_issues_start_time = time.time()
+        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
+        jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
+        issues_meta = [
+            JiraIssueMetadata(issue, jira_util.get_link_to_issue(issue))
+            for issue in jira_issues
+        ]
+        if DEBUG_TIMING:
+            flask.g.jira_issues_time = time.time() - jira_issues_start_time
+
+        tb_meta.append(
+            TracebackMetadata(
+                t,
+                similar_tracebacks,
+                issues_meta,
+            )
+        )
+
     return flask.render_template(
         'index.html',
         tb_meta=tb_meta,
         show_restore_button=__user_has_hidden_tracebacks(),
         date_to_analyze=date_to_analyze,
-        days_ago=days_ago_int
+        days_ago=days_ago_int,
     )
 
 
@@ -144,8 +167,8 @@ def parse_s3():
         return 'error accessing s3', 502
 
     # save the parser output to the database
-    for traceback in traceback_generator:
-        database.save_traceback(ES, traceback)
+    for tb in traceback_generator:
+        traceback_database.save_traceback(ES, tb)
 
     return 'success'
 
@@ -182,7 +205,7 @@ def create_jira_ticket():
     traceback_text = json_request['traceback_text']
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = database.get_similar_tracebacks(ES, traceback_text)
+    similar_tracebacks = traceback_database.get_similar_tracebacks(ES, traceback_text)
 
     # create a description using the list of tracebacks
     description = jira_util.create_description(similar_tracebacks)
@@ -204,8 +227,44 @@ def create_jira_ticket():
 @app.route("/api/tracebacks", methods=['GET'])
 @login_required
 def get_tracebacks():
-    data = [tb.document() for tb in database.get_tracebacks(ES)]
+    data = [tb.document() for tb in traceback_database.get_tracebacks(ES)]
     return flask.jsonify({'tracebacks': data})
+
+
+@app.route("/api/update_jira_cache", methods=['PUT'])
+@login_required
+def update_jira_cache():
+    """
+        Update our cache of jira issues.
+
+        Takes a JSON payload with the following fields:
+        - issue_key: if included, must be the key of the issue to update. if we see this key we
+          only update the specified issue. example: SAN-1234
+        - all: if included, must be the boolean value of True. if we see this key (and not
+          issue_key) we update all jira issues.
+
+        The JSON payload must have at least one field.
+    """
+    # parse our input
+    json_request = flask.request.get_json()
+    if json_request is None or not any(k in json_request for k in ('issue_key', 'all')):
+        return 'invalid json', 400
+
+    if 'issue_key' in json_request:
+        # save the given issue to ES
+        issue = json_request['issue_key']
+        jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
+    else:
+        if json_request['all'] != True:
+            return 'invalid "all" json', 400
+        # iterate through all issues and save them to ES
+        count = 0
+        for issue in jira_util.get_all_issues():
+            count += 1
+            jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
+        logger.debug("saved %s issues", count)
+
+    return 'success'
 
 
 @app.before_first_request
@@ -239,8 +298,8 @@ def profile_request(_):
     logger.debug('/%s request took %.2fs', flask.g.endpoint, time_diff)
     try:
         logger.debug(
-            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs',
-            flask.g.time_tracebacks, flask.g.time_meta
+            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs, get jira issues: %.2fs',
+            flask.g.time_tracebacks, flask.g.similar_tracebacks_time, flask.g.jira_issues_time
         )
     except AttributeError:
         pass  # info not present on this one

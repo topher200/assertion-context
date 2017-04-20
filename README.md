@@ -36,6 +36,7 @@ ES_ADDRESS = <url to ElasticSearch database>
 AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the user. example: '@gmail.com$'>
 JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
 JIRA_BASIC_AUTH = (<jira username>, <jira password>)
+JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
 ```
 
 Then to start it all up:

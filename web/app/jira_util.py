@@ -4,6 +4,8 @@ import logging
 from instance import config
 import jira
 
+from .jira_issue import JiraIssue
+
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -44,6 +46,7 @@ JIRA_CLIENT = jira.JIRA(
     server=config.JIRA_SERVER,
     basic_auth=config.JIRA_BASIC_AUTH,
 )
+JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
 
 logger = logging.getLogger()
 
@@ -86,10 +89,12 @@ def create_jira_issue(title, description):
     """
         Creates a issue in jira given the title/description text
 
+        Creates the issue in the project specified by JIRA_PROJECT_KEY.
+
         Returns the newly created issue
     """
     fields = {
-        'project': {'key': 'PPC'},
+        'project': {'key': JIRA_PROJECT_KEY},
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
@@ -97,6 +102,45 @@ def create_jira_issue(title, description):
     issue = JIRA_CLIENT.create_issue(fields=fields)
     logger.info('created jira issue: %s', issue.key)
     return issue
+
+
+def get_issue(key):
+    """
+        Get a jira issue given its key
+
+        @rtype: JiraIssue
+    """
+    return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+
+
+def get_all_issues():
+    """
+        Get a jira issues.
+
+        Searches for all issues for the configured JIRA_PROJECT_KEY.
+
+        @rtype: generator
+
+        @postcondition: all(isinstance(r, JiraIssue) for r in return)
+    """
+    # there seems to be a bug in the jira library where it only grabs the first 50 results (even if
+    # maxResults evaluates to False, as instructed to do by the docs). we'll handle the pagination
+    # ourselves.
+    start_at = 0
+    BATCH_SIZE = 50
+    while True:
+        new_results = JIRA_CLIENT.search_issues(
+            'project=%s' % JIRA_PROJECT_KEY,
+            startAt=start_at,
+            maxResults=BATCH_SIZE
+        )
+        if len(new_results) > 0:
+            logger.debug('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
+            for r in new_results:
+                yield r
+            start_at += BATCH_SIZE
+        else:
+            break
 
 
 def get_link_to_issue(issue):
@@ -107,3 +151,21 @@ def get_link_to_issue(issue):
     """
     server = config.JIRA_SERVER
     return '%s/browse/%s' % (server, issue.key)
+
+
+def jira_api_object_to_JiraIssue(jira_object):
+    """
+        Convert a jira issue object from the jira API to our home-grown JiraIssue class
+
+        @type jira_object: jira.resources.Issue
+        @rtype: JiraIssue
+    """
+    assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
+
+    return JiraIssue(
+        jira_object.key,
+        jira_object.fields.summary,
+        jira_object.fields.description,
+        jira_object.fields.issuetype.name,
+        jira_object.fields.status.name,
+    )

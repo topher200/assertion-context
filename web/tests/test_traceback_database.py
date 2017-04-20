@@ -11,7 +11,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import sys
 sys.path.append(ROOT)
 
-from app import database
+from app import traceback_database
 from app import traceback
 from instance.config import ES_ADDRESS
 
@@ -40,27 +40,27 @@ class TestElasticSearch(unittest.TestCase):
         # Clean up any created tracebacks after each test
         try:
             self.es.delete(
-                index=database.INDEX,
-                doc_type=database.DOC_TYPE,
+                index=traceback_database.INDEX,
+                doc_type=traceback_database.DOC_TYPE,
                 id=self.traceback_0.origin_papertrail_id,
             )
         except NotFoundError:
             pass
         try:
             self.es.delete(
-                index=database.INDEX,
-                doc_type=database.DOC_TYPE,
+                index=traceback_database.INDEX,
+                doc_type=traceback_database.DOC_TYPE,
                 id=self.traceback_1.origin_papertrail_id,
             )
         except NotFoundError:
             pass
 
     def test_save_traceback(self):
-        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
+        self.assertTrue(traceback_database.save_traceback(self.es, self.traceback_0))
         self.assertTrue(
             self.es.exists(
-                index=database.INDEX,
-                doc_type=database.DOC_TYPE,
+                index=traceback_database.INDEX,
+                doc_type=traceback_database.DOC_TYPE,
                 id=self.traceback_0.origin_papertrail_id,
                 params={
                     'refresh': True,
@@ -73,12 +73,12 @@ class TestElasticSearch(unittest.TestCase):
             Check that when we search for our new tracebacks we find them.
         """
         # save the tracebacks
-        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
-        self.assertTrue(database.save_traceback(self.es, self.traceback_1))
-        database.refresh(self.es)
+        self.assertTrue(traceback_database.save_traceback(self.es, self.traceback_0))
+        self.assertTrue(traceback_database.save_traceback(self.es, self.traceback_1))
+        traceback_database.refresh(self.es)
 
         # test that we find them all. assumes that the timestamps are from the same day.
-        tracebacks = database.get_tracebacks(
+        tracebacks = traceback_database.get_tracebacks(
             self.es,
             self.traceback_0.origin_timestamp.date(),
             self.traceback_0.origin_timestamp.date(),
@@ -90,11 +90,11 @@ class TestElasticSearch(unittest.TestCase):
             Check that when we search for all tracebacks, we find many
         """
         # save the new tracebacks
-        self.assertTrue(database.save_traceback(self.es, self.traceback_0))
-        self.assertTrue(database.save_traceback(self.es, self.traceback_1))
-        database.refresh(self.es)
+        self.assertTrue(traceback_database.save_traceback(self.es, self.traceback_0))
+        self.assertTrue(traceback_database.save_traceback(self.es, self.traceback_1))
+        traceback_database.refresh(self.es)
 
-        tracebacks = database.get_tracebacks(
+        tracebacks = traceback_database.get_tracebacks(
             self.es,
         )
         self.assertGreaterEqual(len(list(tracebacks)), 2)
