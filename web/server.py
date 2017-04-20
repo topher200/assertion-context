@@ -261,10 +261,8 @@ def update_jira_cache():
         count = 0
         for issue in jira_util.get_all_issues():
             count += 1
-            if count > 50:
-                logger.warning("reached max 'ALL'")
-                break
             jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
+        logger.debug("saved %s issues", count)
 
     return 'success'
 

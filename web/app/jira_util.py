@@ -123,7 +123,24 @@ def get_all_issues():
 
         @postcondition: all(isinstance(r, JiraIssue) for r in return)
     """
-    return JIRA_CLIENT.search_issues('project=%s' % JIRA_PROJECT_KEY)
+    # there seems to be a bug in the jira library where it only grabs the first 50 results (even if
+    # maxResults evaluates to False, as instructed to do by the docs). we'll handle the pagination
+    # ourselves.
+    start_at = 0
+    BATCH_SIZE = 50
+    while True:
+        new_results = JIRA_CLIENT.search_issues(
+            'project=%s' % JIRA_PROJECT_KEY,
+            startAt=start_at,
+            maxResults=BATCH_SIZE
+        )
+        if len(new_results) > 0:
+            logger.debug('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
+            for r in new_results:
+                yield r
+            start_at += BATCH_SIZE
+        else:
+            break
 
 
 def get_link_to_issue(issue):
