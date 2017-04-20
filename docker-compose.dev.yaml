@@ -13,12 +13,14 @@ services:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:31896"
+            tag: web
 
   nginx:
     logging:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:31896"
+            tag: nginx
 
   redis:
     ports:
@@ -27,6 +29,7 @@ services:
         driver: syslog
         options:
             syslog-address: "udp://logs4.papertrailapp.com:31896"
+            tag: redis
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.2.1
