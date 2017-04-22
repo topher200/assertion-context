@@ -149,6 +149,8 @@ def get_link_to_issue(issue):
 
         Returns the user-facing url, not the rest-api one
     """
+    assert isinstance(issue, jira.resources.Issue), (type(issue), issue)
+
     server = config.JIRA_SERVER
     return '%s/browse/%s' % (server, issue.key)
 
@@ -164,6 +166,7 @@ def jira_api_object_to_JiraIssue(jira_object):
 
     return JiraIssue(
         jira_object.key,
+        get_link_to_issue(jira_object),
         jira_object.fields.summary,
         jira_object.fields.description,
         jira_object.fields.issuetype.name,

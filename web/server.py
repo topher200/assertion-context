@@ -92,9 +92,6 @@ def index():
     TracebackMetadata = collections.namedtuple(
         'TracebackMetadata', 'traceback, similar_tracebacks, jira_issues'
     )
-    JiraIssueMetadata = collections.namedtuple(
-        'JiraIssueMetadata', 'issue, url'
-    )
     tb_meta = []
     for t in tracebacks:
         if DEBUG_TIMING:
@@ -106,10 +103,6 @@ def index():
         if DEBUG_TIMING:
             jira_issues_start_time = time.time()
         jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
-        issues_meta = (
-            JiraIssueMetadata(issue, jira_util.get_link_to_issue(issue))
-            for issue in jira_issues
-        )
         if DEBUG_TIMING:
             flask.g.jira_issues_time = time.time() - jira_issues_start_time
 
@@ -117,7 +110,7 @@ def index():
             TracebackMetadata(
                 t,
                 similar_tracebacks,
-                itertools.islice(issues_meta, 5),
+                jira_issues,
             )
         )
 

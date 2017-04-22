@@ -4,6 +4,7 @@ class JiraIssue(object):
 
         We save the following fields:
         - The key JIRA gives the issue. For example: PPC-123
+        - url of the issue
         - The summary of the issue. The "title" of the ticket
         - description text
         - the type of the issue (bug, story, etc)
@@ -12,12 +13,14 @@ class JiraIssue(object):
     def __init__(
             self,
             key,
+            url,
             summary,
             description,
             issue_type,
             status,
     ):
         self._key = key
+        self._url = url
         self._summary = summary
         self._description = description
         self._issue_type = issue_type
@@ -31,6 +34,7 @@ class JiraIssue(object):
         """
         return {
             "key": self._key,
+            "url": self._url,
             "summary": self._summary,
             "description": self._description,
             "issue_type": self._issue_type,
@@ -43,6 +47,10 @@ class JiraIssue(object):
     @property
     def key(self):
         return self._key
+
+    @property
+    def url(self):
+        return self._url
 
     @property
     def summary(self):
@@ -69,6 +77,7 @@ def generate_from_source(source):
 
     return JiraIssue(
         source["key"],
+        source["url"],
         source["summary"],
         source["description"],
         source["issue_type"],

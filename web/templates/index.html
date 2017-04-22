@@ -6,9 +6,9 @@
     <div class="traceback-metadata col-md-3">
         <p>
             <ul>
-                {% for issue_meta in t.jira_issues %}
+                {% for issue in t.jira_issues %}
                 <li>
-                    <a href="{{ issue_meta.url }}">{{ issue_meta.issue.key }}</a>
+                    <a href="{{ issue.url }}">{{ issue.key }}</a>
                 </li>
                 {% endfor %}
             </ul>
