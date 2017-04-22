@@ -20,7 +20,9 @@ class Traceback(object):
         - traceback_plus_context_text: the traceback text PLUS an extra few lines before the start
             of the traceback. WARNING: not present in all historical data. will be equal to
             traceback_text if not found
-        - raw_traceback_text: the raw traceback text, including Papertrail metadata. no context text
+        - raw_traceback_text: the raw traceback text, including Papertrail metadata. no context
+            text. WARNING: not present in all historical data. will be equal to traceback_text if
+            not found
         - raw_full_text: the raw traceback text, plus many extra lines before the traceback.
             includes Papertrail metadata
         - origin_papertrail_id: the int id papertrail gave the last log line in our traceback.
@@ -90,7 +92,11 @@ class Traceback(object):
 
     @property
     def raw_traceback_text(self):
-        return self._raw_full_text
+        # not guaranteed to exist
+        if self._raw_full_text is not None:
+            return self._raw_full_text
+        else:
+            return self.traceback_text
 
     @property
     def raw_full_text(self):
@@ -128,8 +134,8 @@ def generate_traceback_from_source(source):
     return Traceback(
         source["traceback_text"],
         source.get("traceback_plus_context_text", None),  # not guaranteed to exist
-        source["raw_traceback_text"],
-        source["raw_full_text"],
+        source.get("raw_traceback_text", None),  # not guaranteed to exist
+        source.get("raw_full_text", 'raw_text'),  # original name was 'raw_text'
         source["origin_papertrail_id"],
         timestamp,
         source["instance_id"],
