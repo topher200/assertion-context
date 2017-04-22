@@ -217,11 +217,11 @@ def get_tracebacks():
     return flask.jsonify({'tracebacks': data})
 
 
-@app.route("/api/update_jira_cache", methods=['PUT'])
+@app.route("/api/update_jira_db", methods=['PUT'])
 @login_required
-def update_jira_cache():
+def update_jira_db():
     """
-        Update our cache of jira issues.
+        Update our database of jira issues.
 
         Takes a JSON payload with the following fields:
         - issue_key: if included, must be the key of the issue to update. if we see this key we
