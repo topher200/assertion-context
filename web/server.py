@@ -107,13 +107,19 @@ def index():
     if DEBUG_TIMING:
         flask.g.jira_issues_time = time.time() - jira_issues_start_time
 
-    return flask.render_template(
+    if DEBUG_TIMING:
+        render_start_time = time.time()
+    render = flask.render_template(
         'index.html',
         tb_meta=tb_meta,
         show_restore_button=__user_has_hidden_tracebacks(),
         date_to_analyze=date_to_analyze,
         days_ago=days_ago_int,
     )
+    if DEBUG_TIMING:
+        flask.g.render_time = time.time() - render_start_time
+
+    return render
 
 
 def __user_has_hidden_tracebacks():
@@ -294,13 +300,14 @@ def before_request():
 def profile_request(_):
     time_diff = time.time() - flask.g.start_time
     logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
-    try:
-        logger.info(
-            'get tracebacks: %.2fs, get similar_tracebacks: %.2fs, get jira issues: %.2fs',
-            flask.g.time_tracebacks, flask.g.similar_tracebacks_time, flask.g.jira_issues_time
-        )
-    except AttributeError:
-        pass  # info not present on this one
+    timings = []
+    for t in ('time_tracebacks', 'similar_tracebacks_time', 'jira_issues_time', 'render_time'):
+        try:
+            timings.append('%s: %.2fs' % (t, flask.g.get(t)))
+        except TypeError:
+            pass  # info not present on this one
+    if len(timings) > 0:
+        logger.info(', '.join(timings))
 
 
 if __name__ == "__main__":
