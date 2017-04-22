@@ -40,8 +40,8 @@ JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
 ```
  - fill out .env for docker-compose variables. requires these fields:
 ```
-PAPERTRAIL_PRODUCTION_URL="udp://logs4.papertrailapp.com:35000"
-PAPERTRAIL_DEVELOPMENT_URL="udp://logs4.papertrailapp.com:31000"
+PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
+PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ```
 
 Then to start it all up:
