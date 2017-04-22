@@ -31,4 +31,4 @@ class TestParse(unittest.TestCase):
 
         for t in tracebacks:
             # check that our parsing and saving worked correctly
-            self.assertNotIn('origin_papertrail_id', t.raw_text)
+            self.assertNotIn('origin_papertrail_id', t.raw_full_text)
