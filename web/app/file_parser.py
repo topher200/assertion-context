@@ -7,6 +7,7 @@ import collections
 import datetime
 import itertools
 import gzip
+import logging
 import re
 
 from .logline import LogLine
@@ -34,6 +35,8 @@ NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
 
     I'm purposely going high with this number since it's easier to ignore data than re-query for it
 """
+
+logger = logging.getLogger()
 
 
 def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
@@ -69,10 +72,13 @@ def __generate_Traceback(origin_logline, previous_loglines):
     """
     log_lines = itertools.chain(previous_loglines, [origin_logline])
     log_lines1, log_lines2 = itertools.tee(log_lines)
+
     raw_full_text = ''.join(logline.raw_log_message for logline in log_lines1)
     raw_traceback_text = _get_last_traceback_text_raw(raw_full_text)
+
     parsed_text = ''.join(logline.parsed_log_message for logline in log_lines2)
     traceback_text, traceback_plus_context_text = _get_last_traceback_text(parsed_text)
+
     return Traceback(
         traceback_text,
         traceback_plus_context_text,
