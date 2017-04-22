@@ -13,13 +13,14 @@ sys.path.append(ROOT)
 
 from app import traceback_database
 from app import traceback
-from instance.config import ES_ADDRESS
 
 
 class TestElasticSearch(unittest.TestCase):
     def setUp(self):
-        self.es = Elasticsearch(ES_ADDRESS, use_ssl=True)
+        self.es = Elasticsearch('localhost:9200')
         self.traceback_0 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
+            'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/services/bing/DeprecatedBingDownloadAccountChangesService.py", line 81, in download_account_changes\nAssertionError\n',
             '700594297938165770',
@@ -28,6 +29,8 @@ class TestElasticSearch(unittest.TestCase):
             'manager.debug',
         )
         self.traceback_1 = traceback.Traceback(
+            'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
+            'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
             'File "/opt/wordstream/engine/rest_api/handlers/bing/BingDownloadAccountChangesHandler.py", line 93, in _do_post\nAssertionError\n',
             '700594297938165771',
