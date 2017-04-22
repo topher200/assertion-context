@@ -67,15 +67,11 @@ def __generate_Traceback(origin_logline, previous_loglines):
     """
         Combines L{LogLine}s into a L{Traceback}.
     """
-    raw_full_text = ''.join(
-        logline.raw_log_message for logline
-        in itertools.chain(previous_loglines, [origin_logline])
-    )
+    log_lines = itertools.chain(previous_loglines, [origin_logline])
+    log_lines1, log_lines2 = itertools.tee(log_lines)
+    raw_full_text = ''.join(logline.raw_log_message for logline in log_lines1)
     raw_traceback_text = _get_last_traceback_text_raw(raw_full_text)
-    parsed_text = ''.join(
-        logline.parsed_log_message for logline
-        in itertools.chain(previous_loglines, [origin_logline])
-    )
+    parsed_text = ''.join(logline.parsed_log_message for logline in log_lines2)
     traceback_text, traceback_plus_context_text = _get_last_traceback_text(parsed_text)
     return Traceback(
         traceback_text,
