@@ -60,7 +60,7 @@ export PROJECT_HOME=$HOME/Devel
 source /usr/local/bin/virtualenvwrapper.sh
 ```
  - `source .bashrc` to enable virtualenvwrapper
- - (if not installed) yum install -y python34-virtualenv
+   - (if not installed) `yum install -y python34-virtualenv`
  - mkvirtualenv -p python3 <virtualenv name>
  - pip install -r requirements.txt
 
