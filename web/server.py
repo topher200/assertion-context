@@ -5,6 +5,7 @@
 """
 import collections
 import datetime
+import itertools
 import logging
 import os
 import time
@@ -104,7 +105,6 @@ def index():
 
         if DEBUG_TIMING:
             jira_issues_start_time = time.time()
-        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
         jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
         issues_meta = [
             JiraIssueMetadata(issue, jira_util.get_link_to_issue(issue))
