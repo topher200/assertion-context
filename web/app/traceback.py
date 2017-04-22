@@ -64,12 +64,13 @@ class Traceback(object):
         """
         return {
             "traceback_text": self._traceback_text,
+            "traceback_plus_context_text": self._traceback_plus_context_text,
+            "raw_traceback_text": self._raw_traceback_text,
             "raw_full_text": self._raw_full_text,
             "origin_papertrail_id": self._origin_papertrail_id,
             "origin_timestamp": self._origin_timestamp,
             "instance_id": self._instance_id,
             "program_name": self._program_name,
-            "traceback_plus_context_text": self._traceback_plus_context_text,
         }
 
     def __repr__(self):
