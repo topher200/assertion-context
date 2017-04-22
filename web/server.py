@@ -5,10 +5,10 @@
 """
 import collections
 import datetime
-import itertools
 import logging
 import os
 import time
+import types
 
 import flask
 import pytz
@@ -77,42 +77,35 @@ def index():
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     date_to_analyze = today - datetime.timedelta(days=days_ago_int)
 
+    # get all tracebacks
     if DEBUG_TIMING:
         db_start_time = time.time()
     tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
     if DEBUG_TIMING:
         flask.g.time_tracebacks = time.time() - db_start_time
-    # get all tracebacks that the user hasn't hidden
-    tracebacks = (
-        t for t in tracebacks
+
+    # filter out tracebacks the user has hidden. we use a SimpleNamespace to store each traceback +
+    # some metadata we'll use when rendering the html page
+    tb_meta = [
+        types.SimpleNamespace(traceback=t) for t in tracebacks
         if not flask.session.get(TRACEBACK_TEXT_KV_PREFIX + t.traceback_text, False)
-    )
+    ]
 
     # for each traceback, get all similar tracebacks and any matching jira tickets
-    TracebackMetadata = collections.namedtuple(
-        'TracebackMetadata', 'traceback, similar_tracebacks, jira_issues'
-    )
-    tb_meta = []
-    for t in tracebacks:
-        if DEBUG_TIMING:
-            similar_tracebacks_start_time = time.time()
-        similar_tracebacks = traceback_database.get_similar_tracebacks(ES, t.traceback_text)
-        if DEBUG_TIMING:
-            flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
-
-        if DEBUG_TIMING:
-            jira_issues_start_time = time.time()
-        jira_issues = jira_issue_db.get_matching_jira_issues(ES, t.traceback_text)
-        if DEBUG_TIMING:
-            flask.g.jira_issues_time = time.time() - jira_issues_start_time
-
-        tb_meta.append(
-            TracebackMetadata(
-                t,
-                similar_tracebacks,
-                jira_issues,
-            )
+    if DEBUG_TIMING:
+        similar_tracebacks_start_time = time.time()
+    for tb in tb_meta:
+        tb.similar_tracebacks = traceback_database.get_similar_tracebacks(
+            ES, tb.traceback.traceback_text
         )
+    if DEBUG_TIMING:
+        flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
+    if DEBUG_TIMING:
+        jira_issues_start_time = time.time()
+    for tb in tb_meta:
+        tb.jira_issues = jira_issue_db.get_matching_jira_issues(ES, tb.traceback.traceback_text)
+    if DEBUG_TIMING:
+        flask.g.jira_issues_time = time.time() - jira_issues_start_time
 
     return flask.render_template(
         'index.html',
