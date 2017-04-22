@@ -83,8 +83,12 @@ def get_matching_jira_issues(es, traceback_text):
     """
     body = {
         "query": {
-            "match_phrase": {
-                "description": traceback_text
+            "match": {
+                "description": {
+                    "query": traceback_text,
+                    "slop": 50,
+                    "minimum_should_match": "99%",
+                }
             }
         }
     }
