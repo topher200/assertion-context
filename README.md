@@ -20,15 +20,15 @@ machine previous to the offending line.
 We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up the host:
  - install docker
-  - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
+   - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
  - fill out web/.aws_credentials. requires these fields:
 ```
 [default]
 aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
-  - (optional) fill out web/.aws_config as well. defaults to us-east-1
-  - fill out instance/config.py. requires these fields:
+ - (optional) fill out web/.aws_config as well. defaults to us-east-1
+ - fill out instance/config.py. requires these fields:
 ```
 OAUTH_CLIENT_ID = <from your oauth provider>
 OAUTH_CLIENT_SECRET = <from your oauth provider>
@@ -38,14 +38,14 @@ JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
 JIRA_BASIC_AUTH = (<jira username>, <jira password>)
 JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
 ```
-   - fill out .env for docker-compose variables. requires these fields:
+ - fill out .env for docker-compose variables. requires these fields:
 ```
 PAPERTRAIL_PRODUCTION_URL="udp://logs4.papertrailapp.com:35000"
 PAPERTRAIL_DEVELOPMENT_URL="udp://logs4.papertrailapp.com:31000"
 ```
 
 Then to start it all up:
-  - ./start-servers.sh
+ - ./start-servers.sh
 
 Elasticsearch database must be externally hosted. The IP of this server must be whitelisted.
 
