@@ -73,7 +73,7 @@ def refresh(es):
     )
 
 
-# @DOGPILE_REGION.cache_on_arguments()
+@DOGPILE_REGION.cache_on_arguments()
 def get_matching_jira_issues(es, traceback_text):
     """
         Queries the database for any jira issues that include the traceback_text
