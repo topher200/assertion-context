@@ -10,6 +10,17 @@ services:
     restart:
       always
 
+  celery:
+    build: web/
+    links:
+      - redis
+    volumes:
+      - ./web:/code:ro
+    restart:
+      always
+    command:
+      [celery, -A, app.tasks, --log-level=info]
+
   nginx:
     restart:
       always
