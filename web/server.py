@@ -224,7 +224,6 @@ def get_tracebacks():
 
 
 @app.route("/api/update_jira_db", methods=['PUT'])
-@login_required
 def update_jira_db():
     """
         Update our database of jira issues.
