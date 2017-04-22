@@ -53,8 +53,12 @@ def save_traceback(es, traceback):
         id=traceback.origin_papertrail_id,
         body=doc
     )
-    DOGPILE_REGION.invalidate()
+    invalidate_cache()
     return res
+
+
+def invalidate_cache():
+    DOGPILE_REGION.invalidate()
 
 
 def refresh(es):

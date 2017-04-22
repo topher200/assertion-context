@@ -253,6 +253,18 @@ def update_jira_db():
     return 'success'
 
 
+@app.route("/api/invalidate_cache", methods=['PUT'])
+@login_required
+def invalidate_cache():
+    """
+        Invalidate all the dogpile function caches
+    """
+    traceback_database.invalidate_cache()
+    jira_issue_db.invalidate_cache()
+    return 'success'
+
+
+
 @app.before_first_request
 def setup_logging():
     # add log handler to sys.stderr.

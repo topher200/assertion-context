@@ -56,8 +56,12 @@ def save_jira_issue(es, jira_issue):
         id=jira_issue.key,
         body=doc
     )
-    DOGPILE_REGION.invalidate()
+    invalidate_cache()
     return res
+
+
+def invalidate_cache():
+    DOGPILE_REGION.invalidate()
 
 
 def refresh(es):
