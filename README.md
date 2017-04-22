@@ -45,9 +45,10 @@ PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ```
 
 Then to start it all up:
- - ./start-servers.sh
+ - `./start-servers.sh` or `./production-servers.sh`
 
-Elasticsearch database must be externally hosted. The IP of this server must be whitelisted.
+For production, Elasticsearch database must be externally hosted. The IP of this
+server must be whitelisted.
 
 ## Running tests
 ### Setup - install Python locally
