@@ -52,11 +52,12 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
         instance_id,
         program_name,
         parsed_log_message,
+        formatted_line,
     ) = __parse_papertrail_log_line(raw_log_line)
 
     return LogLine(
         parsed_log_message,
-        raw_log_line,
+        formatted_line,
         timestamp,
         papertrail_id,
         origin_papertrail_id if origin_papertrail_id is not None else papertrail_id,
@@ -169,6 +170,8 @@ def __parse_papertrail_log_line(raw_log_line):
             - the instance id, the 5th column
             - the running program name, the 9th column
             - the actual log message, which is everything after the 9th column
+            - the "formatted line", which is how papertrail displays the log line to the user. if
+              you were to copy/paste the line out of papertrail, this is what you'd get
 
         In addition to parsing out the text for every field, we convert the timestamp field to a
         L{datetime}. Times in the logs are UTC (thanks Papertrail!)
@@ -187,12 +190,25 @@ def __parse_papertrail_log_line(raw_log_line):
 
     timestamp = datetime.datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S')
 
+    # formatted line looks like this, seperated by spaces:
+    # - three letter month
+    # - two letter day
+    # - time 00:00:00
+    # - instance id
+    # - program name
+    # - log message
+    formatted_timestamp = timestamp.strftime('%b %d %H:%M:%S')
+    formatted_line = '%s %s %s:  %s' % (
+        formatted_timestamp, instance_id, program_name, parsed_log_message
+    )
+
     return (
         papertrail_id,
         timestamp,
         instance_id,
         program_name,
         parsed_log_message,
+        formatted_line,
     )
 
 
