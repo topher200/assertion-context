@@ -9,6 +9,13 @@ services:
             syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
             tag: web
 
+  celery:
+    logging:
+        driver: syslog
+        options:
+            syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
+            tag: celery
+
   nginx:
     logging:
         driver: syslog
