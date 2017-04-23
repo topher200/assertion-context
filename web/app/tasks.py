@@ -1,15 +1,16 @@
 import logging
 
-from celery import Celery
+from celery.utils.log import get_task_logger
 from elasticsearch import Elasticsearch
+import celery
 
-from web.app import (
+from app import (
     jira_issue_db,
     jira_util,
 )
-from web.instance import config
+from instance import config
 
-app = Celery('tasks', broker='redis://redis')  # redis is a hostname that Docker populates
+app = celery.Celery('tasks', broker='redis://redis')  # redis is a hostname that Docker populates
 
 # set up database
 ES = Elasticsearch([config.ES_ADDRESS])
@@ -28,3 +29,15 @@ def update_jira_issue_db():
         count += 1
         jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
     logger.info("saved %s issues", count)
+
+
+@celery.signals.setup_logging.connect
+def setup_logging(*_, **__):
+    # add log handler to sys.stderr.
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "[%(asctime)s] | %(levelname)s | %(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
