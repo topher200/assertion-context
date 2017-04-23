@@ -3,7 +3,6 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
-import collections
 import datetime
 import logging
 import os
@@ -25,6 +24,7 @@ from app import traceback_database
 from app import jira_issue_db
 from app import jira_util
 from app import s3
+from app import tasks
 from app import traceback
 
 
@@ -248,12 +248,9 @@ def update_jira_db():
     else:
         if json_request['all'] != True:
             return 'invalid "all" json', 400
-        # iterate through all issues and save them to ES
-        count = 0
-        for issue in jira_util.get_all_issues():
-            count += 1
-            jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
-        logger.info("saved %s issues", count)
+        # offload task onto our queue
+        tasks.update_jira_issue_db.delay()
+        return 'job queued', 202
 
     return 'success'
 
