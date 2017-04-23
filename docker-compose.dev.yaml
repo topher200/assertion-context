@@ -43,7 +43,7 @@ services:
     environment:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms1000m -Xmx1000m"
       - xpack.security.enabled=false
     ulimits:
       memlock:
@@ -52,7 +52,7 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    mem_limit: 1g
+    mem_limit: 2g
     cap_add:
       - IPC_LOCK
     ports:
