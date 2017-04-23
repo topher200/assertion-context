@@ -10,6 +10,8 @@ import gzip
 import logging
 import re
 
+import pytz
+
 from .logline import LogLine
 from .traceback import Traceback
 
@@ -34,6 +36,13 @@ NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
     How many log lines previous to our AssertionError we should save.
 
     I'm purposely going high with this number since it's easier to ignore data than re-query for it
+"""
+
+LOG_TIMEZONE = pytz.timezone("US/Eastern")
+"""
+    Timezone in which the logs were taken
+
+    We translate Papertrail's UTC timestamps into this timezone
 """
 
 logger = logging.getLogger()
@@ -188,7 +197,10 @@ def __parse_papertrail_log_line(raw_log_line):
     program_name = log_line_pieces[8]
     parsed_log_message = log_line_pieces[9]
 
-    timestamp = datetime.datetime.strptime(timestamp_string, '%Y-%m-%dT%H:%M:%S')
+    timestamp_utc = datetime.datetime.strptime(
+        timestamp_string, '%Y-%m-%dT%H:%M:%S'
+    ).replace(tzinfo=pytz.UTC)
+    timestamp_with_tz = timestamp_utc.astimezone(LOG_TIMEZONE)
 
     # formatted line looks like this, seperated by spaces:
     # - three letter month
@@ -197,14 +209,14 @@ def __parse_papertrail_log_line(raw_log_line):
     # - instance id
     # - program name
     # - log message
-    formatted_timestamp = timestamp.strftime('%b %d %H:%M:%S')
+    formatted_timestamp = timestamp_with_tz.strftime('%b %d %H:%M:%S')
     formatted_line = '%s %s %s:  %s' % (
         formatted_timestamp, instance_id, program_name, parsed_log_message
     )
 
     return (
         papertrail_id,
-        timestamp,
+        timestamp_with_tz,
         instance_id,
         program_name,
         parsed_log_message,

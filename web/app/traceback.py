@@ -126,10 +126,17 @@ def generate_traceback_from_source(source):
     assert isinstance(source, dict), (type(source), source)
 
     # We get the datetime as a string, we need to parse it out
-    timestamp = datetime.datetime.strptime(
-        source["origin_timestamp"],
-        '%Y-%m-%dT%H:%M:%S'
-    )
+    try:
+        timestamp = datetime.datetime.strptime(
+            source["origin_timestamp"],
+            '%Y-%m-%dT%H:%M:%S%z'
+        )
+    except ValueError:
+        # no timezone info on this one
+        timestamp = datetime.datetime.strptime(
+            source["origin_timestamp"],
+            '%Y-%m-%dT%H:%M:%S'
+        )
 
     return Traceback(
         source["traceback_text"],
