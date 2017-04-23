@@ -110,7 +110,10 @@ def get_issue(key):
 
         @rtype: JiraIssue
     """
-    return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+    try:
+        return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+    except jira.exceptions.JIRAError as e:
+        logger.error('error accessing issue %s. is it deleted?\n%s', key, e)
 
 
 def get_all_issues():
