@@ -6,6 +6,8 @@ import celery
 from app import (
     jira_issue_db,
     jira_util,
+    traceback_database,
+    s3,
 )
 from instance import config
 
@@ -28,6 +30,27 @@ def update_jira_issue_db():
         count += 1
         jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
     logger.info("saved %s issues", count)
+
+
+@app.task
+def parse_log_file(bucket, key):
+    """
+        takes a bucket and key refering to a logfile on s3 and parses that file
+    """
+    logger.info("parsing log file. bucket: %s, key: %s", bucket, key)
+
+    # use our powerful parser to run checks on the requested file
+    traceback_generator = s3.parse_s3_file(bucket, key)
+    if traceback_generator is None:
+        logger.error('unable to download log file from s3')
+
+    # save the parser output to the database
+    count = 0
+    for tb in traceback_generator:
+        count += 1
+        traceback_database.save_traceback(ES, tb)
+
+    logger.info("saved %s tracebacks. bucket: %s, key: %s", count, bucket, key)
 
 
 @celery.signals.setup_logging.connect

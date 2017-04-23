@@ -150,19 +150,12 @@ def parse_s3():
     json_request = flask.request.get_json()
     if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
         return 'missing params', 400
-    logger.info("parsing s3 file. bucket: '%s', key: '%s'",
-                     json_request['bucket'], json_request['key'])
+    bucket = json_request['bucket']
+    key = json_request['key']
 
-    # use our powerful parser to run checks on the requested file
-    traceback_generator = s3.parse_s3_file(json_request['bucket'], json_request['key'])
-    if traceback_generator is None:
-        return 'error accessing s3', 502
-
-    # save the parser output to the database
-    for tb in traceback_generator:
-        traceback_database.save_traceback(ES, tb)
-
-    return 'success'
+    logger.info("parsing s3 file. bucket: '%s', key: '%s'", bucket, key)
+    tasks.parse_log_file.delay(bucket, key)
+    return 'job queued', 202
 
 
 @app.route("/hide_traceback", methods=['POST'])
@@ -288,7 +281,8 @@ def before_request():
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "handling '%s' request from '%s'%s", flask.request.full_path, user, json_str
+        "handling %s '%s' request from '%s'%s",
+        flask.request.method, flask.request.full_path, user, json_str
     )
 
 
