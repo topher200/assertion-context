@@ -249,13 +249,17 @@ def update_jira_db():
 
 
 @app.route("/api/invalidate_cache", methods=['PUT'])
-@login_required
-def invalidate_cache():
+@app.route("/api/invalidate_cache/<cache>", methods=['PUT'])
+def invalidate_cache(cache=None):
     """
         Invalidate all the dogpile function caches
     """
-    traceback_database.invalidate_cache()
-    jira_issue_db.invalidate_cache()
+    if cache is None or cache == 'traceback':
+        logger.info('invalidating traceback cache')
+        traceback_database.invalidate_cache()
+    if cache is None or cache == 'jira':
+        logger.info('invalidating jira cache')
+        jira_issue_db.invalidate_cache()
     return 'success'
 
 
