@@ -4,6 +4,7 @@ Flask_Login==0.4.0
 Flask-OAuthlib==0.9.3
 Gunicorn==19.6
 boto3==1.4.0
+celery[redis]==4.0.2
 certifi
 dogpile.cache==0.6.2
 flask-bootstrap==3.3.7.1
