@@ -58,23 +58,6 @@ class Traceback(object):
         self._instance_id = instance_id
         self._program_name = program_name
 
-    def document(self):
-        """
-            Returns the document form of this logline for ElasticSearch.
-
-            Document form is a dictionary of <field name>: <value> pairs.
-        """
-        return {
-            "traceback_text": self._traceback_text,
-            "traceback_plus_context_text": self._traceback_plus_context_text,
-            "raw_traceback_text": self._raw_traceback_text,
-            "raw_full_text": self._raw_full_text,
-            "origin_papertrail_id": self._origin_papertrail_id,
-            "origin_timestamp": self._origin_timestamp,
-            "instance_id": self._instance_id,
-            "program_name": self._program_name,
-        }
-
     def __repr__(self):
         return str(self.document())
 
@@ -117,6 +100,23 @@ class Traceback(object):
     @property
     def program_name(self):
         return self._program_name
+
+    def document(self):
+        """
+            Returns the document form of this logline for ElasticSearch.
+
+            Document form is a dictionary of <field name>: <value> pairs.
+        """
+        return {
+            "traceback_text": self._traceback_text,
+            "traceback_plus_context_text": self._traceback_plus_context_text,
+            "raw_traceback_text": self._raw_traceback_text,
+            "raw_full_text": self._raw_full_text,
+            "origin_papertrail_id": self._origin_papertrail_id,
+            "origin_timestamp": self._origin_timestamp.strftime('%Y-%m-%dT%H:%M:%S%z'),
+            "instance_id": self._instance_id,
+            "program_name": self._program_name,
+        }
 
 
 def generate_traceback_from_source(source):

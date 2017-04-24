@@ -26,21 +26,6 @@ class JiraIssue(object):
         self._issue_type = issue_type
         self._status = status
 
-    def document(self):
-        """
-            Returns the document form of this object for ElasticSearch.
-
-            Document form is a dictionary of <field name>: <value> pairs.
-        """
-        return {
-            "key": self._key,
-            "url": self._url,
-            "summary": self._summary,
-            "description": self._description,
-            "issue_type": self._issue_type,
-            "status": self._status,
-        }
-
     def __repr__(self):
         return str(self.document())
 
@@ -67,6 +52,21 @@ class JiraIssue(object):
     @property
     def status(self):
         return self._status
+
+    def document(self):
+        """
+            Returns the document form of this object for ElasticSearch.
+
+            Document form is a dictionary of <field name>: <value> pairs.
+        """
+        return {
+            "key": self._key,
+            "url": self._url,
+            "summary": self._summary,
+            "description": self._description,
+            "issue_type": self._issue_type,
+            "status": self._status,
+        }
 
 
 def generate_from_source(source):
