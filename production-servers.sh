@@ -7,3 +7,6 @@ docker-compose stop web celery
 
 # build and start all services
 docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build "$@"
+
+# since our web app address may have changed, restart nginx
+docker-compose restart nginx
