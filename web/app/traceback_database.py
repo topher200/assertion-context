@@ -7,6 +7,7 @@ import dogpile.cache
 import redis
 
 from .traceback import Traceback, generate_traceback_from_source
+from app import es_util
 
 
 # if we don't see the remote (docker) redis, see if we're running locally instead
@@ -126,7 +127,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_similar_tracebacks(es, traceback_text):
+def get_matching_tracebacks(es, traceback_text, match_level):
     """
         Queries the database for any tracebacks with identical traceback_text
 
@@ -135,20 +136,12 @@ def get_similar_tracebacks(es, traceback_text):
         @type traceback_text: str
         @rtype: list
 
+        @precondition: match_level in es_util.ALL_MATCH_LEVELS
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
-    matching_percentage = 100
-    body = {
-        "query": {
-            "match": {
-                "traceback_text": {
-                    "query": traceback_text,
-                    "slop": 50,
-                    "minimum_should_match": "%s%%" % matching_percentage,
-                }
-            }
-        }
-    }
+    assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
+
+    body = es_util.generate_text_match_payload(traceback_text, "traceback_text", match_level)
 
     raw_es_response = es.search(
         index=INDEX,

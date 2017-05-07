@@ -8,6 +8,7 @@ from dogpile.cache import make_region
 import redis
 
 from .jira_issue import JiraIssue, generate_from_source
+from app import es_util
 
 
 # if we don't see the remote (docker) redis, see if we're running locally instead
@@ -74,7 +75,7 @@ def refresh(es):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_matching_jira_issues(es, traceback_text, matching_percentage):
+def get_matching_jira_issues(es, traceback_text, match_level):
     """
         Queries the database for any jira issues that include the traceback_text
 
@@ -86,21 +87,13 @@ def get_matching_jira_issues(es, traceback_text, matching_percentage):
         @type traceback_text: str
         @rtype: list
 
+        @precondition: match_level in es_util.ALL_MATCH_LEVELS
         @postcondition: all(isinstance(v, JiraIssue) for v in return)
     """
-    assert isinstance(matching_percentage, int), (type(matching_percentage), matching_percentage)
+    assert isinstance(traceback_text, str), (type(traceback_text), traceback_text)
+    assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
 
-    body = {
-        "query": {
-            "match": {
-                "description": {
-                    "query": traceback_text,
-                    "slop": 50,
-                    "minimum_should_match": "%s%%" % matching_percentage,
-                }
-            }
-        }
-    }
+    body = es_util.generate_text_match_payload(traceback_text, "description", match_level)
 
     raw_es_response = es.search(
         index=INDEX,

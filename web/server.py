@@ -20,12 +20,13 @@ from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
 from app import authentication
-from app import traceback_database
-from app import jira_issue_db
+from app import es_util
 from app import jira_issue_aservice
+from app import jira_issue_db
 from app import s3
 from app import tasks
 from app import traceback
+from app import traceback_database
 
 
 # to work around https://github.com/pallets/flask/issues/1907
@@ -95,8 +96,8 @@ def index():
     if DEBUG_TIMING:
         similar_tracebacks_start_time = time.time()
     for tb in tb_meta:
-        tb.similar_tracebacks = traceback_database.get_similar_tracebacks(
-            ES, tb.traceback.traceback_text
+        tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
+            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
         )
     if DEBUG_TIMING:
         flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
@@ -104,11 +105,11 @@ def index():
         jira_issues_start_time = time.time()
     for tb in tb_meta:
         tb.jira_issues = jira_issue_db.get_matching_jira_issues(
-            ES, tb.traceback.traceback_text, 100
+            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
         )
         matching_jira_keys = set(jira_issue.key for jira_issue in tb.jira_issues)
         similar_jira_issues = jira_issue_db.get_matching_jira_issues(
-            ES, tb.traceback.traceback_text, 98
+            ES, tb.traceback.traceback_text, es_util.SIMILAR_MATCH
         )
         tb.similar_jira_issues = [similar_jira_issue for similar_jira_issue in similar_jira_issues
                                   if similar_jira_issue.key not in matching_jira_keys]
@@ -198,7 +199,7 @@ def create_jira_ticket():
     traceback_text = json_request['traceback_text']
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = traceback_database.get_similar_tracebacks(ES, traceback_text)
+    similar_tracebacks = traceback_database.get_matching_tracebacks(ES, traceback_text, es_util.EXACT_MATCH)
 
     # create a description using the list of tracebacks
     description = jira_issue_aservice.create_description(similar_tracebacks)
