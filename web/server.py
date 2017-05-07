@@ -143,8 +143,8 @@ def parse_s3():
 
         All fields are required.
 
-        Returns a 400 error on bad input. Returns a 502 if we get an error accessing s3. Returns a
-        200 on success.
+        Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
+        asyncronously.
     """
     # parse our input
     json_request = flask.request.get_json()
