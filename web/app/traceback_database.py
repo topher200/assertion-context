@@ -155,7 +155,7 @@ def get_similar_tracebacks(es, traceback_text):
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
-        size=1000
+        size=100
     )
     res = []
     for raw_traceback in raw_es_response['hits']['hits']:
