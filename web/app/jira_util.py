@@ -98,6 +98,7 @@ def create_jira_issue(title, description):
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
+        'labels': ['tracebacks'],
     }
     issue = JIRA_CLIENT.create_issue(fields=fields)
     logger.info('created jira issue: %s', issue.key)
