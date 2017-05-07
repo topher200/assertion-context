@@ -3,7 +3,7 @@
 
 {% macro show_traceback(t) %}
 <div class="traceback-container">
-    <div class="traceback-metadata col-md-3">
+    <div class="traceback-metadata col-md-2">
         <p>
             <ul>
                 {% for issue in t.jira_issues %}
@@ -27,14 +27,14 @@
             </ul>
         </p>
     </div>
-    <div class="traceback-text col-md-9">
+    <div class="traceback-text col-md-10">
         <pre class="prettyprint code">{{ t.traceback.traceback_plus_context_text }}</pre>
     </div>
 </div>
 {% endmacro %}
 
 {% block navbar %}
-<div class="container">
+<div class="container-fluid">
     <nav class="navbar navbar-light bg-faded">
         <a class="navbar-brand" href="#">
             <img src="/static/media/wordy.png" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -54,7 +54,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     {%- with messages = get_flashed_messages(with_categories=True) %}
         {%- if messages %}
             <div class="row">
@@ -66,7 +66,7 @@
     {%- endwith %}
 
     <body>
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 {% for t in tb_meta %}
                     {{ show_traceback(t) }}
