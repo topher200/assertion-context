@@ -108,7 +108,7 @@ def index():
         )
         matching_jira_keys = set(jira_issue.key for jira_issue in tb.jira_issues)
         similar_jira_issues = jira_issue_db.get_matching_jira_issues(
-            ES, tb.traceback.traceback_text, 95
+            ES, tb.traceback.traceback_text, 98
         )
         tb.similar_jira_issues = [similar_jira_issue for similar_jira_issue in similar_jira_issues
                                   if similar_jira_issue.key not in matching_jira_keys]
