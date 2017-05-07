@@ -9,7 +9,9 @@
             <ul>
                 {% for issue in t.jira_issues %}
                 <li class="highlight">
-                    <a href="{{ issue.url }}">{{ issue.key }}</a>
+                    <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
+                        {{ issue.key }}
+                    </a>
                 </li>
                 {% endfor %}
                 <li>
@@ -21,7 +23,9 @@
             <ul>
                 {% for issue in t.similar_jira_issues %}
                 <li>
-                    <a href="{{ issue.url }}">{{ issue.key }}</a>
+                    <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
+                        {{ issue.key }}
+                    </a>
                 </li>
                 {% endfor %}
             </ul>
