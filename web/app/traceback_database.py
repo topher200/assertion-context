@@ -137,10 +137,15 @@ def get_similar_tracebacks(es, traceback_text):
 
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
+    matching_percentage = 100
     body = {
         "query": {
-            "match_phrase": {
-                "traceback_text": traceback_text
+            "match": {
+                "traceback_text": {
+                    "query": traceback_text,
+                    "slop": 50,
+                    "minimum_should_match": "%s%%" % matching_percentage,
+                }
             }
         }
     }
