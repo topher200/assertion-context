@@ -27,7 +27,7 @@
             </ul>
             {% endif %}
             <hr>
-            Hits:
+            Hits ({{ t.similar_tracebacks | length }}{% if t.similar_tracebacks | length > 99 %}+{% endif %}):
             <ul class="scrollable-list">
                 {% for similar_traceback in t.similar_tracebacks %}
                 <li
