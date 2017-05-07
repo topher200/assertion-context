@@ -103,7 +103,15 @@ def index():
     if DEBUG_TIMING:
         jira_issues_start_time = time.time()
     for tb in tb_meta:
-        tb.jira_issues = jira_issue_db.get_matching_jira_issues(ES, tb.traceback.traceback_text)
+        tb.jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, tb.traceback.traceback_text, 100
+        )
+        matching_jira_keys = set(jira_issue.key for jira_issue in tb.jira_issues)
+        similar_jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, tb.traceback.traceback_text, 95
+        )
+        tb.similar_jira_issues = [similar_jira_issue for similar_jira_issue in similar_jira_issues
+                                  if similar_jira_issue.key not in matching_jira_keys]
     if DEBUG_TIMING:
         flask.g.jira_issues_time = time.time() - jira_issues_start_time
 

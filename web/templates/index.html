@@ -5,15 +5,27 @@
 <div class="traceback-container">
     <div class="traceback-metadata col-md-2">
         <p>
+            Matching JIRA issues:
             <ul>
                 {% for issue in t.jira_issues %}
+                <li class="highlight">
+                    <a href="{{ issue.url }}">{{ issue.key }}</a>
+                </li>
+                {% endfor %}
+                <li>
+                    <button onclick="create_jira_ticket(this)" value="{{ t.traceback.traceback_text }}">create new ticket</button>
+                </li>
+            </ul>
+            Similar JIRA issues:
+            <ul>
+                {% for issue in t.similar_jira_issues %}
                 <li>
                     <a href="{{ issue.url }}">{{ issue.key }}</a>
                 </li>
                 {% endfor %}
             </ul>
-            <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all</button> |
-            <button onclick="create_jira_ticket(this)" value="{{ t.traceback.traceback_text }}">create jira ticket</button>
+            <hr>
+            Hits:
             <ul>
                 {% for similar_traceback in t.similar_tracebacks %}
                 <li
@@ -25,6 +37,7 @@
                 </li>
                 {% endfor %}
             </ul>
+            <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all hits</button>
         </p>
     </div>
     <div class="traceback-text col-md-10">

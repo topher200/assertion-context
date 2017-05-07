@@ -74,9 +74,12 @@ def refresh(es):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_matching_jira_issues(es, traceback_text):
+def get_matching_jira_issues(es, traceback_text, matching_percentage):
     """
         Queries the database for any jira issues that include the traceback_text
+
+        We use matching_percentage to determine how much the traceback needs to match the given
+        traceback_text before we return it.
 
         Returns a list (instead of a generator) so we can be cached
 
@@ -85,13 +88,15 @@ def get_matching_jira_issues(es, traceback_text):
 
         @postcondition: all(isinstance(v, JiraIssue) for v in return)
     """
+    assert isinstance(matching_percentage, int), (type(matching_percentage), matching_percentage)
+
     body = {
         "query": {
             "match": {
                 "description": {
                     "query": traceback_text,
                     "slop": 50,
-                    "minimum_should_match": "99%",
+                    "minimum_should_match": "%s%%" % matching_percentage,
                 }
             }
         }
