@@ -22,7 +22,7 @@ from simplekv.decorator import PrefixDecorator
 from app import authentication
 from app import traceback_database
 from app import jira_issue_db
-from app import jira_util
+from app import jira_issue_aservice
 from app import s3
 from app import tasks
 from app import traceback
@@ -201,16 +201,16 @@ def create_jira_ticket():
     similar_tracebacks = traceback_database.get_similar_tracebacks(ES, traceback_text)
 
     # create a description using the list of tracebacks
-    description = jira_util.create_description(similar_tracebacks)
+    description = jira_issue_aservice.create_description(similar_tracebacks)
 
     # create a title using the traceback text
-    title = jira_util.create_title(traceback_text)
+    title = jira_issue_aservice.create_title(traceback_text)
 
     # make API call to jira
-    ticket = jira_util.create_jira_issue(title, description)
+    ticket = jira_issue_aservice.create_jira_issue(title, description)
 
     # send flash message to user with the JIRA url
-    url = jira_util.get_link_to_issue(ticket)
+    url = jira_issue_aservice.get_link_to_issue(ticket)
     flask.flash(flask.Markup(
         'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
     ))
@@ -245,7 +245,7 @@ def update_jira_db():
     if 'issue_key' in json_request:
         # save the given issue to ES
         issue = json_request['issue_key']
-        jira_issue_db.save_jira_issue(ES, jira_util.get_issue(issue))
+        jira_issue_db.save_jira_issue(ES, jira_issue_aservice.get_issue(issue))
     else:
         if json_request['all'] != True:
             return 'invalid "all" json', 400
