@@ -5,3 +5,9 @@
 li.highlight {
     font-weight: bold;
 }
+
+.scrollable-list {
+    height: auto;
+    max-height: 600px;
+    overflow-x: hidden;
+}

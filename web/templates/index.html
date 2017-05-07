@@ -28,7 +28,7 @@
             {% endif %}
             <hr>
             Hits:
-            <ul>
+            <ul class="scrollable-list">
                 {% for similar_traceback in t.similar_tracebacks %}
                 <li
                     {% if t.traceback.origin_papertrail_id == similar_traceback.origin_papertrail_id %}
