@@ -3,7 +3,7 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
-from dogpile.cache import make_region
+import dogpile.cache
 import redis
 
 from .traceback import Traceback, generate_traceback_from_source
@@ -11,8 +11,9 @@ from .traceback import Traceback, generate_traceback_from_source
 
 # if we don't see the remote (docker) redis, see if we're running locally instead
 try:
-    DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:traceback:" + key
+    DOGPILE_REGION = dogpile.cache.make_region(
+        key_mangler=lambda key: ("dogpile:traceback:%s" %
+                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
     ).configure(
         'dogpile.cache.redis',
         arguments={
@@ -22,8 +23,9 @@ try:
     )
     DOGPILE_REGION.get('confirm_redis_connection')
 except redis.exceptions.ConnectionError:
-    DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:traceback:" + key
+    DOGPILE_REGION = dogpile.cache.make_region(
+        key_mangler=lambda key: ("dogpile:traceback:%s" %
+                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
     ).configure(
         'dogpile.cache.redis',
         arguments={
