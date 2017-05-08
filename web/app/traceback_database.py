@@ -4,37 +4,18 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 import dogpile.cache
-import redis
 
 from .traceback import Traceback, generate_traceback_from_source
 from app import es_util
+from app import redis_util
 
 
-# if we don't see the remote (docker) redis, see if we're running locally instead
-try:
-    DOGPILE_REGION = dogpile.cache.make_region(
-        key_mangler=lambda key: ("dogpile:traceback:%s" %
-                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'redis',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
+DOGPILE_REGION = redis_util.make_dogpile_region(
+    lambda key: (
+        "dogpile:traceback:%s" %
+        dogpile.cache.util.sha1_mangle_key(key.encode('utf-8'))
     )
-    DOGPILE_REGION.get('confirm_redis_connection')
-except redis.exceptions.ConnectionError:
-    DOGPILE_REGION = dogpile.cache.make_region(
-        key_mangler=lambda key: ("dogpile:traceback:%s" %
-                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'localhost',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
-    )
-    DOGPILE_REGION.get('confirm_redis_connection')
+)
 
 INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'

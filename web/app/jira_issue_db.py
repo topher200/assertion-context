@@ -3,37 +3,15 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
-
-from dogpile.cache import make_region
-import redis
-
 from .jira_issue import JiraIssue, generate_from_source
 from app import es_util
+from app import redis_util
 
 
-# if we don't see the remote (docker) redis, see if we're running locally instead
-try:
-    DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:jira:" + key
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'redis',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
-    )
-    DOGPILE_REGION.get('confirm_redis_connection')
-except redis.exceptions.ConnectionError:
-    DOGPILE_REGION = make_region(
-        key_mangler=lambda key: "dogpile:jira:" + key
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'localhost',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
-    )
-    DOGPILE_REGION.get('confirm_redis_connection')
+
+DOGPILE_REGION = redis_util.make_dogpile_region(
+    lambda key: "dogpile:jira:" + key
+)
 
 INDEX = 'jira-issue-index'
 DOC_TYPE = 'jira-issue'
