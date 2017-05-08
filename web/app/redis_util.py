@@ -9,7 +9,7 @@ logger = logging.getLogger()
 
 
 def make_dogpile_region(key_mangler_func):
-    if config.USE_CACHE:
+    if config.USE_DOGPILE_CACHE:
         dogpile_region = dogpile.cache.make_region(
             key_mangler=key_mangler_func
         ).configure(
