@@ -1,4 +1,4 @@
-EXACT_MATCH = 99 # percent
+EXACT_MATCH = 100 # percent
 SIMILAR_MATCH = 98 # percent
 ALL_MATCH_LEVELS = set((
     EXACT_MATCH,
@@ -21,9 +21,7 @@ def generate_text_match_payload(text, field_to_match_against, match_level):
             "match": {
                 field_to_match_against: {
                     "query": text,
-                    "slop": 50,
                     "minimum_should_match": "%s%%" % match_level,
-                    "cutoff_frequency": 0.001,
                 }
             }
         }
