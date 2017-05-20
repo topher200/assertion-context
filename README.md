@@ -33,6 +33,8 @@ aws_secret_access_key = ###
 OAUTH_CLIENT_ID = <from your oauth provider>
 OAUTH_CLIENT_SECRET = <from your oauth provider>
 ES_ADDRESS = <url to ElasticSearch database>
+REDIS_ADDRESS = <url to Redis database>
+USE_DOGPILE_CACHE = <True if we should use the dogpile cache>
 AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the user. example: '@gmail.com$'>
 JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
 JIRA_BASIC_AUTH = (<jira username>, <jira password>)
@@ -47,8 +49,65 @@ PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 Then to start it all up:
  - `./start-servers.sh` or `./production-servers.sh`
 
-For production, Elasticsearch database must be externally hosted. The IP of this
-server must be whitelisted.
+## Elasticsearch
+
+For production, Elasticsearch database must be externally hosted. The IP of the
+host server must be whitelisted.
+
+This index should be set up with this mapping:
+```
+PUT traceback-index
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "traceback_filtered": {
+          "type": "stop",
+          "stopwords": [
+            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "traceback": {
+      "properties": {
+        "traceback_text": {
+          "analyzer": "traceback_filtered",
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+
+PUT jira-issue-index
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "traceback_filtered": {
+          "type": "stop",
+          "stopwords": [
+            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "jira-issue": {
+      "properties": {
+        "description": {
+          "analyzer": "traceback_filtered",
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+```
 
 ## Running tests
 ### Setup - install Python locally

@@ -4,36 +4,18 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 import dogpile.cache
-import redis
 
 from .traceback import Traceback, generate_traceback_from_source
+from app import es_util
+from app import redis_util
 
 
-# if we don't see the remote (docker) redis, see if we're running locally instead
-try:
-    DOGPILE_REGION = dogpile.cache.make_region(
-        key_mangler=lambda key: ("dogpile:traceback:%s" %
-                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'redis',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
+DOGPILE_REGION = redis_util.make_dogpile_region(
+    lambda key: (
+        "dogpile:traceback:%s" %
+        dogpile.cache.util.sha1_mangle_key(key.encode('utf-8'))
     )
-    DOGPILE_REGION.get('confirm_redis_connection')
-except redis.exceptions.ConnectionError:
-    DOGPILE_REGION = dogpile.cache.make_region(
-        key_mangler=lambda key: ("dogpile:traceback:%s" %
-                                 dogpile.cache.util.sha1_mangle_key(key.encode('utf-8')))
-    ).configure(
-        'dogpile.cache.redis',
-        arguments={
-            'host': 'localhost',
-            'redis_expiration_time': 60*60*2,  # 2 hours
-        }
-    )
-    DOGPILE_REGION.get('confirm_redis_connection')
+)
 
 INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'
@@ -126,7 +108,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
 
 @DOGPILE_REGION.cache_on_arguments()
-def get_similar_tracebacks(es, traceback_text):
+def get_matching_tracebacks(es, traceback_text, match_level):
     """
         Queries the database for any tracebacks with identical traceback_text
 
@@ -135,20 +117,12 @@ def get_similar_tracebacks(es, traceback_text):
         @type traceback_text: str
         @rtype: list
 
+        @precondition: match_level in es_util.ALL_MATCH_LEVELS
         @postcondition: all(isinstance(v, Traceback) for v in return)
     """
-    matching_percentage = 100
-    body = {
-        "query": {
-            "match": {
-                "traceback_text": {
-                    "query": traceback_text,
-                    "slop": 50,
-                    "minimum_should_match": "%s%%" % matching_percentage,
-                }
-            }
-        }
-    }
+    assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
+
+    body = es_util.generate_text_match_payload(traceback_text, "traceback_text", match_level)
 
     raw_es_response = es.search(
         index=INDEX,
