@@ -58,24 +58,49 @@ This index should be set up with this mapping:
 ```
 PUT traceback-index
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "traceback_filtered": {
+          "type": "stop",
+          "stopwords": [
+            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+          ]
+        }
+      }
+    }
+  },
   "mappings": {
     "traceback": {
       "properties": {
         "traceback_text": {
-          "analyzer": "simple",
+          "analyzer": "traceback_filtered",
           "type": "text"
         }
       }
     }
   }
 }
+
 PUT jira-issue-index
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "traceback_filtered": {
+          "type": "stop",
+          "stopwords": [
+            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+          ]
+        }
+      }
+    }
+  },
   "mappings": {
     "jira-issue": {
       "properties": {
         "description": {
-          "analyzer": "simple",
+          "analyzer": "traceback_filtered",
           "type": "text"
         }
       }
