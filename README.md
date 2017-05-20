@@ -49,8 +49,40 @@ PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 Then to start it all up:
  - `./start-servers.sh` or `./production-servers.sh`
 
-For production, Elasticsearch database must be externally hosted. The IP of this
-server must be whitelisted.
+## Elasticsearch
+
+For production, Elasticsearch database must be externally hosted. The IP of the
+host server must be whitelisted.
+
+This index should be set up with this mapping:
+```
+PUT traceback-index
+{
+  "mappings": {
+    "traceback": {
+      "properties": {
+        "traceback_text": {
+          "analyzer": "simple",
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+PUT jira-issue-index
+{
+  "mappings": {
+    "jira-issue": {
+      "properties": {
+        "description": {
+          "analyzer": "simple",
+          "type": "text"
+        }
+      }
+    }
+  }
+}
+```
 
 ## Running tests
 ### Setup - install Python locally
