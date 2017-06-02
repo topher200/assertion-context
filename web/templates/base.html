@@ -20,7 +20,9 @@
     <script src="{{ url_for('static', filename='javascript/traceback.js') }}"></script>
     <script>
     $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip();
+         $('[data-toggle="tooltip"]').tooltip(
+             { trigger: 'hover' }
+         );
     });
     </script>
 {% endblock %}
