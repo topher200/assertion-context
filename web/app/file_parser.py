@@ -16,7 +16,7 @@ from .logline import LogLine
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('\nAssertionError|KeyError|NotImplementedError|ValueError')
+ERROR_REGEX = re.compile('\nAssertionError|\nKeyError|\nNotImplementedError|\nValueError')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''(details = AssertionError)|(AssertionError.*can only join a child process)'''
 )
