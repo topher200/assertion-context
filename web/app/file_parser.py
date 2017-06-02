@@ -124,7 +124,7 @@ def _get_last_traceback_text(parsed_log_text):
     if len(sep) == 0:
         print("unable to parse out Traceback")
     context_lines = '\n'.join(previous_text.splitlines()[-3:])
-    return sep + traceback_text, context_lines + sep + traceback_text
+    return sep + traceback_text, context_lines + '\n' + sep + traceback_text
 
 
 def _get_last_traceback_text_raw(raw_log_text):
