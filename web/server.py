@@ -51,7 +51,7 @@ Bootstrap(app)
 store = RedisStore(redis.StrictRedis(host='redis'))
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
-TRACEBACK_TEXT_KV_PREFIX = 'hide_traceback:'
+HIDDEN_TRACEBACK_TEXT_KEY = 'hide_tracebacks'
 
 # config
 DEBUG_TIMING = True
@@ -85,12 +85,24 @@ def index():
     if DEBUG_TIMING:
         flask.g.time_tracebacks = time.time() - db_start_time
 
+    # create a set of tracebacks that match all the traceback texts the user has hidden
+    hidden_tracebacks = set()
+    if flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is not None:
+        for traceback_text in flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY):
+            for tb in traceback_database.get_matching_tracebacks(
+                ES, traceback_text, es_util.EXACT_MATCH
+            ):
+                hidden_tracebacks.add(tb.origin_papertrail_id)
+        logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
+
     # filter out tracebacks the user has hidden. we use a SimpleNamespace to store each traceback +
     # some metadata we'll use when rendering the html page
     tb_meta = [
         types.SimpleNamespace(traceback=t) for t in tracebacks
-        if not flask.session.get(TRACEBACK_TEXT_KV_PREFIX + t.traceback_text, False)
+        if t.origin_papertrail_id not in hidden_tracebacks
     ]
+    if len(tracebacks) - len(tb_meta) > 0:
+        logger.info('hid %s tracebacks', len(tracebacks) - len(tb_meta))
 
     # for each traceback, get all similar tracebacks and any matching jira tickets
     if DEBUG_TIMING:
@@ -135,10 +147,7 @@ def __user_has_hidden_tracebacks():
     """
         Returns True if the user has hidden any tracebacks using /hide_traceback this session
     """
-    for key in flask.session:
-        if key.startswith(TRACEBACK_TEXT_KV_PREFIX) and flask.session[key]:
-            return True
-    return False
+    return flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is not None
 
 
 @app.route("/api/parse_s3", methods=['POST'])
@@ -175,16 +184,16 @@ def hide_traceback():
         logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
-    flask.session[TRACEBACK_TEXT_KV_PREFIX + traceback_text] = True
+    if flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is None:
+        flask.session[HIDDEN_TRACEBACK_TEXT_KEY] = set()
+    flask.session[HIDDEN_TRACEBACK_TEXT_KEY].add(traceback_text)
     return 'success'
 
 
 @app.route("/restore_all", methods=['POST'])
 @login_required
 def restore_all_tracebacks():
-    for key in flask.session:
-        if key.startswith(TRACEBACK_TEXT_KV_PREFIX):
-            flask.session[key] = False
+    flask.session[HIDDEN_TRACEBACK_TEXT_KEY] = None
     return 'success'
 
 
@@ -199,7 +208,9 @@ def create_jira_ticket():
     traceback_text = json_request['traceback_text']
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = traceback_database.get_matching_tracebacks(ES, traceback_text, es_util.EXACT_MATCH)
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, traceback_text, es_util.EXACT_MATCH
+    )
 
     # create a description using the list of tracebacks
     description = jira_issue_aservice.create_description(similar_tracebacks)
