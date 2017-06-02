@@ -6,11 +6,11 @@
         {{ issue.key }}
     </a>
     {% if issue.status == 'Closed' %}
-    <span class="closed issue">
+    <span class="issue closed">
     {% elif issue.status == 'Open' or issue.status == 'Reopened' %}
-    <span class="open issue">
+    <span class="issue open">
     {% else %}
-    <span class="inprogress issue">
+    <span class="issue inprogress">
     {% endif %}
         {{ issue.status }}
     </span>
