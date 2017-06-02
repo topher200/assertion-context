@@ -65,7 +65,9 @@ logger = logging.getLogger()
 @app.route("/", methods=['GET'])
 @login_required
 def index():
-    # use the query params to determine the date_to_analyze
+    FILTERS = ['ticket', 'openticket', 'noticket', 'none']
+
+    # parse the query params
     days_ago_raw = flask.request.args.get('days_ago')
     if days_ago_raw is not None:
         try:
@@ -74,6 +76,12 @@ def index():
             return 'bad params', 400
     else:
         days_ago_int = 0
+    filter_text = flask.request.args.get('filter')
+    if filter_text is not None and filter_text not in FILTERS:
+        return 'bad filter', 400
+    if filter_text is None:
+        filter_text = 'none'
+
     # our papertrail logs are saved in Eastern Time
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     date_to_analyze = today - datetime.timedelta(days=days_ago_int)
@@ -128,6 +136,18 @@ def index():
     if DEBUG_TIMING:
         flask.g.jira_issues_time = time.time() - jira_issues_start_time
 
+    # apply user's filters
+    if filter_text == 'ticket':
+        tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) > 0]
+    elif filter_text == 'noticket':
+        tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) == 0]
+    elif filter_text == 'openticket':
+        tb_meta = [
+            tb for tb in tb_meta if len(
+                [issue for issue in tb.jira_issues if issue.status != 'Closed']
+            ) > 0
+        ]
+
     if DEBUG_TIMING:
         render_start_time = time.time()
     render = flask.render_template(
@@ -136,6 +156,7 @@ def index():
         show_restore_button=__user_has_hidden_tracebacks(),
         date_to_analyze=date_to_analyze,
         days_ago=days_ago_int,
+        filter_text=filter_text
     )
     if DEBUG_TIMING:
         flask.g.render_time = time.time() - render_start_time

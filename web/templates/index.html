@@ -64,17 +64,32 @@
 
 {% block navbar %}
 <div class="container-fluid">
-    <nav class="navbar navbar-default">
+    <nav class="nav navbar navbar-default">
         <a class="navbar-brand" href="#">
             <img src="/static/media/wordy.png" width="30" height="30" class="d-inline-block align-top" alt="">
             Tracebacks
         </a>
-        <ul class="pager">
-            <li><a href="/?days_ago={{ days_ago + 1 }}">Previous</a></li>
+
+        <ul class="nav pager">
+            <li><a href="/?days_ago={{ days_ago + 1 }}&filter={{ filter_text }}">Previous</a></li>
             <li>{{ date_to_analyze }}</li>
-            <li><a href="/?days_ago={{ days_ago - 1 }}">Next</a></li>
+            <li><a href="/?days_ago={{ days_ago - 1 }}&filter={{ filter_text }}">Next</a></li>
             <li><a href="/">Today</a></li>
         </ul>
+
+        <div class="nav dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="filterMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Filter
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="/?days_ago={{ days_ago }}">None</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=ticket">JIRA Ticket Only</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=openticket">Open JIRA Ticket Only</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=noticket">No JIRA Ticket</a></li>
+            </ul>
+        </div>
+
         {% if show_restore_button %}
         <button onclick="restore_all()">Restore all hidden Tracebacks</button>
         {% endif %}
