@@ -15,11 +15,6 @@ DESCRIPTION_TEMPLATE = '''Error observed in production.
 
 Hits on this error:
 %s
-
-More context around this error (from the latest hit):
-{noformat}
-%s
-{noformat}
 '''
 """
     A template for the description to save in the ticket.
@@ -27,7 +22,6 @@ More context around this error (from the latest hit):
     Implementer needs to provide:
         - the traceback
         - a list of instances of this traceback
-        - a traceback + context text
 """
 
 SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
@@ -79,9 +73,8 @@ def create_description(similar_tracebacks):
         ) for t in tracebacks
     )
     return DESCRIPTION_TEMPLATE % (
-        master_traceback.traceback_plus_context_text,
-        list_of_tracebacks_string,
-        master_traceback.raw_full_text
+        master_traceback.traceback_plus_context_text.rstrip(),
+        list_of_tracebacks_string
     )
 
 
