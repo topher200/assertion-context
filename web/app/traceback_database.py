@@ -129,7 +129,7 @@ def get_matching_tracebacks(es, traceback_text, match_level):
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
-        size=100
+        size=10000
     )
     res = []
     for raw_traceback in raw_es_response['hits']['hits']:

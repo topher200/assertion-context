@@ -110,7 +110,7 @@ def index():
     for tb in tb_meta:
         tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
             ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
-        )
+        )[:100]
     if DEBUG_TIMING:
         flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
     if DEBUG_TIMING:
