@@ -1,6 +1,21 @@
 {%- extends "base.html" %}
 {% import "bootstrap/utils.html" as utils %}
 
+{% macro jira_issue(issue) %}
+    <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
+        {{ issue.key }}
+    </a>
+    {% if issue.status == 'Closed' %}
+    <span class="closed issue">
+    {% elif issue.status == 'Open' or issue.status == 'Reopened' %}
+    <span class="open issue">
+    {% else %}
+    <span class="inprogress issue">
+    {% endif %}
+        {{ issue.status }}
+    </span>
+{% endmacro %}
+
 {% macro show_traceback(t) %}
 <div class="traceback-container">
     <div class="traceback-metadata col-md-2">
@@ -10,9 +25,7 @@
             <ul>
                 {% for issue in t.jira_issues %}
                 <li class="highlight">
-                    <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
-                        {{ issue.key }}
-                    </a>
+                    {{ jira_issue(issue) }}
                 </li>
                 {% endfor %}
             </ul>
@@ -22,9 +35,7 @@
             <ul>
                 {% for issue in t.similar_jira_issues %}
                 <li>
-                    <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
-                        {{ issue.key }}
-                    </a>
+                    {{ jira_issue(issue) }}
                 </li>
                 {% endfor %}
             </ul>

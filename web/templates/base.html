@@ -15,6 +15,8 @@
     {{super()}}  {# required for Bootstrap's style elements #}
     <link rel="stylesheet" type="text/css"
         href="{{url_for('static', filename='css/traceback.css')}}">
+    <link rel="stylesheet" type="text/css"
+        href="{{url_for('static', filename='css/jira.css')}}">
     <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"> </script>
     <script src="{{ url_for('static', filename='javascript/traceback.js') }}"></script>
