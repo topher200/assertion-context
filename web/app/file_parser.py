@@ -111,10 +111,10 @@ def _get_last_traceback_text(parsed_log_text):
         If we can't parse out the traceback, returns an empty string.
 
         Returns a two-tuple:
-            - the traceback, parsed remove the metadata and show just the message
-            - the parsed traceback (so no metadata) plus the last few lines before the start of the
-                traceback (to give a little context); the extra lines are also parsed (include no
-                metadata).
+            - the parsed traceback (so no metadata, shows just the message)
+            - the parsed traceback (so no metadata), plus the last few lines before the start of
+                the traceback (to give a little context); the extra lines are also parsed (include
+                no metadata).
     """
     assert isinstance(parsed_log_text, str), (type(parsed_log_text), parsed_log_text)
 
