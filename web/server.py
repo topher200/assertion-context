@@ -112,15 +112,7 @@ def index():
     if len(tracebacks) - len(tb_meta) > 0:
         logger.info('hid %s tracebacks', len(tracebacks) - len(tb_meta))
 
-    # for each traceback, get all similar tracebacks and any matching jira tickets
-    if DEBUG_TIMING:
-        similar_tracebacks_start_time = time.time()
-    for tb in tb_meta:
-        tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
-            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
-        )[:100]
-    if DEBUG_TIMING:
-        flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
+    # get a list of matching jira issues
     if DEBUG_TIMING:
         jira_issues_start_time = time.time()
     for tb in tb_meta:
@@ -147,6 +139,16 @@ def index():
                 [issue for issue in tb.jira_issues if issue.status != 'Closed']
             ) > 0
         ]
+
+    # for each traceback, get all similar tracebacks
+    if DEBUG_TIMING:
+        similar_tracebacks_start_time = time.time()
+    for tb in tb_meta:
+        tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
+            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
+        )[:100]
+    if DEBUG_TIMING:
+        flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
 
     if DEBUG_TIMING:
         render_start_time = time.time()
