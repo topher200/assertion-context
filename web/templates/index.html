@@ -79,14 +79,14 @@
 
         <div class="nav dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="filterMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                Filter
+                {{ filter_text }}
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                <li><a href="/?days_ago={{ days_ago }}">None</a></li>
-                <li><a href="/?days_ago={{ days_ago }}&filter=ticket">JIRA Ticket Only</a></li>
-                <li><a href="/?days_ago={{ days_ago }}&filter=openticket">Open JIRA Ticket Only</a></li>
-                <li><a href="/?days_ago={{ days_ago }}&filter=noticket">No JIRA Ticket</a></li>
+                <li><a href="/?days_ago={{ days_ago }}">All Tracebacks</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=Has Ticket">Only Tracebacks with a Ticket</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=Has Open Ticket">Only Tracebacks with an Open Ticket</a></li>
+                <li><a href="/?days_ago={{ days_ago }}&filter=No Ticket">Tracebacks with No Ticket</a></li>
             </ul>
         </div>
 

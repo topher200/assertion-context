@@ -8,6 +8,7 @@ import logging
 import os
 import time
 import types
+import urllib
 
 import flask
 import pytz
@@ -65,7 +66,7 @@ logger = logging.getLogger()
 @app.route("/", methods=['GET'])
 @login_required
 def index():
-    FILTERS = ['ticket', 'openticket', 'noticket', 'none']
+    FILTERS = ['Has Ticket', 'Has Open Ticket', 'No Ticket', 'All Tracebacks']
 
     # parse the query params
     days_ago_raw = flask.request.args.get('days_ago')
@@ -77,10 +78,12 @@ def index():
     else:
         days_ago_int = 0
     filter_text = flask.request.args.get('filter')
-    if filter_text is not None and filter_text not in FILTERS:
-        return 'bad filter', 400
+    if filter_text is not None:
+        filter_text = urllib.parse.unquote_plus(filter_text)
+        if filter_text not in FILTERS:
+            return 'bad filter: %s' % filter_text, 400
     if filter_text is None:
-        filter_text = 'none'
+        filter_text = 'All Tracebacks'
 
     # our papertrail logs are saved in Eastern Time
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
@@ -129,11 +132,11 @@ def index():
         flask.g.jira_issues_time = time.time() - jira_issues_start_time
 
     # apply user's filters
-    if filter_text == 'ticket':
+    if filter_text == 'Has Ticket':
         tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) > 0]
-    elif filter_text == 'noticket':
+    elif filter_text == 'No Ticket':
         tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) == 0]
-    elif filter_text == 'openticket':
+    elif filter_text == 'Has Open Ticket':
         tb_meta = [
             tb for tb in tb_meta if len(
                 [issue for issue in tb.jira_issues if issue.status != 'Closed']
