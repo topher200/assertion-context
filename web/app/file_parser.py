@@ -79,6 +79,8 @@ def __generate_LogLine(raw_log_line, origin_papertrail_id, line_number):
 def __generate_Traceback(origin_logline, previous_loglines):
     """
         Combines L{LogLine}s into a L{Traceback}.
+
+        Returns None on failure
     """
     log_lines = itertools.chain(previous_loglines, [origin_logline])
     log_lines1, log_lines2 = itertools.tee(log_lines)
@@ -88,6 +90,8 @@ def __generate_Traceback(origin_logline, previous_loglines):
 
     parsed_text = ''.join(logline.parsed_log_message for logline in log_lines2)
     traceback_text, traceback_plus_context_text = _get_last_traceback_text(parsed_text)
+    if traceback_text is None or traceback_plus_context_text is None:
+        return None
 
     return Traceback(
         traceback_text,
@@ -108,13 +112,13 @@ def _get_last_traceback_text(parsed_log_text):
         All python tracebacks start with the string 'Traceback (most recent call last)'. We grab
         the last one in the parsed text.
 
-        If we can't parse out the traceback, returns an empty string.
-
         Returns a two-tuple:
             - the parsed traceback (so no metadata, shows just the message)
             - the parsed traceback (so no metadata), plus the last few lines before the start of
                 the traceback (to give a little context); the extra lines are also parsed (include
                 no metadata).
+
+        If we can't parse out the traceback, returns a two-tuple of (None, None)
     """
     assert isinstance(parsed_log_text, str), (type(parsed_log_text), parsed_log_text)
 
@@ -122,7 +126,8 @@ def _get_last_traceback_text(parsed_log_text):
         'Traceback (most recent call last)'
     )
     if len(sep) == 0:
-        logger.error("unable to parse out Traceback. text: %s", parsed_log_text)
+        logger.warning("unable to parse out Traceback. text: %s", parsed_log_text)
+        return (None, None)
     context_lines = '\n'.join(previous_text.splitlines()[-3:])
     return sep + traceback_text, context_lines + '\n' + sep + traceback_text
 
@@ -311,7 +316,9 @@ def parse(file_object):
                 )
             )
 
-            yield __generate_Traceback(origin_line, reversed(previous_log_lines))
+            traceback = __generate_Traceback(origin_line, reversed(previous_log_lines))
+            if traceback is not None:
+                yield traceback
 
         # now that we're done processing this line, add it to the buffer
         assert isinstance(line, str), line
