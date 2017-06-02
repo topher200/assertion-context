@@ -122,7 +122,7 @@ def _get_last_traceback_text(parsed_log_text):
         'Traceback (most recent call last)'
     )
     if len(sep) == 0:
-        logger.error("unable to parse out Traceback")
+        logger.error("unable to parse out Traceback. text: %s", parsed_log_text)
     context_lines = '\n'.join(previous_text.splitlines()[-3:])
     return sep + traceback_text, context_lines + '\n' + sep + traceback_text
 
