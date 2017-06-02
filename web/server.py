@@ -184,9 +184,12 @@ def hide_traceback():
         logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     traceback_text = json_request['traceback_text']
-    if flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is None:
-        flask.session[HIDDEN_TRACEBACK_TEXT_KEY] = set()
-    flask.session[HIDDEN_TRACEBACK_TEXT_KEY].add(traceback_text)
+    our_set = flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY)
+    if our_set is None:
+        our_set = set()
+    # NOTE: changing the session implictly with session_object.add doesn't seem to work
+    our_set.add(traceback_text)
+    flask.session[HIDDEN_TRACEBACK_TEXT_KEY] = our_set
     return 'success'
 
 
