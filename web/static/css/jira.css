@@ -25,4 +25,5 @@
     margin: 0;
     padding: 2px 5px;
     text-align: center;
+    white-space: nowrap;
 }
