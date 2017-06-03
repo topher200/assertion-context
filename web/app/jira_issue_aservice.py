@@ -42,6 +42,11 @@ JIRA_CLIENT = jira.JIRA(
 )
 JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
 
+COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
+"""
+    We're saving comments in the database as one long string. This is the separator between them
+"""
+
 logger = logging.getLogger()
 
 
@@ -161,11 +166,14 @@ def jira_api_object_to_JiraIssue(jira_object):
     """
     assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
 
+    comments = (comment.body for comment in jira_object.fields.comment.comments)
+
     return JiraIssue(
         jira_object.key,
         get_link_to_issue(jira_object),
         jira_object.fields.summary,
         jira_object.fields.description,
+        COMMENT_SEPARATOR.join(comments),
         jira_object.fields.issuetype.name,
         jira_object.fields.status.name,
     )

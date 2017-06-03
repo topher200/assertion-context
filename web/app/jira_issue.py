@@ -7,6 +7,7 @@ class JiraIssue(object):
         - url of the issue
         - The summary of the issue. The "title" of the ticket
         - description text
+        - string of all the issue's comments, concatinated together. may not exist on legacy issues
         - the type of the issue (bug, story, etc)
         - the current status of the issue
     """
@@ -16,6 +17,7 @@ class JiraIssue(object):
             url,
             summary,
             description,
+            comments,
             issue_type,
             status,
     ):
@@ -23,6 +25,7 @@ class JiraIssue(object):
         self._url = url
         self._summary = summary
         self._description = description
+        self._comments = comments
         self._issue_type = issue_type
         self._status = status
 
@@ -46,6 +49,10 @@ class JiraIssue(object):
         return self._description
 
     @property
+    def comments(self):
+        return self._comments
+
+    @property
     def issue_type(self):
         return self._issue_type
 
@@ -64,6 +71,7 @@ class JiraIssue(object):
             "url": self._url,
             "summary": self._summary,
             "description": self._description,
+            "comments": self._comments,
             "issue_type": self._issue_type,
             "status": self._status,
         }
@@ -75,11 +83,17 @@ def generate_from_source(source):
     """
     assert isinstance(source, dict), (type(source), source)
 
+    # comments may not exist on legacy issues, so we'll just return an empty string
+    comments = source.get('comments')
+    if comments is None:
+        comments = ''
+
     return JiraIssue(
         source["key"],
         source["url"],
         source["summary"],
         source["description"],
+        comments,
         source["issue_type"],
         source["status"],
     )
