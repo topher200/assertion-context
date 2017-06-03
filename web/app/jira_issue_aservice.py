@@ -1,5 +1,6 @@
 import itertools
 import logging
+import re
 
 from instance import config
 import jira
@@ -177,3 +178,31 @@ def jira_api_object_to_JiraIssue(jira_object):
         jira_object.fields.issuetype.name,
         jira_object.fields.status.name,
     )
+
+def get_all_referenced_ids(issue):
+    """
+        Look through the comments and description and find all papertrail ids that are referenced
+
+        @type issue: JiraIssue
+        @return: yields individual ids as ints
+        @rtype: generator
+    """
+    assert isinstance(issue, JiraIssue), (type(issue), issue)
+
+    pattern = 'focus=(\d{18})'
+    for match in re.findall(pattern, issue.description):
+        yield int(match)
+    for match in re.findall(pattern, issue.comments):
+        yield int(match)
+
+def find_latest_referenced_id(issue):
+    """
+        Look through the comments and description find the latest papertrail id someone referenced
+
+        @type issue: JiraIssue
+        @return: a single papertrail id or None if no ids are found
+        @rtype: int or None
+    """
+    assert isinstance(issue, JiraIssue), (type(issue), issue)
+
+    return max(get_all_referenced_ids(issue), default=None)
