@@ -258,6 +258,41 @@ def create_jira_ticket():
     return 'success'
 
 
+@app.route("/jira_comment", methods=['POST'])
+@login_required
+def jira_comment():
+    """
+        Save a comment in jira with the latest hits on this traceback
+
+        Takes a json payload with these fields:
+        - traceback_text: the text to find papertrail matches for
+        - issue_key: the jira issue key on which to leave the comment
+    """
+    # get the traceback text
+    json_request = flask.request.get_json()
+    if json_request is None or 'traceback_text' not in json_request:
+        logger.warning('invalid json detected: %s', json_request)
+        return 'invalid json', 400
+    traceback_text = json_request['traceback_text']
+    issue_key = json_request['issue_key']
+    issue = jira_issue_aservice.get_issue(issue_key)
+
+    # find a list of tracebacks that use that text
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, traceback_text, es_util.EXACT_MATCH
+    )
+
+    # filter out any tracebacks that are after the latest one already on that ticket
+    latest = jira_issue_aservice.find_latest_referenced_id(issue)
+    tracebacks_to_comment = (tb for tb in similar_tracebacks
+                             if int(tb.origin_papertrail_id) > latest)
+
+    # create a comment using the list of tracebacks
+    comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
+    jira_issue_aservice.save_comment(issue, comment)
+    return 'success'
+
+
 @app.route("/api/tracebacks", methods=['GET'])
 @login_required
 def get_tracebacks():

@@ -25,6 +25,15 @@ Hits on this error:
         - a list of instances of this traceback
 """
 
+COMMENT_TEMPLATE = '''Errors observed in production:
+'''
+"""
+    A template for the comment containing a list of recent hits
+
+    Implementer needs to provide:
+        - a list of instances of this traceback
+"""
+
 SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
 """
     A template for the list of hits on this traceback.
@@ -82,6 +91,31 @@ def create_description(similar_tracebacks):
         master_traceback.traceback_plus_context_text.rstrip(),
         list_of_tracebacks_string
     )
+
+def create_comment_with_hits_list(tracebacks):
+    """
+        Creates a comment given the list of tracebacks
+
+        Sorts them so that the latest one is first
+    """
+    tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
+    list_of_tracebacks_string = '\n'.join(
+        SIMILAR_LIST_TEMPLATE % (
+            t.origin_timestamp,
+            t.instance_id,
+            t.origin_papertrail_id
+        ) for t in tracebacks
+    )
+    return COMMENT_TEMPLATE % (
+        list_of_tracebacks_string
+    )
+
+
+def create_comment(issue, comment_string):
+    """
+        Leaves the given comment on the issue
+    """
+    JIRA_CLIENT.add_comment(issue, comment_string)
 
 
 def create_jira_issue(title, description):
