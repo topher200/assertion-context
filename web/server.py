@@ -258,6 +258,59 @@ def create_jira_ticket():
     return 'success'
 
 
+@app.route("/jira_comment", methods=['POST'])
+@login_required
+def jira_comment():
+    """
+        Save a comment in jira with the latest hits on this traceback
+
+        Takes a json payload with these fields:
+        - traceback_text: the text to find papertrail matches for
+        - issue_key: the jira issue key on which to leave the comment
+
+        The frontend is expecting this API to return a human readable string in the event of
+        success (200 response code)
+    """
+    # get the payload
+    json_request = flask.request.get_json()
+    if json_request is None:
+        logger.warning('no json detected: %s', json_request)
+        return 'missing json', 400
+    if 'traceback_text' not in json_request:
+        logger.warning('missing json field detected: %s', json_request)
+        return 'missing traceback_text', 400
+    if 'issue_key' not in json_request:
+        logger.warning('missing json field detected: %s', json_request)
+        return 'missing issue_key', 400
+    traceback_text = json_request['traceback_text']
+    issue_key = json_request['issue_key']
+    issue = jira_issue_aservice.get_issue(issue_key)
+
+    # find a list of tracebacks that use the given traceback text
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, traceback_text, es_util.EXACT_MATCH
+    )
+
+    # filter out any tracebacks that are after the latest one already on that ticket
+    latest = jira_issue_aservice.find_latest_referenced_id(issue)
+    tracebacks_to_comment = [tb for tb in similar_tracebacks
+                             if int(tb.origin_papertrail_id) > latest]
+    if len(tracebacks_to_comment) <= 0:
+        logger.info('not saving comment - found %s hits but none were newer than %s',
+                    len(similar_tracebacks),
+                    latest)
+        return 'No comment created on %s. That ticket is already up to date' % issue_key
+    else:
+        logger.info('commenting with %s/%s hits',
+                    len(tracebacks_to_comment),
+                    len(similar_tracebacks))
+
+    # create a comment using the list of tracebacks
+    comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
+    jira_issue_aservice.create_comment(issue, comment)
+    return 'Created a comment on %s' % issue_key
+
+
 @app.route("/api/tracebacks", methods=['GET'])
 @login_required
 def get_tracebacks():

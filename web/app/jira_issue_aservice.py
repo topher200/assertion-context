@@ -1,5 +1,6 @@
 import itertools
 import logging
+import re
 
 from instance import config
 import jira
@@ -24,6 +25,16 @@ Hits on this error:
         - a list of instances of this traceback
 """
 
+COMMENT_TEMPLATE = '''Errors observed in production:
+%s
+'''
+"""
+    A template for the comment containing a list of recent hits
+
+    Implementer needs to provide:
+        - a list of instances of this traceback
+"""
+
 SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
 """
     A template for the list of hits on this traceback.
@@ -41,6 +52,11 @@ JIRA_CLIENT = jira.JIRA(
     basic_auth=config.JIRA_BASIC_AUTH,
 )
 JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
+
+COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
+"""
+    We're saving comments in the database as one long string. This is the separator between them
+"""
 
 logger = logging.getLogger()
 
@@ -76,6 +92,32 @@ def create_description(similar_tracebacks):
         master_traceback.traceback_plus_context_text.rstrip(),
         list_of_tracebacks_string
     )
+
+def create_comment_with_hits_list(tracebacks):
+    """
+        Creates a comment given the list of tracebacks
+
+        Sorts them so that the latest one is first
+    """
+    tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
+    list_of_tracebacks_string = '\n'.join(
+        SIMILAR_LIST_TEMPLATE % (
+            t.origin_timestamp,
+            t.instance_id,
+            t.origin_papertrail_id
+        ) for t in tracebacks
+    )
+    return COMMENT_TEMPLATE % (
+        list_of_tracebacks_string
+    )
+
+
+def create_comment(issue, comment_string):
+    """
+        Leaves the given comment on the issue
+    """
+    JIRA_CLIENT.add_comment(issue.key, comment_string)
+    logger.info('added comment to issue: %s', issue.key)
 
 
 def create_jira_issue(title, description):
@@ -161,11 +203,42 @@ def jira_api_object_to_JiraIssue(jira_object):
     """
     assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
 
+    comments = (comment.body for comment in jira_object.fields.comment.comments)
+
     return JiraIssue(
         jira_object.key,
         get_link_to_issue(jira_object),
         jira_object.fields.summary,
         jira_object.fields.description,
+        COMMENT_SEPARATOR.join(comments),
         jira_object.fields.issuetype.name,
         jira_object.fields.status.name,
     )
+
+def get_all_referenced_ids(issue):
+    """
+        Look through the comments and description and find all papertrail ids that are referenced
+
+        @type issue: JiraIssue
+        @return: yields individual ids as ints
+        @rtype: generator
+    """
+    assert isinstance(issue, JiraIssue), (type(issue), issue)
+
+    pattern = 'focus=(\d{18})'
+    for match in re.findall(pattern, issue.description):
+        yield int(match)
+    for match in re.findall(pattern, issue.comments):
+        yield int(match)
+
+def find_latest_referenced_id(issue):
+    """
+        Look through the comments and description find the latest papertrail id someone referenced
+
+        @type issue: JiraIssue
+        @return: a single papertrail id or None if no ids are found
+        @rtype: int or None
+    """
+    assert isinstance(issue, JiraIssue), (type(issue), issue)
+
+    return max(get_all_referenced_ids(issue), default=None)
