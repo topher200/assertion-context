@@ -228,7 +228,7 @@ def get_all_referenced_ids(issue):
     """
     assert isinstance(issue, JiraIssue), (type(issue), issue)
 
-    pattern = 'focus=(\d{18})'
+    pattern = '(?:focus|centered_on_id)=(\d{18})'
     for match in re.findall(pattern, issue.description):
         yield int(match)
     for match in re.findall(pattern, issue.comments):
