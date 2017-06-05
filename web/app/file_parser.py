@@ -16,9 +16,9 @@ from .logline import LogLine
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('\nAssertionError|\nKeyError|\nNotImplementedError|\nValueError')
+ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
-    '''(details = AssertionError)|(AssertionError.*can only join a child process)'''
+    '''(details = AssertionError)|(AssertionError.*can only join a child process)|DEBUG'''
 )
 KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\['''
