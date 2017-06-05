@@ -338,8 +338,14 @@ def update_jira_db():
 
     if 'issue_key' in json_request:
         # save the given issue to ES
-        issue = json_request['issue_key']
-        jira_issue_db.save_jira_issue(ES, jira_issue_aservice.get_issue(issue))
+        issue_key = json_request['issue_key']
+        issue = jira_issue_aservice.get_issue(issue_key)
+        if issue is None:
+            # the issue is deleted, remove it
+            logger.info('removing %s - issue not found', issue_key)
+            jira_issue_db.remove_jira_issue(ES, issue_key)
+        else:
+            jira_issue_db.save_jira_issue(ES, issue)
     else:
         if json_request['all'] != True:
             return 'invalid "all" json', 400

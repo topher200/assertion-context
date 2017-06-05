@@ -144,12 +144,15 @@ def get_issue(key):
     """
         Get a jira issue given its key
 
-        @rtype: JiraIssue
+        Returns None if we can't find the given issue. This can happen if a user deletes an issue in Jira
+
+        @rtype: JiraIssue or None
     """
     try:
         return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
     except jira.exceptions.JIRAError as e:
         logger.error('error accessing issue %s. is it deleted?\n%s', key, e)
+        return None
 
 
 def get_all_issues():

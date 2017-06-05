@@ -39,6 +39,32 @@ def save_jira_issue(es, jira_issue):
     return res
 
 
+def remove_jira_issue(es, issue_key):
+    """
+        Removes any issues with the specified key from the database
+
+        @type issue_key: str
+    """
+    assert isinstance(issue_key, str), (type(issue_key), issue_key)
+
+    body = {
+        "query": {
+            "match": {
+                "key": {
+                    "query": issue_key,
+                }
+            }
+        }
+    }
+    res = es.delete_by_query(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        body=body
+    )
+    invalidate_cache()
+    return res
+
+
 def invalidate_cache():
     DOGPILE_REGION.invalidate()
 
