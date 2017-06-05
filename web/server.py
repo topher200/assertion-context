@@ -267,6 +267,9 @@ def jira_comment():
         Takes a json payload with these fields:
         - traceback_text: the text to find papertrail matches for
         - issue_key: the jira issue key on which to leave the comment
+
+        The frontend is expecting this API to return a human readable string in the event of
+        success (200 response code)
     """
     # get the payload
     json_request = flask.request.get_json()
@@ -296,7 +299,7 @@ def jira_comment():
         logger.info('not saving comment - found %s hits but none were newer than %s',
                     len(similar_tracebacks),
                     latest)
-        return 'nothing to do'
+        return 'No comment created on %s. That ticket is already up to date' % issue_key
     else:
         logger.info('commenting with %s/%s hits',
                     len(tracebacks_to_comment),
@@ -305,7 +308,7 @@ def jira_comment():
     # create a comment using the list of tracebacks
     comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
     jira_issue_aservice.create_comment(issue, comment)
-    return 'success'
+    return 'Created a comment on %s' % issue_key
 
 
 @app.route("/api/tracebacks", methods=['GET'])

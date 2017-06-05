@@ -54,14 +54,13 @@ function jira_comment(comment_button, issue_key) {
         type: "POST",
         url: "/jira_comment",
         data: JSON.stringify(payload),
-        success: function() {
+        success: function(textStatus) {
             comment_button.disabled = false;
-            // location.href = location.href;
-            // TODO
+            toastr.info(textStatus);
         },
-        error: function() {
+        error: function(textStatus, errorThrown) {
             comment_button.disabled = false;
-            // TODO
+            toastr.error(textStatus);
         },
         contentType: "application/json"
     });
