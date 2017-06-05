@@ -47,6 +47,13 @@ SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?fo
         - the id of the logline that we want to link to (ie: origin_papertrail_id)
 """
 
+TIMESTAMP_TEMPLATE = '%b %d %H:%M:%S'
+"""
+    A template for human-readable timestamps. Timezone info is ignored.
+
+    To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
+"""
+
 JIRA_CLIENT = jira.JIRA(
     server=config.JIRA_SERVER,
     basic_auth=config.JIRA_BASIC_AUTH,
@@ -83,7 +90,7 @@ def create_description(similar_tracebacks):
 
     list_of_tracebacks_string = '\n'.join(
         SIMILAR_LIST_TEMPLATE % (
-            t.origin_timestamp,
+            t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
             t.instance_id,
             t.origin_papertrail_id
         ) for t in tracebacks
@@ -102,7 +109,7 @@ def create_comment_with_hits_list(tracebacks):
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
     list_of_tracebacks_string = '\n'.join(
         SIMILAR_LIST_TEMPLATE % (
-            t.origin_timestamp,
+            t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
             t.instance_id,
             t.origin_papertrail_id
         ) for t in tracebacks
