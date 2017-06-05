@@ -5,6 +5,9 @@
     <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
         {{ issue.key }}
     </a>
+    <button type="button" class="btn btn-default btn-xs"  onclick="jira_comment(this, '{{ issue.key }}', `{{ tb.traceback.traceback_text }}`)">
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Save Comment
+    </button>
     {% if issue.status == 'Closed' %}
     <span class="issue closed">
     {% elif issue.status == 'Open' or issue.status == 'Reopened' %}
@@ -14,12 +17,11 @@
     {% endif %}
         {{ issue.status }}
     </span>
-    <p> <button onclick="jira_comment(this,  '{{ issue.key }}')", value = "{{ tb.traceback.traceback_text }}">[comment]</button>
 {% endmacro %}
 
 {% macro show_traceback(t) %}
 <div class="traceback-container">
-    <div class="traceback-metadata col-md-2">
+    <div class="traceback-metadata col-md-3">
         <p>
             {% if t.jira_issues %}
             Matching JIRA issues:
@@ -41,7 +43,10 @@
                 {% endfor %}
             </ul>
             {% endif %}
-            <p> <button onclick="create_jira_ticket(this)" value="{{ t.traceback.traceback_text }}">Create new JIRA ticket</button>
+            <p></p>
+            <button type="button" class="btn btn-default" onclick="create_jira_ticket(this)" value="{{ t.traceback.traceback_text }}">
+                <span class="glyphicon glyphicon-save-file"></span> Create new JIRA ticket
+            </button>
             <p> Hits ({{ t.similar_tracebacks | length }}{% if t.similar_tracebacks | length > 99 %}+{% endif %}):
             <ul class="scrollable-list">
                 {% for similar_traceback in t.similar_tracebacks %}
@@ -57,7 +62,7 @@
             <button onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">hide all hits</button>
         </p>
     </div>
-    <div class="traceback-text col-md-10">
+    <div class="traceback-text col-md-9">
         <pre class="prettyprint code">{{ t.traceback.traceback_plus_context_text }}</pre>
     </div>
 </div>
