@@ -60,7 +60,7 @@ function jira_comment(comment_button, issue_key) {
         },
         error: function(textStatus, errorThrown) {
             comment_button.disabled = false;
-            toastr.error(textStatus);
+            toastr.error("Server error while trying to create comment on " + issue_key);
         },
         contentType: "application/json"
     });
