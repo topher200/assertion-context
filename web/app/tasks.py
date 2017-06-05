@@ -29,7 +29,7 @@ def update_jira_issue_db():
     count = 0
     for issue in jira_issue_aservice.get_all_issues():
         count += 1
-        jira_issue_db.save_jira_issue(ES, jira_issue_aservice.get_issue(issue))
+        jira_issue_db.save_jira_issue(ES, jira_issue_aservice.get_issue(issue.key))
     logger.info("saved %s issues", count)
 
     invalidate_cache('jira')
