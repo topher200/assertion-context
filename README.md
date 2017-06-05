@@ -62,9 +62,29 @@ PUT traceback-index
     "analysis": {
       "analyzer": {
         "traceback_filtered": {
+          "type": "custom",
+          "tokenizer": "letter",
+          "char_filter": [
+            "remove_underscores"
+          ],
+          "filter": [
+            "newrelic_filtered"
+          ]
+        }
+      },
+      "char_filter": {
+        "remove_underscores": {
+          "type": "mapping",
+          "mappings": [
+            "_ => "
+          ]
+        }
+      },
+      "filter": {
+        "newrelic_filtered": {
           "type": "stop",
           "stopwords": [
-            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+      "File", "args", "body", "call", "callable", "cherrypy", "cpdispatch", "cprequest", "encoding", "frameworkcherrypy", "handler", "handlerwrapper", "hooks", "in", "kwargs", "lib", "line", "local", "newrelic", "oldhandler", "opt", "packages", "py", "python", "respond", "response", "return", "self", "site", "venv", "wordstreamvirtualenv", "wrapped"
           ]
         }
       }
@@ -81,16 +101,35 @@ PUT traceback-index
     }
   }
 }
-
 PUT jira-issue-index
 {
   "settings": {
     "analysis": {
       "analyzer": {
         "traceback_filtered": {
+          "type": "custom",
+          "tokenizer": "letter",
+          "char_filter": [
+            "remove_underscores"
+          ],
+          "filter": [
+            "newrelic_filtered"
+          ]
+        }
+      },
+      "char_filter": {
+        "remove_underscores": {
+          "type": "mapping",
+          "mappings": [
+            "_ => "
+          ]
+        }
+      },
+      "filter": {
+        "newrelic_filtered": {
           "type": "stop",
           "stopwords": [
-            "file", "opt", "virtualenv", "venv", "local", "lib", "python", "site", "packages", "newrelic", "hooks", "framework", "cherrypy", "py", "line", "in", "handler", "wrapper", "return", "wrapped", "args", "kwargs", "wordstream"
+      "File", "args", "body", "call", "callable", "cherrypy", "cpdispatch", "cprequest", "encoding", "frameworkcherrypy", "handler", "handlerwrapper", "hooks", "in", "kwargs", "lib", "line", "local", "newrelic", "oldhandler", "opt", "packages", "py", "python", "respond", "response", "return", "self", "site", "venv", "wordstreamvirtualenv", "wrapped"
           ]
         }
       }
