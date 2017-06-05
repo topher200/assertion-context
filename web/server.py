@@ -268,28 +268,43 @@ def jira_comment():
         - traceback_text: the text to find papertrail matches for
         - issue_key: the jira issue key on which to leave the comment
     """
-    # get the traceback text
+    # get the payload
     json_request = flask.request.get_json()
-    if json_request is None or 'traceback_text' not in json_request:
-        logger.warning('invalid json detected: %s', json_request)
-        return 'invalid json', 400
+    if json_request is None:
+        logger.warning('no json detected: %s', json_request)
+        return 'missing json', 400
+    if 'traceback_text' not in json_request:
+        logger.warning('missing json field detected: %s', json_request)
+        return 'missing traceback_text', 400
+    if 'issue_key' not in json_request:
+        logger.warning('missing json field detected: %s', json_request)
+        return 'missing issue_key', 400
     traceback_text = json_request['traceback_text']
     issue_key = json_request['issue_key']
     issue = jira_issue_aservice.get_issue(issue_key)
 
-    # find a list of tracebacks that use that text
+    # find a list of tracebacks that use the given traceback text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
         ES, traceback_text, es_util.EXACT_MATCH
     )
 
     # filter out any tracebacks that are after the latest one already on that ticket
     latest = jira_issue_aservice.find_latest_referenced_id(issue)
-    tracebacks_to_comment = (tb for tb in similar_tracebacks
-                             if int(tb.origin_papertrail_id) > latest)
+    tracebacks_to_comment = [tb for tb in similar_tracebacks
+                             if int(tb.origin_papertrail_id) > latest]
+    if len(tracebacks_to_comment) <= 0:
+        logger.info('not saving comment - found %s hits but none were newer than %s',
+                    len(similar_tracebacks),
+                    latest)
+        return 'nothing to do'
+    else:
+        logger.info('commenting with %s/%s hits',
+                    len(tracebacks_to_comment),
+                    len(similar_tracebacks))
 
     # create a comment using the list of tracebacks
     comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
-    jira_issue_aservice.save_comment(issue, comment)
+    jira_issue_aservice.create_comment(issue, comment)
     return 'success'
 
 

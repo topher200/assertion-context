@@ -1,7 +1,7 @@
 {%- extends "base.html" %}
 {% import "bootstrap/utils.html" as utils %}
 
-{% macro jira_issue(issue) %}
+{% macro jira_issue(issue, tb) %}
     <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
         {{ issue.key }}
     </a>
@@ -14,6 +14,7 @@
     {% endif %}
         {{ issue.status }}
     </span>
+    <p> <button onclick="jira_comment(this,  '{{ issue.key }}')", value = "{{ tb.traceback.traceback_text }}">[comment]</button>
 {% endmacro %}
 
 {% macro show_traceback(t) %}
@@ -25,7 +26,7 @@
             <ul>
                 {% for issue in t.jira_issues %}
                 <li class="highlight">
-                    {{ jira_issue(issue) }}
+                    {{ jira_issue(issue, t) }}
                 </li>
                 {% endfor %}
             </ul>
@@ -35,7 +36,7 @@
             <ul>
                 {% for issue in t.similar_jira_issues %}
                 <li>
-                    {{ jira_issue(issue) }}
+                    {{ jira_issue(issue, t) }}
                 </li>
                 {% endfor %}
             </ul>

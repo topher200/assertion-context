@@ -26,6 +26,7 @@ Hits on this error:
 """
 
 COMMENT_TEMPLATE = '''Errors observed in production:
+%s
 '''
 """
     A template for the comment containing a list of recent hits
@@ -115,7 +116,8 @@ def create_comment(issue, comment_string):
     """
         Leaves the given comment on the issue
     """
-    JIRA_CLIENT.add_comment(issue, comment_string)
+    JIRA_CLIENT.add_comment(issue.key, comment_string)
+    logger.info('added comment to issue: %s', issue.key)
 
 
 def create_jira_issue(title, description):
