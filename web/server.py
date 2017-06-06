@@ -293,8 +293,12 @@ def jira_comment():
 
     # filter out any tracebacks that are after the latest one already on that ticket
     latest = jira_issue_aservice.find_latest_referenced_id(issue)
-    tracebacks_to_comment = [tb for tb in similar_tracebacks
-                             if int(tb.origin_papertrail_id) > latest]
+    if latest is not None:
+        tracebacks_to_comment = [tb for tb in similar_tracebacks
+                                if int(tb.origin_papertrail_id) > latest]
+    else:
+        # just take the them all
+        tracebacks_to_comment = similar_tracebacks
     if len(tracebacks_to_comment) <= 0:
         logger.info('not saving comment - found %s hits but none were newer than %s',
                     len(similar_tracebacks),
