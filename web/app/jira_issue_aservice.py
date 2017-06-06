@@ -169,9 +169,11 @@ def get_all_issues():
 
         Searches for all issues for the configured JIRA_PROJECT_KEY.
 
+        Returns issues in the jira API object form, not our home-grown JiraIssue form.
+
         @rtype: generator
 
-        @postcondition: all(isinstance(r, JiraIssue) for r in return)
+        @postcondition: all(isinstance(r, jira.resources.Issue) for r in return)
     """
     # there seems to be a bug in the jira library where it only grabs the first 50 results (even if
     # maxResults evaluates to False, as instructed to do by the docs). we'll handle the pagination
