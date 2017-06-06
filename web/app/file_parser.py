@@ -23,6 +23,9 @@ ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
 KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\['''
 )
+VALUE_ERROR_REGEX_NEGATIVE = re.compile(
+    '''raise ValueError'''
+)
 """
     Our regexes are by the Papertrail search we perform against production, which looks like this:
         (AssertionError -"details = AssertionError" -"can only join a child process")
@@ -279,6 +282,10 @@ def log_line_contains_important_error(log_line):
 
     if 'KeyError' in log_line:
         if re.search(KEY_ERROR_REGEX_NEGATIVE, log_line) is not None:
+            return False
+
+    if 'ValueError' in log_line:
+        if re.search(VALUE_ERROR_REGEX_NEGATIVE, log_line) is not None:
             return False
 
     return True
