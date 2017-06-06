@@ -47,7 +47,7 @@ SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?fo
         - the id of the logline that we want to link to (ie: origin_papertrail_id)
 """
 
-TIMESTAMP_TEMPLATE = '%b %d %H:%M:%S'
+TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
 """
     A template for human-readable timestamps. Timezone info is ignored.
 
