@@ -3,6 +3,9 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
+
+import elasticsearch
+
 from .jira_issue import JiraIssue, generate_from_source
 from app import es_util
 from app import redis_util
@@ -41,28 +44,25 @@ def save_jira_issue(es, jira_issue):
 
 def remove_jira_issue(es, issue_key):
     """
-        Removes any issues with the specified key from the database
+        Removes the issue with the specified key from the database
+
+        Deletes the record by key. This works because we set the ES doc's key to be the jira issue
+        key (so there will be at most one issue with a given key)
 
         @type issue_key: str
     """
     assert isinstance(issue_key, str), (type(issue_key), issue_key)
 
-    body = {
-        "query": {
-            "match": {
-                "key": {
-                    "query": issue_key,
-                }
-            }
-        }
-    }
-    res = es.delete_by_query(
-        index=INDEX,
-        doc_type=DOC_TYPE,
-        body=body
-    )
-    invalidate_cache()
-    return res
+    try:
+        es.delete(
+            index=INDEX,
+            doc_type=DOC_TYPE,
+            id=issue_key
+        )
+    except elasticsearch.exceptions.NotFoundError:
+        return # it's cool if we don't find a matching issue
+    else:
+        invalidate_cache()
 
 
 def invalidate_cache():
