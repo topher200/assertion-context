@@ -122,7 +122,7 @@ def get_matching_tracebacks(es, traceback_text, match_level):
     """
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
 
-    body = es_util.generate_text_match_payload(traceback_text, "traceback_text", match_level)
+    body = es_util.generate_text_match_payload(traceback_text, ["traceback_text"], match_level)
 
     raw_es_response = es.search(
         index=INDEX,
