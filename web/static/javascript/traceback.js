@@ -37,8 +37,13 @@ function create_jira_ticket(traceback_button){
         type: "POST",
         url: "/create_jira_ticket",
         data: JSON.stringify(payload),
-        success: function() {
-            location.href = location.href;
+        success: function(textStatus) {
+            traceback_button.disabled = false;
+            toastr.info(textStatus);
+        },
+        error: function(textStatus, errorThrown) {
+            traceback_button.disabled = false;
+            toastr.error("Server error while trying to create jira ticket");
         },
         contentType: "application/json"
     });

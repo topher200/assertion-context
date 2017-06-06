@@ -229,6 +229,15 @@ def restore_all_tracebacks():
 @app.route("/create_jira_ticket", methods=['POST'])
 @login_required
 def create_jira_ticket():
+    """
+        Create a jira ticket with tracebacks that share the given traceback text
+
+        Takes a json payload with these fields:
+        - traceback_text: text of the traceback for which to create an issue
+
+        The frontend is expecting this API to return a human readable string in the event of
+        success (200 response code)
+    """
     # get the traceback text
     json_request = flask.request.get_json()
     if json_request is None or 'traceback_text' not in json_request:
@@ -250,12 +259,9 @@ def create_jira_ticket():
     # make API call to jira
     ticket = jira_issue_aservice.create_jira_issue(title, description)
 
-    # send flash message to user with the JIRA url
-    url = jira_issue_aservice.get_link_to_issue(ticket)
-    flask.flash(flask.Markup(
-        'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
-    ))
-    return 'success'
+    # send toast message to user with the JIRA url
+    url = jira_issue_aservice.get_link_to_issue(ticket.key)
+    return 'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
 
 
 @app.route("/jira_comment", methods=['POST'])
@@ -312,7 +318,8 @@ def jira_comment():
     # create a comment using the list of tracebacks
     comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
     jira_issue_aservice.create_comment(issue, comment)
-    return 'Created a comment on %s' % issue_key
+    url = jira_issue_aservice.get_link_to_issue(issue_key)
+    return 'Created a comment on <a href="%s" class="alert-link">%s</a>' % (url, issue_key)
 
 
 @app.route("/api/tracebacks", methods=['GET'])
