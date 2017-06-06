@@ -3,4 +3,12 @@
 
 {% block content %}
 <p>Num jira issues: {{ num_jira_issues }}</p>
+
+<p>Update jira issue in database
+    <form id="jira-issue-form">
+        Issue key:<br>
+        <input type="text" id="issue_key" name="issue_key"><br>
+        <input type="submit" value="Submit" onclick="update_jira_db(document.getElementById('issue_key').value);"/>
+    </form>
+</p>
 {%- endblock %}
