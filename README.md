@@ -141,6 +141,10 @@ PUT jira-issue-index
         "description": {
           "analyzer": "traceback_filtered",
           "type": "text"
+        },
+        "comments": {
+          "analyzer": "traceback_filtered",
+          "type": "text"
         }
       }
     }
