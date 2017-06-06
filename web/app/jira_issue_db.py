@@ -111,3 +111,13 @@ def get_matching_jira_issues(es, traceback_text, match_level):
     for raw_jira_issue in raw_es_response['hits']['hits']:
         res.append(generate_from_source(raw_jira_issue['_source']))
     return res
+
+def get_num_jira_issues(es):
+    """
+        Returns the total number of jira issues found in the database
+    """
+    return es.count(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        body={},
+    )['count']

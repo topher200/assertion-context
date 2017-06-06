@@ -371,6 +371,15 @@ def invalidate_cache(cache=None):
     return 'success'
 
 
+@app.route("/admin", methods=['GET'])
+@login_required
+def admin():
+    num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
+    return flask.render_template(
+        'admin.html',
+        num_jira_issues=num_jira_issues
+    )
+
 
 @app.before_first_request
 def setup_logging():
