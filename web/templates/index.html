@@ -6,7 +6,7 @@
         {{ issue.key }}
     </a>
     <button type="button" class="btn btn-default btn-xs"  onclick="jira_comment(this, '{{ issue.key }}', `{{ tb.traceback.traceback_text }}`)">
-        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Save Comment
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Add Comment
     </button>
     {% if issue.status == 'Closed' %}
     <span class="issue closed">
