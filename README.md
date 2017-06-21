@@ -21,14 +21,17 @@ We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up the host:
  - install docker
    - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
- - fill out web/.aws_credentials. requires these fields:
+ - close this repo
+ - fill out `web/.aws_credentials` for a user that has S3 read permissions to
+   the papertrail archives. this is used for our app to download the archives
+   from S3. requires these fields:
 ```
 [default]
 aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
- - (optional) fill out web/.aws_config as well. defaults to us-east-1
- - fill out instance/config.py. requires these fields:
+ - (optional) fill out `web/.aws_config` as well. defaults to us-east-1
+ - fill out `web/instance/config.py`. requires these fields:
 ```
 OAUTH_CLIENT_ID = <from your oauth provider>
 OAUTH_CLIENT_SECRET = <from your oauth provider>
