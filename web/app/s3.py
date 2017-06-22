@@ -7,8 +7,10 @@ import boto3
 import botocore
 
 from . import file_parser
+from . import retry
 
 
+@retry.Retry(exceptions=(EOFError,))
 def parse_s3_file(bucket, key):
     """
         Downloads the file given described by the params and parses it.
