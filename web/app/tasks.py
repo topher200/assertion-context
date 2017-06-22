@@ -29,7 +29,17 @@ def update_jira_issue_db():
     count = 0
     for issue in jira_issue_aservice.get_all_issues():
         count += 1
-        jira_issue_db.save_jira_issue(ES, jira_issue_aservice.get_issue(issue.key))
+        # issues returned by get_all_issues() don't include all the possible fields for some
+        # reason. we need to do a get on the individual issue to get everything (like comments)
+        full_issue = None
+        num_tries = 0
+        while full_issue is None and num_tries < 5:
+            num_tries += 1
+            full_issue = jira_issue_aservice.get_issue(issue.key)
+        if full_issue is None:
+            logger.error('unable to retrieve issue %s, even after %s tries', issue.key, num_tries)
+            continue
+        jira_issue_db.save_jira_issue(ES, full_issue)
     logger.info("saved %s issues", count)
 
     invalidate_cache('jira')
