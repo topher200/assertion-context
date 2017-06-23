@@ -21,6 +21,8 @@ We run everything in Docker, but there's some things you need to set up on the
 host to get started. Installation instructions for setting up the host:
  - install docker
    - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
+ - `pip install docker-compose`
+   - optional: do this in a virtualenv
  - close this repo
  - fill out `web/.aws_credentials` for a user that has S3 read permissions to
    the papertrail archives. this is used for our app to download the archives
@@ -177,6 +179,7 @@ Once servers are started and python is installed, tests can be run with
 ## S3 and Lambda
 ### Papertrail
 Enable Papertrail's "archive to s3" feature
+  - http://help.papertrailapp.com/kb/how-it-works/automatic-s3-archive-export/
 
 ### Lambda
 Create an SNS topic to trigger a Lambda function whenever a Papertrail log file
