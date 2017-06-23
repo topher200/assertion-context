@@ -143,7 +143,7 @@ class Retry(object):
                     )
                     sleep(seconds)
                 else:
-                    raise exc_info[0], exc_info[1], exc_info[2]
+                    raise
 
     __LOGGER = logging.getLogger(__name__)
 
