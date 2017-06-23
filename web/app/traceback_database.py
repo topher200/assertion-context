@@ -4,10 +4,12 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 import dogpile.cache
+import elasticsearch
 
 from .traceback import Traceback, generate_traceback_from_source
 from app import es_util
 from app import redis_util
+from app import retry
 
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
@@ -21,6 +23,7 @@ INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'
 
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def save_traceback(es, traceback):
     """
         Takes a L{Traceback} and saves it to the database
@@ -45,6 +48,7 @@ def invalidate_cache():
     DOGPILE_REGION.invalidate()
 
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def refresh(es):
     """
         Performs an ES refresh. Required to see newly-inserted values when searching
@@ -55,6 +59,7 @@ def refresh(es):
 
 
 @DOGPILE_REGION.cache_on_arguments()
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_tracebacks(es, start_date=None, end_date=None):
     """
         Queries the database for L{Traceback} from a given date range.
@@ -108,6 +113,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
 
 @DOGPILE_REGION.cache_on_arguments()
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_matching_tracebacks(es, traceback_text, match_level):
     """
         Queries the database for any tracebacks with identical traceback_text

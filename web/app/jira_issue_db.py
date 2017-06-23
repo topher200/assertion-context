@@ -9,6 +9,7 @@ import elasticsearch
 from .jira_issue import JiraIssue, generate_from_source
 from app import es_util
 from app import redis_util
+from app import retry
 
 
 
@@ -20,6 +21,7 @@ INDEX = 'jira-issue-index'
 DOC_TYPE = 'jira-issue'
 
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def save_jira_issue(es, jira_issue):
     """
         Saves a jira issue to ES
@@ -42,6 +44,7 @@ def save_jira_issue(es, jira_issue):
     return res
 
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def remove_jira_issue(es, issue_key):
     """
         Removes the issue with the specified key from the database
@@ -69,6 +72,7 @@ def invalidate_cache():
     DOGPILE_REGION.invalidate()
 
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def refresh(es):
     """
         Performs an ES refresh. Required to see newly-inserted values when searching
@@ -79,6 +83,7 @@ def refresh(es):
 
 
 @DOGPILE_REGION.cache_on_arguments()
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_matching_jira_issues(es, traceback_text, match_level):
     """
         Queries the database for any jira issues that include the traceback_text
@@ -112,6 +117,7 @@ def get_matching_jira_issues(es, traceback_text, match_level):
         res.append(generate_from_source(raw_jira_issue['_source']))
     return res
 
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_num_jira_issues(es):
     """
         Returns the total number of jira issues found in the database
