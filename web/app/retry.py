@@ -125,7 +125,7 @@ class Retry(object):
         """
         assert isinstance(func, Callable), type(func)
 
-        for i in xrange(self.__retries):
+        for i in range(self.__retries):
             try:
                 if self.__debug:
                     Retry.__LOGGER.debug(
@@ -143,7 +143,7 @@ class Retry(object):
                     )
                     sleep(seconds)
                 else:
-                    raise exc_info[0], exc_info[1], exc_info[2]
+                    raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
     __LOGGER = logging.getLogger(__name__)
 
