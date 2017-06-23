@@ -3,7 +3,6 @@ import functools
 import logging
 import sys
 from time import sleep
-from types import IntType, TupleType, BooleanType, FloatType
 
 
 class Retry(object):
@@ -61,15 +60,15 @@ class Retry(object):
 
             @param retries: how many times to retry the method, if the method raises
             one of the given exceptions.
-            @type retries: IntType
+            @type retries: int
             @param exceptions: a tuple of exceptions that should be caught if raised by the method,
             and retried.
-            @type exceptions: TupleType
+            @type exceptions: tuple
             @param sleep_seconds: a sequence of values indicating how much time (in seconds) to
             delay between retries.
-            @type sleep_seconds: TupleType
+            @type sleep_seconds: tuple
             @param debug: enable (True)/disable (False) debug logging of method call and its args
-            @type debug: BooleanType
+            @type debug: bool
 
             @precondition: retries > 0
             @precondition: len(exceptions) > 0
@@ -78,20 +77,20 @@ class Retry(object):
             )
             @precondition: len(sleep_seconds) > 0
             @precondition: (
-                all(isinstance(x, (IntType, FloatType)) for x in sleep_seconds)
+                all(isinstance(x, (int, float)) for x in sleep_seconds)
             )
             @precondition: (
                 all(x > 0. for x in sleep_seconds)
             )
         """
-        assert isinstance(retries, IntType), type(retries)
-        assert isinstance(exceptions, TupleType), type(exceptions)
-        assert isinstance(sleep_seconds, TupleType), type(sleep_seconds)
-        assert isinstance(debug, BooleanType), type(debug)
+        assert isinstance(retries, int), type(retries)
+        assert isinstance(exceptions, tuple), type(exceptions)
+        assert isinstance(sleep_seconds, tuple), type(sleep_seconds)
+        assert isinstance(debug, bool), type(debug)
         assert exceptions
         assert all(issubclass(x, Exception) for x in exceptions), exceptions
         assert sleep_seconds
-        assert all(isinstance(x, (IntType, FloatType)) for x in sleep_seconds), sleep_seconds
+        assert all(isinstance(x, (int, float)) for x in sleep_seconds), sleep_seconds
         assert all(x > 0. for x in sleep_seconds), sleep_seconds
 
         self.__retries = retries
