@@ -55,7 +55,7 @@ def parse_log_file(bucket, key):
     # use our powerful parser to run checks on the requested file
     traceback_generator = s3.parse_s3_file(bucket, key)
     if traceback_generator is None:
-        logger.error('unable to download log file from s3')
+        logger.error('unable to download log file from s3. key: %s', key)
         return
 
     # save the parser output to the database
