@@ -19,7 +19,7 @@ services:
     restart:
       always
     command:
-      [celery, -A, app.tasks, worker]
+      [celery, -A, app.tasks, -c, '10', worker]
 
   nginx:
     restart:
