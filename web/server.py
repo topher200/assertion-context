@@ -197,7 +197,7 @@ def parse_s3():
     bucket = json_request['bucket']
     key = json_request['key']
 
-    logger.info("parsing s3 file. bucket: '%s', key: '%s'", bucket, key)
+    logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
     tasks.parse_log_file.delay(bucket, key)
     return 'job queued', 202
 
