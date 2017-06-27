@@ -268,17 +268,57 @@ def find_latest_referenced_id(issue):
 
     return max(get_all_referenced_ids(issue), default=None)
 
-__PAPERTRAIL_METADATA_REGEX = re.compile('\w{3} \d{2} \d\d:\d\d:\d\d i-\w+ \S+:')
+
 def __strip_papertrail_metadata(text):
     """
         Given a block of text, filters out papertrail metadata
 
-        This function would transform a line like this
-            Apr 18 11:19:55 i-00cb37cd49bdd7b66 \
-                aws1.engine.server.cherrypy.error:      assert (not code) != (not error)
-        into
-            assert (not code) != (not error)
+        Filtering happens in two steps:
+        1. Find all the tracebacks in the text. Find the instance ids of those tracebacks. Strip
+        out any papertrail log lines that aren't from one of those instances - these are log lines
+        that aren't part of a traceback and they're just noise.
+        2. Strip all papertrail metadata from all lines
+
+        The result of this function should leave any tracebacks that were copy/pasted out of
+        papertrail as just the traceback text, without any metadata or extranious lines.
 
         @rtype: str
     """
-    return re.sub(__PAPERTRAIL_METADATA_REGEX, '', text)
+    matches = re.findall(__GET_INSTANCE_ID_AND_PROGRAM_NAME_REGEX, text)
+    lines_to_keep = []
+    for line in text.splitlines():
+        keep = False
+        if re.search(__PAPERTRAIL_METADATA_REGEX, line):
+            # it's a papertrail line - see if we should keep it
+            for instance_id, program_name in matches:
+                if instance_id in line and program_name in line:
+                    keep = True
+        else:
+            # always keep non-papertrail lines
+            keep = True
+        if keep:
+            lines_to_keep.append(line)
+    result_text = '\n'.join(lines_to_keep)
+
+    return re.sub(__PAPERTRAIL_METADATA_REGEX, '', result_text)
+
+
+__GET_INSTANCE_ID_AND_PROGRAM_NAME_REGEX = re.compile(
+    '\w{3} \d{2} \d\d:\d\d:\d\d (i-\w+) (\S+):\s*Traceback \(most recent call last\):'
+)
+"""
+    Regex that matches on the Traceback line from a set of text.
+
+    Produces the AWS instance id and program name as a match group tuple
+"""
+
+
+__PAPERTRAIL_METADATA_REGEX = re.compile('\w{3} \d{2} \d\d:\d\d:\d\d i-\w+ \S+:')
+"""
+    Regex that matches on the papertrail metadata on a line
+
+    On the line...
+        Apr 18 11:19:55 i-00cb37cd49bdd7b66 aws1.engine.server: assert (not code) != (not error)
+    this would match on...
+        Apr 18 11:19:55 i-00cb37cd49bdd7b66 aws1.engine.server:
+"""
