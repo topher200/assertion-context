@@ -238,6 +238,7 @@ def jira_api_object_to_JiraIssue(jira_object):
         jira_object.fields.status.name,
     )
 
+
 def get_all_referenced_ids(issue):
     """
         Look through the comments and description and find all papertrail ids that are referenced
@@ -253,6 +254,7 @@ def get_all_referenced_ids(issue):
         yield int(match)
     for match in re.findall(pattern, issue.comments):
         yield int(match)
+
 
 def find_latest_referenced_id(issue):
     """
