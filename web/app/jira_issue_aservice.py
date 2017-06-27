@@ -134,6 +134,8 @@ def create_jira_issue(title, description):
         Creates the issue in the project specified by JIRA_PROJECT_KEY.
 
         Returns the newly created issue
+
+        @rtype: jira.resources.Issue
     """
     fields = {
         'project': {'key': JIRA_PROJECT_KEY},
