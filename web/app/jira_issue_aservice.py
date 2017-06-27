@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 import itertools
 import logging
 import re
@@ -219,13 +220,20 @@ def jira_api_object_to_JiraIssue(jira_object):
     assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
 
     comments = (comment.body for comment in jira_object.fields.comment.comments)
+    comments_text = COMMENT_SEPARATOR.join(comments)
+
+    description = jira_object.fields.description
+    description_filtered = __strip_papertrail_metadata(description)
+    comments_filtered = __strip_papertrail_metadata(comments_text)
 
     return JiraIssue(
         jira_object.key,
         get_link_to_issue(jira_object.key),
         jira_object.fields.summary,
-        jira_object.fields.description,
-        COMMENT_SEPARATOR.join(comments),
+        description,
+        description_filtered,
+        comments_text,
+        comments_filtered,
         jira_object.fields.issuetype.name,
         jira_object.fields.status.name,
     )
@@ -257,3 +265,18 @@ def find_latest_referenced_id(issue):
     assert isinstance(issue, JiraIssue), (type(issue), issue)
 
     return max(get_all_referenced_ids(issue), default=None)
+
+__PAPERTRAIL_METADATA_REGEX = re.compile('\w{3} \d{2} \d\d:\d\d:\d\d i-\w+ \S+:')
+def __strip_papertrail_metadata(text):
+    """
+        Given a block of text, filters out papertrail metadata
+
+        This function would transform a line like this
+            Apr 18 11:19:55 i-00cb37cd49bdd7b66 \
+                aws1.engine.server.cherrypy.error:      assert (not code) != (not error)
+        into
+            assert (not code) != (not error)
+
+        @rtype: str
+    """
+    return re.sub(__PAPERTRAIL_METADATA_REGEX, '', text)

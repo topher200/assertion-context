@@ -7,7 +7,10 @@ class JiraIssue(object):
         - url of the issue
         - The summary of the issue. The "title" of the ticket
         - description text
+        - description text, with any papertrail metadata filtered out
         - string of all the issue's comments, concatinated together
+        - string of all the issue's comments, concatinated together, with any papertrail metadata
+          filtered out
         - the type of the issue (bug, story, etc)
         - the current status of the issue
     """
@@ -17,7 +20,9 @@ class JiraIssue(object):
             url,
             summary,
             description,
+            description_filtered,
             comments,
+            comments_filtered,
             issue_type,
             status,
     ):
@@ -25,7 +30,9 @@ class JiraIssue(object):
         self._url = url
         self._summary = summary
         self._description = description
+        self._description_filtered = description_filtered
         self._comments = comments
+        self._comments_filtered = comments_filtered
         self._issue_type = issue_type
         self._status = status
 
@@ -49,8 +56,16 @@ class JiraIssue(object):
         return self._description
 
     @property
+    def description_filtered(self):
+        return self._description_filtered
+
+    @property
     def comments(self):
         return self._comments
+
+    @property
+    def comments_filtered(self):
+        return self._comments_filtered
 
     @property
     def issue_type(self):
@@ -71,7 +86,9 @@ class JiraIssue(object):
             "url": self._url,
             "summary": self._summary,
             "description": self._description,
+            "description_filtered": self._description_filtered,
             "comments": self._comments,
+            "comments_filtered": self._comments_filtered,
             "issue_type": self._issue_type,
             "status": self._status,
         }
@@ -88,7 +105,9 @@ def generate_from_source(source):
         source["url"],
         source["summary"],
         source["description"],
+        source["description_filtered"],
         source["comments"],
+        source["comments_filtered"],
         source["issue_type"],
         source["status"],
     )
