@@ -117,6 +117,7 @@ def get_matching_jira_issues(es, traceback_text, match_level):
         res.append(generate_from_source(raw_jira_issue['_source']))
     return res
 
+
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_num_jira_issues(es):
     """
