@@ -44,6 +44,7 @@ AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the 
 JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
 JIRA_BASIC_AUTH = (<jira username>, <jira password>)
 JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
+DEBUG = False  # enables debug logging to file
 ```
  - fill out .env for docker-compose variables. requires these fields:
 ```
@@ -53,6 +54,7 @@ PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 
 Then to start it all up:
  - `./start-servers.sh` or `./production-servers.sh`
+  - start-servers runs its own elasticsearch, where production-servers uses an externally hosted one
 
 ## Elasticsearch
 
