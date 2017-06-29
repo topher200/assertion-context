@@ -12,9 +12,13 @@ from app import redis_util
 from app import retry
 
 
+import dogpile.cache
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
-    lambda key: "dogpile:jira:" + key
+    lambda key: (
+        "dogpile:jira-issue:%s" %
+        dogpile.cache.util.sha1_mangle_key(key.encode('utf-8'))
+    )
 )
 
 INDEX = 'jira-issue-index'
