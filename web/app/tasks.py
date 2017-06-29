@@ -8,6 +8,7 @@ from app import (
     jira_issue_db,
     jira_issue_aservice,
     traceback_database,
+    logging_util,
     s3,
 )
 from instance import config
@@ -70,17 +71,7 @@ def parse_log_file(bucket, key):
 
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
-    # add log handler to sys.stderr.
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        (
-            "[%(asctime)s] | %(levelname)s | %(process)d | "
-            "%(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
-        )
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logging_util.setup_logging()
 
 
 def invalidate_cache(cache=None):

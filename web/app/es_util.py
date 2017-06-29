@@ -24,6 +24,7 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
             "multi_match": {
                 "query": text,
                 "fields": fields_to_match_against,
+                "type": "phrase",
                 "minimum_should_match": "%s%%" % match_level,
             }
         }

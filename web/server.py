@@ -24,6 +24,7 @@ from app import authentication
 from app import es_util
 from app import jira_issue_aservice
 from app import jira_issue_db
+from app import logging_util
 from app import s3
 from app import tasks
 from app import traceback
@@ -394,17 +395,7 @@ def admin():
 
 @app.before_first_request
 def setup_logging():
-    # add log handler to sys.stderr.
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        (
-            "[%(asctime)s] | %(levelname)s | %(process)d | "
-            "%(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
-        )
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+    logging_util.setup_logging()
 
 
 @app.before_request

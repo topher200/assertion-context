@@ -7,8 +7,9 @@ ENV PYTHONUNBUFFERED=1
 
 # install dependencies
 RUN apt-get update && apt-get install -y \
-    python3-pip \
     iputils-ping \
+    less \
+    python3-pip \
     vim
 RUN pip3 install --upgrade pip
 ADD requirements.txt ./
