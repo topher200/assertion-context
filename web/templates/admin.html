@@ -4,12 +4,14 @@
 {% block content %}
 <p>Num jira issues: {{ num_jira_issues }}</p>
 
-<p>Update jira issue in database
+<p>
     <form id="jira-issue-form">
-        Issue key:<br>
+        Update jira issue in database. Issue key:<br>
         <input type="text" id="issue_key" name="issue_key"><br>
         <input type="submit" value="Submit" onclick="update_jira_db(document.getElementById('issue_key').value);"/>
     </form>
+    <button onclick="update_all_jira_tickets();">Update all Jira issues (async, takes a long time)</button>
 </p>
-<button onclick="update_all_jira_tickets();">Update all issues (async, takes a long time)</button>
+<br>
+<button onclick="invalidate_cache();">Invalidate cache</button>
 {%- endblock %}

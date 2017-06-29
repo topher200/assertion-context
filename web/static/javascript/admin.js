@@ -33,3 +33,19 @@ function update_all_jira_tickets(){
         contentType: "application/json"
     });
 }
+
+function invalidate_cache(){
+    var payload = {};
+    $.ajax({
+        type: "PUT",
+        url: "/api/invalidate_cache",
+        data: JSON.stringify(payload),
+        success: function() {
+            location.reload();
+        },
+        error: function() {
+            location.reload();
+        },
+        contentType: "application/json"
+    });
+}
