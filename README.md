@@ -227,4 +227,5 @@ def lambda_handler(event, context):
         print('Successfully parsed "%s"' % key)
     else:
         print('Parse request received %s. data: "%s"' % (res.status_code, payload))
+        raise Exception('parse request failed. payload: %s', payload)
 ```
