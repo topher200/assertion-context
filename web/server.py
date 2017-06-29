@@ -323,13 +323,6 @@ def jira_comment():
     return 'Created a comment on <a href="%s" class="alert-link">%s</a>' % (url, issue_key)
 
 
-@app.route("/api/tracebacks", methods=['GET'])
-@login_required
-def get_tracebacks():
-    data = [tb.document() for tb in traceback_database.get_tracebacks(ES)]
-    return flask.jsonify({'tracebacks': data})
-
-
 @app.route("/api/update_jira_db", methods=['PUT'])
 def update_jira_db():
     """
