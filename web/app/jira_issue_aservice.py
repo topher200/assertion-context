@@ -307,7 +307,7 @@ def __strip_papertrail_metadata(text):
 
 
 __GET_INSTANCE_ID_AND_PROGRAM_NAME_REGEX = re.compile(
-    '\w{3} \d{2} \d\d:\d\d:\d\d (i-\w+) (\S+):\s*Traceback \(most recent call last\):'
+    '\w{3} \d{2} \d\d:\d\d:\d\d (i-\w+) (\S+):.*Traceback \(most recent call last\):'
 )
 """
     Regex that matches on the Traceback line from a set of text.
