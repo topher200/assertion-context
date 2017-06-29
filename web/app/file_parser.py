@@ -300,7 +300,7 @@ def parse(file_object):
         previous to it.
 
         L{file_object} is expected to be an open file, but can be anything that generates lines of
-        log files.
+        logs
     """
     # We use a LIFO buffer to keep track of the last few lines. When we find an
     # AssertionError, we search backwards in the log lines to find the lines previous from that
