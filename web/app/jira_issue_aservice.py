@@ -284,6 +284,9 @@ def __strip_papertrail_metadata(text):
 
         @rtype: str
     """
+    if not text:
+        return ''
+
     matches = re.findall(__GET_INSTANCE_ID_AND_PROGRAM_NAME_REGEX, text)
     lines_to_keep = []
     for line in text.splitlines():
