@@ -60,7 +60,7 @@ def refresh(es):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_tracebacks(es, start_date=None, end_date=None):
+def get_tracebacks(es, start_date=None, end_date=None, num_matches=10000):
     """
         Queries the database for L{Traceback} from a given date range.
 
@@ -77,6 +77,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
         @rtype: list
         @postcondition: all(isinstance(v, Traceback) for v in return)
+        @postcondition: len(return) <= num_matches
     """
     params_list = {}
     if start_date is not None:
@@ -104,7 +105,7 @@ def get_tracebacks(es, start_date=None, end_date=None):
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
-        size=100
+        size=num_matches
     )
     res = []
     for raw_traceback in raw_tracebacks['hits']['hits']:
@@ -114,17 +115,19 @@ def get_tracebacks(es, start_date=None, end_date=None):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_matching_tracebacks(es, traceback_text, match_level):
+def get_matching_tracebacks(es, traceback_text, match_level, num_matches):
     """
         Queries the database for any tracebacks with identical traceback_text
 
-        Returns a list (instead of a generator) so we can be cached
+        Returns a list (instead of a generator) so we can be cached. Returns up to L{num_matches}
+        tracebacks
 
         @type traceback_text: str
         @rtype: list
 
         @precondition: match_level in es_util.ALL_MATCH_LEVELS
         @postcondition: all(isinstance(v, Traceback) for v in return)
+        @postcondition: len(return) <= num_matches
     """
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
 
@@ -135,7 +138,7 @@ def get_matching_tracebacks(es, traceback_text, match_level):
         doc_type=DOC_TYPE,
         body=body,
         sort='origin_timestamp:desc',
-        size=10000
+        size=num_matches
     )
     res = []
     for raw_traceback in raw_es_response['hits']['hits']:

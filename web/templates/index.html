@@ -75,7 +75,7 @@
     <nav class="nav navbar navbar-default">
         <a class="navbar-brand" href="#">
             <img src="/static/media/wordy.png" width="30" height="30" class="d-inline-block align-top" alt="">
-            Tracebacks - showing {{ tb_meta|length }}
+            Tracebacks - found {{ tb_meta|length }}{% if tb_meta|length > 99 %}+{% endif %}
         </a>
 
         <ul class="nav pager">

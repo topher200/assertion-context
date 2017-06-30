@@ -4,6 +4,7 @@
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
 import datetime
+import itertools
 import logging
 import os
 import time
@@ -102,7 +103,7 @@ def index():
     if flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is not None:
         for traceback_text in flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY):
             for tb in traceback_database.get_matching_tracebacks(
-                ES, traceback_text, es_util.EXACT_MATCH
+                    ES, traceback_text, es_util.EXACT_MATCH, 10000
             ):
                 hidden_tracebacks.add(tb.origin_papertrail_id)
         logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
@@ -113,8 +114,6 @@ def index():
         types.SimpleNamespace(traceback=t) for t in tracebacks
         if t.origin_papertrail_id not in hidden_tracebacks
     ]
-    if len(tracebacks) - len(tb_meta) > 0:
-        logger.info('hid %s tracebacks', len(tracebacks) - len(tb_meta))
 
     # get a list of matching jira issues
     if DEBUG_TIMING:
@@ -143,14 +142,19 @@ def index():
                 [issue for issue in tb.jira_issues if issue.status != 'Closed']
             ) > 0
         ]
+    else:
+        tb_meta = tb_meta
+
+    # we take at most 100 tracebacks, due to performance issues of having more
+    tb_meta = tb_meta[:100]
 
     # for each traceback, get all similar tracebacks
     if DEBUG_TIMING:
         similar_tracebacks_start_time = time.time()
     for tb in tb_meta:
         tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
-            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH
-        )[:100]
+            ES, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
+        )
     if DEBUG_TIMING:
         flask.g.similar_tracebacks_time = time.time() - similar_tracebacks_start_time
 
@@ -248,7 +252,7 @@ def create_jira_ticket():
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, traceback_text, es_util.EXACT_MATCH
+        ES, traceback_text, es_util.EXACT_MATCH, 50
     )
 
     # create a description using the list of tracebacks
@@ -295,14 +299,14 @@ def jira_comment():
 
     # find a list of tracebacks that use the given traceback text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, traceback_text, es_util.EXACT_MATCH
+        ES, traceback_text, es_util.EXACT_MATCH, 10000
     )
 
     # filter out any tracebacks that are after the latest one already on that ticket
     latest = jira_issue_aservice.find_latest_referenced_id(issue)
     if latest is not None:
         tracebacks_to_comment = [tb for tb in similar_tracebacks
-                                if int(tb.origin_papertrail_id) > latest]
+                                 if int(tb.origin_papertrail_id) > latest][:50]
     else:
         # just take the them all
         tracebacks_to_comment = similar_tracebacks
