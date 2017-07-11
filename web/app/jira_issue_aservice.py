@@ -71,9 +71,20 @@ logger = logging.getLogger()
 
 def create_title(traceback_text):
     """
-        Creates a title for the jira ticket by using the final line of the traceback text
+        Intelligently creates a title for the jira ticket
+
+        If the final line of the traceback has some substance (defined as being more than one
+        word), we use the last line. Otherwise, we use the second-to-last line.
     """
-    return traceback_text.splitlines()[-1]
+    try:
+        last_line = traceback_text.splitlines()[-1]
+        if len(last_line.split()) > 1:
+            return last_line
+        else:
+            return traceback_text.splitlines()[-2]
+    except IndexError:
+        logger.warning('text as fewer lines than expected. text: "%s"', traceback_text)
+        return 'Unknown error'
 
 
 def create_description(similar_tracebacks):
