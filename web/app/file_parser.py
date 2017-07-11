@@ -16,7 +16,7 @@ from .logline import LogLine
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError')
+ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError|AttributeError')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''(details = AssertionError)|(AssertionError.*can only join a child process)|DEBUG'''
 )
@@ -32,6 +32,7 @@ VALUE_ERROR_REGEX_NEGATIVE = re.compile(
             OR (KeyError -threading.pyc -args:[)
             OR (NotImplementedError)
             OR (ValueError)
+            OR (AttributeError)
 """
 
 NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
@@ -259,12 +260,6 @@ def __get_previous_log_lines(circular_buffer, origin_line):
 def log_line_contains_important_error(log_line):
     """
         Returns True if the log line contains an AssertionError (or other important error)
-
-        Defined by the Papertrail search we perform against production, which looks like this:
-            (AssertionError -"details = AssertionError" -"can only join a child process")
-                OR (KeyError -threading.pyc -args:[)
-                OR (NotImplementedError)
-                OR (ValueError)
     """
     # implementation note: since the regex contains "negative" fields, we check for the things we
     # want then reject if it contains things we don't.
