@@ -107,7 +107,7 @@ def get_matching_jira_issues(es, traceback_text, match_level):
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
 
     body = es_util.generate_text_match_payload(
-        traceback_text, ["description_filtered", "comments_filtered"], match_level
+        es, INDEX, traceback_text, ["description_filtered", "comments_filtered"], match_level
     )
 
     raw_es_response = es.search(
