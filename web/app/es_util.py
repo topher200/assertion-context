@@ -12,6 +12,8 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
 
         How close the match will be is goverend by match_level. It must be in ALL_MATCH_LEVELS
 
+        NOTE: Match level is currently unused.
+
         @return: a payload dict that can be sent directly to ES
     """
     assert isinstance(fields_to_match_against, list), (
@@ -25,7 +27,6 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
                 "query": text,
                 "fields": fields_to_match_against,
                 "type": "phrase",
-                "minimum_should_match": "%s%%" % match_level,
             }
         }
     }
