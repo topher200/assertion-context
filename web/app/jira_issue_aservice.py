@@ -74,14 +74,16 @@ def create_title(traceback_text):
         Intelligently creates a title for the jira ticket
 
         If the final line of the traceback has some substance (defined as being more than one
-        word), we use the last line. Otherwise, we use the second-to-last line.
+        word), we use the last line. Otherwise, we combine the last line and the second-to-last
+        line.
     """
     try:
         last_line = traceback_text.splitlines()[-1]
         if len(last_line.split()) > 1:
-            return last_line
-        else:
-            return traceback_text.splitlines()[-2]
+            return last_line.strip()
+
+        second_to_last_line = traceback_text.splitlines()[-2]
+        return '%s: %s' % (last_line.strip(), second_to_last_line.strip())
     except IndexError:
         logger.warning('text as fewer lines than expected. text: "%s"', traceback_text)
         return 'Unknown error'
