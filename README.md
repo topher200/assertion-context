@@ -201,7 +201,7 @@ def lambda_handler(event, context):
     }
     print payload
     res = requests.post(API_REQUEST_URL, json=payload)
-    if res.status_code == 200:
+    if res.status_code in (200, 202):
         print('Successfully parsed "%s"' % key)
     else:
         print('Parse request received %s. data: "%s"' % (res.status_code, payload))

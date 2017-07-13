@@ -22,28 +22,39 @@ logger = logging.getLogger()
 
 
 @app.task
-def update_jira_issue_db():
+def update_jira_issue(issue_key):
+    """
+        update a jira issue in our database, given its key
+
+        we do this out of band since the jira API can sometimes take a few tries
+    """
+    issue = None
+    num_tries = 0
+    while issue is None and num_tries < 5:
+        num_tries += 1
+        issue = jira_issue_aservice.get_issue(issue_key)
+    if issue is None:
+        # the issue must be deleted
+        logger.info('removing %s - issue not found', issue_key)
+        jira_issue_db.remove_jira_issue(ES, issue_key)
+    else:
+        jira_issue_db.save_jira_issue(ES, issue)
+        logger.info("updated jira issue %s", issue_key)
+
+    invalidate_cache('jira')
+
+
+@app.task
+def update_all_jira_issues():
     """
         iterate through all JIRA issues and save them to the database
     """
-    logger.info("updating jira issue db")
+    logger.info("updating all jira issues")
     count = 0
     for issue in jira_issue_aservice.get_all_issues():
         count += 1
-        # issues returned by get_all_issues() don't include all the possible fields for some
-        # reason. we need to do a get on the individual issue to get everything (like comments)
-        full_issue = None
-        num_tries = 0
-        while full_issue is None and num_tries < 5:
-            num_tries += 1
-            full_issue = jira_issue_aservice.get_issue(issue.key)
-        if full_issue is None:
-            logger.error('unable to retrieve issue %s, even after %s tries', issue.key, num_tries)
-            continue
-        jira_issue_db.save_jira_issue(ES, full_issue)
-    logger.info("saved %s issues", count)
-
-    invalidate_cache('jira')
+        update_jira_issue.delay(issue.key)
+    logger.info("queued %s jira issues", count)
 
 
 @app.task

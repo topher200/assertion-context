@@ -348,21 +348,14 @@ def update_jira_db():
     if 'issue_key' in json_request:
         # save the given issue to ES
         issue_key = json_request['issue_key']
-        issue = jira_issue_aservice.get_issue(issue_key)
-        if issue is None:
-            # the issue is deleted, remove it
-            logger.info('removing %s - issue not found', issue_key)
-            jira_issue_db.remove_jira_issue(ES, issue_key)
-        else:
-            jira_issue_db.save_jira_issue(ES, issue)
+        tasks.update_jira_issue.delay(issue_key)
+        return 'job queued', 202
     else:
         if json_request['all'] != True:
             return 'invalid "all" json', 400
         # offload task onto our queue
-        tasks.update_jira_issue_db.delay()
+        tasks.update_all_jira_issues.delay()
         return 'job queued', 202
-
-    return 'success'
 
 
 @app.route("/api/invalidate_cache", methods=['PUT'])
