@@ -49,3 +49,19 @@ function invalidate_cache(){
         contentType: "application/json"
     });
 }
+
+function purge_celery_queue(){
+    var payload = {};
+    $.ajax({
+        type: "PUT",
+        url: "/api/purge_celery_queue",
+        data: JSON.stringify(payload),
+        success: function() {
+            location.reload();
+        },
+        error: function() {
+            location.reload();
+        },
+        contentType: "application/json"
+    });
+}

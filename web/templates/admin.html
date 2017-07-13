@@ -13,5 +13,9 @@
     <button onclick="update_all_jira_tickets();">Update all Jira issues (async, takes a long time)</button>
 </p>
 <br>
+<p>Num celery tasks: {{ num_celery_tasks }}</p>
+<button onclick="purge_celery_queue();">Purge celery queue</button>
+<br>
+<br>
 <button onclick="invalidate_cache();">Invalidate cache</button>
 {%- endblock %}

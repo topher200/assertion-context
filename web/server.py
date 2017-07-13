@@ -51,7 +51,8 @@ ES = Elasticsearch([app.config['ES_ADDRESS']])
 Bootstrap(app)
 
 # use redis for our session storage (ie: server side cookies)
-store = RedisStore(redis.StrictRedis(host='redis'))
+REDIS = redis.StrictRedis(host='redis')
+store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 HIDDEN_TRACEBACK_TEXT_KEY = 'hide_tracebacks'
@@ -373,13 +374,23 @@ def invalidate_cache(cache=None):
     return 'success'
 
 
+@app.route("/api/purge_celery_queue", methods=['PUT'])
+def purge_celery_queue():
+    num_tasks = REDIS.llen('celery')
+    REDIS.delete('celery')
+    logger.info('purged %s tasks', num_tasks)
+    return 'success'
+
+
 @app.route("/admin", methods=['GET'])
 @login_required
 def admin():
     num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
+    num_celery_tasks = REDIS.llen('celery')
     return flask.render_template(
         'admin.html',
-        num_jira_issues=num_jira_issues
+        num_jira_issues=num_jira_issues,
+        num_celery_tasks=num_celery_tasks
     )
 
 
