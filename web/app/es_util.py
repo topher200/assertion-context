@@ -8,7 +8,11 @@ ALL_MATCH_LEVELS = set((
 def generate_text_match_payload(text, fields_to_match_against, match_level):
     """
         Given a text to match against and a list of fields_to_match_against, creates an ES query
-        payload that finds match_level matches
+        payload that finds match_level matches.
+
+        We remove the final word of the query text. This allows us to ignore strings (like profile
+        names or email addresses) that are unique on each hit. As a side effect we also strip
+        newlines.
 
         How close the match will be is goverend by match_level. It must be in ALL_MATCH_LEVELS
 
@@ -21,10 +25,12 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
     )
     assert match_level in ALL_MATCH_LEVELS, (match_level, ALL_MATCH_LEVELS)
 
+    culled_text = ' '.join(text.split()[:-1])  # remove final word
+
     return {
         "query": {
             "multi_match": {
-                "query": text,
+                "query": culled_text,
                 "fields": fields_to_match_against,
                 "type": "phrase",
             }
