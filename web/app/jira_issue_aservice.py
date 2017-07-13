@@ -187,6 +187,8 @@ def get_all_issues():
 
         Returns issues in the jira API object form, not our home-grown JiraIssue form.
 
+        Only grabs the 'id' field of the jira issues, since that's all we're currently using
+
         @rtype: generator
 
         @postcondition: all(isinstance(r, jira.resources.Issue) for r in return)
@@ -200,7 +202,8 @@ def get_all_issues():
         new_results = JIRA_CLIENT.search_issues(
             'project=%s' % JIRA_PROJECT_KEY,
             startAt=start_at,
-            maxResults=BATCH_SIZE
+            maxResults=BATCH_SIZE,
+            fields='key'
         )
         if len(new_results) > 0:
             logger.info('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
