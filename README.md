@@ -72,27 +72,15 @@ PUT traceback-index
           "type": "custom",
           "tokenizer": "letter",
           "char_filter": [
-            "remove_underscores"
-          ],
-          "filter": [
-            "newrelic_filtered"
+            "newrelic_and_underscore_filter"
           ]
         }
       },
       "char_filter": {
-        "remove_underscores": {
-          "type": "mapping",
-          "mappings": [
-            "_ => "
-          ]
-        }
-      },
-      "filter": {
-        "newrelic_filtered": {
-          "type": "stop",
-          "stopwords": [
-      "File", "args", "body", "call", "callable", "cherrypy", "cpdispatch", "cprequest", "encoding", "frameworkcherrypy", "handler", "handlerwrapper", "hooks", "in", "kwargs", "lib", "line", "local", "newrelic", "oldhandler", "opt", "packages", "py", "python", "respond", "response", "return", "self", "site", "venv", "wordstreamvirtualenv", "wrapped"
-          ]
+        "newrelic_and_underscore_filter": {
+          "type": "pattern_replace",
+          "pattern": "_|args|File|framework_cherrypy.py|handler_wrapper|hooks|in|kwargs|lib|line|local|newrelic|opt|packages|python2.7|return|site|venv|wordstream_virtualenv|wrapped",
+          "replacement": ""
         }
       }
     }
@@ -117,27 +105,15 @@ PUT jira-issue-index
           "type": "custom",
           "tokenizer": "letter",
           "char_filter": [
-            "remove_underscores"
-          ],
-          "filter": [
-            "newrelic_filtered"
+            "newrelic_and_underscore_filter"
           ]
         }
       },
       "char_filter": {
-        "remove_underscores": {
-          "type": "mapping",
-          "mappings": [
-            "_ => "
-          ]
-        }
-      },
-      "filter": {
-        "newrelic_filtered": {
-          "type": "stop",
-          "stopwords": [
-      "File", "args", "body", "call", "callable", "cherrypy", "cpdispatch", "cprequest", "encoding", "frameworkcherrypy", "handler", "handlerwrapper", "hooks", "in", "kwargs", "lib", "line", "local", "newrelic", "oldhandler", "opt", "packages", "py", "python", "respond", "response", "return", "self", "site", "venv", "wordstreamvirtualenv", "wrapped"
-          ]
+        "newrelic_and_underscore_filter": {
+          "type": "pattern_replace",
+          "pattern": "_|args|File|framework_cherrypy.py|handler_wrapper|hooks|in|kwargs|lib|line|local|newrelic|opt|packages|python2.7|return|site|venv|wordstream_virtualenv|wrapped",
+          "replacement": ""
         }
       }
     }
