@@ -16,8 +16,6 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
 
         How close the match will be is goverend by match_level. It must be in ALL_MATCH_LEVELS
 
-        NOTE: Match level is currently unused.
-
         @return: a payload dict that can be sent directly to ES
     """
     assert isinstance(fields_to_match_against, list), (
@@ -25,7 +23,8 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
     )
     assert match_level in ALL_MATCH_LEVELS, (match_level, ALL_MATCH_LEVELS)
 
-    culled_text = ' '.join(text.split()[:-1])  # remove final word
+    if match_level is SIMILAR_MATCH:
+        culled_text = ' '.join(text.split()[:-1])  # remove final word
 
     return {
         "query": {
