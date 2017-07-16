@@ -25,6 +25,8 @@ def generate_text_match_payload(text, fields_to_match_against, match_level):
 
     if match_level is SIMILAR_MATCH:
         culled_text = ' '.join(text.split()[:-1])  # remove final word
+    else:
+        culled_text = text
 
     return {
         "query": {
