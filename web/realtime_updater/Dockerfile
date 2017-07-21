@@ -12,13 +12,15 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     ruby-full \
     vim
-RUN pip3 install --upgrade pip
-ADD ../requirements.txt ./
-RUN pip3 install -r requirements.txt
 
 RUN gem install papertrail
+
+RUN pip3 install --upgrade pip
+ADD requirements.txt ./
+RUN pip3 install -r requirements.txt
+
+ADD .papertrail.yml /root/
 
 # web app code is added by docker-compose volume
 
 CMD ["python3", "realtime_updater/run.py"]
-

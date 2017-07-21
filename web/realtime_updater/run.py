@@ -29,12 +29,13 @@ def main():
     papertrail = subprocess.Popen(
         ['papertrail', '-f'], stdout=subprocess.PIPE, universal_newlines=True
     )
+    logger.info('running realtime updater')
 
     # read from the stdout buffer, forever
     count = 0
     for tb in file_parser.parse(papertrail.stdout):
         count += 1
-        logger.info('found %s tracebacks', count)
+        logger.info('found traceback. #%s', count)
         traceback_database.save_traceback(ES, tb)
 
 
