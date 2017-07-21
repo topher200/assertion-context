@@ -2,6 +2,7 @@
 .aws_config
 .aws_credentials
 .env
+.papertrail.yml
 *.pyc
 run-populate-db.sh
 instance/
