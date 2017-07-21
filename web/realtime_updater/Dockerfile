@@ -1,5 +1,5 @@
 # initial setup
-FROM ubuntu:16.04
+FROM ubuntu:17.04
 MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi' >> /root/.bashrc
@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y \
     iputils-ping \
     less \
+    python3.6 \
     python3-pip \
     ruby-full \
     vim
@@ -23,4 +24,4 @@ ADD .papertrail.yml /root/
 
 # web app code is added by docker-compose volume
 
-CMD ["python3", "realtime_updater/run.py"]
+CMD ["python3.6", "realtime_updater/run.py"]
