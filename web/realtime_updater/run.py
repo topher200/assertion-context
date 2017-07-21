@@ -25,6 +25,8 @@ logger = logging.getLogger()
 
 
 def main():
+    setup_logging()
+
     # start a processes with 'papertrail -f'
     papertrail = subprocess.Popen(
         ['papertrail', '-f'], stdout=subprocess.PIPE, universal_newlines=True
