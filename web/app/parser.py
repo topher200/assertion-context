@@ -41,7 +41,7 @@ NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
     I'm purposely going high with this number since it's easier to ignore data than re-query for it
 """
 
-LOG_TIMEZONE = pytz.timezone("US/Eastern")
+LOG_TIMEZONE = pytz.timezone('America/New_York')
 """
     Timezone in which the logs were taken
 
@@ -213,7 +213,7 @@ class Parser():
 
             Papertrail log lines take this form (I've replaced tabs with newlines):
                 700594297938165774
-                2016-08-12T03:18:39
+                2016-08-12T03:18:39 OR 2017-07-21T01:00:12-04:00
                 2016-08-12T03:18:39Z
                 407484803
                 i-2ee330b7
@@ -232,8 +232,9 @@ class Parser():
                 - the "formatted line", which is how papertrail displays the log line to the user.
                 if you were to copy/paste the line out of papertrail, this is what you'd get
 
-            In addition to parsing out the text for every field, we convert the timestamp field to a
-            L{datetime}. Times in the logs are UTC (thanks Papertrail!)
+            In addition to parsing out the text for every field, we convert the timestamp field to
+            a L{datetime}. If a timezone is not given, we assume UTC (the default for Papertrail's
+            archives).
 
             Returns the above fields as a tuple.
         """
@@ -247,10 +248,21 @@ class Parser():
         program_name = log_line_pieces[8]
         parsed_log_message = log_line_pieces[9]
 
-        timestamp_utc = datetime.datetime.strptime(
-            timestamp_string, '%Y-%m-%dT%H:%M:%S'
-        ).replace(tzinfo=pytz.UTC)
-        timestamp_with_tz = timestamp_utc.astimezone(LOG_TIMEZONE)
+        # handle the timestamp, whether it includes a timezone or not
+        timestamp_ignoring_timezone = datetime.datetime.strptime(
+            timestamp_string[:19], '%Y-%m-%dT%H:%M:%S'
+        )
+        timezone_string = timestamp_string[19:]
+        if timezone_string == '':
+            # no timezone string == UTC
+            time_with_timezone = timestamp_ignoring_timezone.replace(tzinfo=pytz.UTC)
+        elif timezone_string == '-04:00':
+            time_with_timezone = timestamp_ignoring_timezone.replace(
+                tzinfo=pytz.timezone('America/New_York'))
+        else:
+            logger.error('unknown timezone string "%s". %s', timezone_string, timestamp_string)
+            assert False, timestamp_string
+        timestamp_with_tz = time_with_timezone.astimezone(LOG_TIMEZONE)
 
         # formatted line looks like this, seperated by spaces:
         # - three letter month
