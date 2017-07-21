@@ -29,7 +29,7 @@ def main():
 
     # start a processes with 'papertrail -f'
     papertrail = subprocess.Popen(
-        ['papertrail', '-f'], stdout=subprocess.PIPE, universal_newlines=True
+        ['papertrail', '-f'], stdout=subprocess.PIPE, encoding="utf-8"
     )
     logger.info('running realtime updater')
 
