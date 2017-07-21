@@ -1,7 +1,11 @@
 import gzip
+import logging
 import json
 
 from .parser import Parser
+
+
+logger = logging.getLogger()
 
 
 def parse_json_stream(stream):
