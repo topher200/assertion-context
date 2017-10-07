@@ -1,4 +1,3 @@
-import gzip
 import logging
 import json
 
@@ -8,9 +7,9 @@ from .parser import Parser
 logger = logging.getLogger()
 
 
-def parse_json_stream(stream):
+def parse_json_file(filename):
     """
-        Yields Tracebacks from a papertrail-cli JSON stream
+        Yields Tracebacks from a papertrail-cli JSON file
 
         The JSON stream takes the form of many parsed log lines in a JSON list. For example, one
         line may look like this:
@@ -29,12 +28,13 @@ def parse_json_stream(stream):
             "facility":"User"
         }
     """
-    yield from Parser.parse_stream(yield_lines(stream))
+    with open(filename, 'r', encoding='UTF-8') as f:
+        yield from Parser.parse_stream(yield_lines(f))
 
 
-def yield_lines(stream):
+def yield_lines(f):
     """
-        Takes a stream of events from 'papertrail-cli -f' and turns them into log lines.
+        Takes an open file dump from 'papertrail-cli -j' and turns it into log lines.
 
         Log lines here is defined as the format of lines from the gzip'd archives that papertrail
         makes.
@@ -42,17 +42,17 @@ def yield_lines(stream):
         Each line in the stream is a JSON dump of a bunch of log events. We piece it all together
         into just a stream of text log lines.
     """
-    for dump in stream:
-        for event in json.loads(dump)['events']:
-            yield '\t'.join([
-                str(event['id']),
-                event['generated_at'],
-                event['received_at'],
-                str(event['source_id']),
-                event['source_name'],
-                event['source_ip'],
-                event['facility'],
-                event['severity'],
-                event['program'],
-                event['message'],
-            ])
+    for line in f:
+        event = json.loads(line)
+        yield '\t'.join([
+            str(event['id']),
+            event['generated_at'],
+            event['received_at'],
+            str(event['source_id']),
+            event['source_name'],
+            event['source_ip'],
+            event['facility'],
+            event['severity'],
+            event['program'],
+            event['message'],
+        ])
