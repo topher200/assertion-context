@@ -11,7 +11,7 @@ import sys
 sys.path.append(ROOT)
 
 from app import (
-    file_parser,
+    json_parser,
     logging_util,
     traceback_database
 )
@@ -29,13 +29,13 @@ def main():
 
     # start a processes with 'papertrail -f'
     papertrail = subprocess.Popen(
-        ['papertrail', '-f'], stdout=subprocess.PIPE, encoding="utf-8"
+        ['papertrail', '-f', '-j'], stdout=subprocess.PIPE, encoding="utf-8"
     )
     logger.info('running realtime updater')
 
     # read from the stdout buffer, forever
     count = 0
-    for tb in file_parser.parse(papertrail.stdout):
+    for tb in json_parser.parse_json_stream(papertrail.stdout):
         count += 1
         logger.info('found traceback. #%s', count)
         traceback_database.save_traceback(ES, tb)
