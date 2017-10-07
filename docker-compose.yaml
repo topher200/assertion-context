@@ -21,6 +21,15 @@ services:
     command:
       [celery, -A, app.tasks, -c, '2', worker]
 
+  realtime_updater:
+    build: web/realtime_updater/
+    links:
+      - redis
+    volumes:
+      - ./web:/code:ro
+    restart:
+      always
+
   nginx:
     restart:
       always

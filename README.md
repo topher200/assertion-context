@@ -51,6 +51,11 @@ DEBUG = False  # enables debug logging to file
 PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
 PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ```
+ - fill out .papertrial.yml for real-time papertrail. requires this field:
+```
+token: 123456789012345678901234567890ab
+```
+
 
 Then to start it all up:
  - `./start-servers.sh` or `./production-servers.sh`

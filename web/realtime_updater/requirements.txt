@@ -1,0 +1,5 @@
+elasticsearch==5.4.0
+dogpile.cache==0.6.2
+pytz
+redis==2.10.5
+elasticsearch-dsl>=5.0.0,<6.0.0
