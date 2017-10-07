@@ -49,6 +49,10 @@ def main():
     logger.info('done with logs from %s -> %s', start_time, end_time)
 
 
+def call_papertrail_cli(start_time, end_time):
+    pass
+
+
 def setup_logging(*_, **__):
     logging_util.setup_logging()
 
