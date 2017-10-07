@@ -78,10 +78,10 @@ def setup_logging(*_, **__):
 
 def __get_times():
     now = datetime.datetime.now()
-    # lag behind by 5 minutes
-    end_time = time_util.round_time(now - datetime.timedelta(minutes=5))
-    # 5 minutes worth of data at a time
-    start_time = end_time - datetime.timedelta(minutes=5)
+    # lag behind by 3 minutes
+    end_time = time_util.round_time(now - datetime.timedelta(minutes=3))
+    # 1 minute worth of data at a time
+    start_time = end_time - datetime.timedelta(minutes=1)
     return (start_time, end_time)
 
 
