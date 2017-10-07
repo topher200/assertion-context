@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     ruby-full \
     vim
 
+# set my timezone to eastern, so we send our company's standard time to papertrail
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN gem install papertrail
 
 RUN pip3 install --upgrade pip
