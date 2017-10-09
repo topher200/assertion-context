@@ -17,7 +17,8 @@ sys.path.append(ROOT)
 from app import (
     json_parser,
     logging_util,
-    traceback_database
+    tasks,
+    traceback_database,
 )
 from realtime_updater import time_util
 
@@ -49,6 +50,10 @@ def main(end_time=None):
         count += 1
         logger.info('found traceback. #%s', count)
         traceback_database.save_traceback(ES, tb)
+
+    if count > 0:
+        logger.info('invalidating traceback cache')
+        tasks.invalidate_cache('traceback')
 
     logger.info('done with logs from %s -> %s', start_time, end_time)
 
