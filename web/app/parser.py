@@ -257,11 +257,10 @@ class Parser():
             # no timezone string == UTC
             time_with_timezone = timestamp_ignoring_timezone.replace(tzinfo=pytz.UTC)
         elif timezone_string == '-04:00':
-            time_with_timezone = timestamp_ignoring_timezone.replace(
-                tzinfo=pytz.timezone('America/New_York'))
+            time_with_timezone = pytz.timezone('America/New_York').localize(timestamp_ignoring_timezone)
         else:
             logger.error('unknown timezone string "%s". %s', timezone_string, timestamp_string)
-            assert False, timestamp_string
+            assert False, locals()
         timestamp_with_tz = time_with_timezone.astimezone(LOG_TIMEZONE)
 
         # formatted line looks like this, seperated by spaces:
