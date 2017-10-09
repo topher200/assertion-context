@@ -17,7 +17,7 @@ sys.path.append(ROOT)
 from app import (
     json_parser,
     logging_util,
-    tasks,
+    tasks_util,
     traceback_database,
 )
 from realtime_updater import time_util
@@ -53,7 +53,7 @@ def main(end_time=None):
 
     if count > 0:
         logger.info('invalidating traceback cache')
-        tasks.invalidate_cache('traceback')
+        tasks_util.invalidate_cache('traceback')
 
     logger.info('done with logs from %s -> %s', start_time, end_time)
 
