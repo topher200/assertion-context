@@ -4,3 +4,4 @@ pytz
 redis==2.10.5
 elasticsearch-dsl>=5.0.0,<6.0.0
 certifi
+celery[redis]==4.0.2
