@@ -14,3 +14,4 @@ jira==1.0.10
 pytz
 redis==2.10.5
 simplejson==3.10.0
+requests==2.7.0
