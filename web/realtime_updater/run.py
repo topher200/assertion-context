@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import logging
 import os
@@ -28,9 +29,9 @@ ES = Elasticsearch([config.ES_ADDRESS])
 logger = logging.getLogger()
 
 
-def main():
+def main(end_time=None):
     setup_logging()
-    start_time, end_time = __get_times()
+    start_time, end_time = __get_times(end_time)
     logger.info('getting logs from %s -> %s', start_time, end_time)
 
     # fill a log file with papertrail output. try 5 times
@@ -76,14 +77,24 @@ def setup_logging(*_, **__):
     logging_util.setup_logging()
 
 
-def __get_times():
-    now = datetime.datetime.now()
-    # lag behind by 3 minutes
-    end_time = time_util.round_time(now - datetime.timedelta(minutes=3))
+def __get_times(end_time=None):
+    if end_time is None:
+        now = datetime.datetime.now()
+        # lag behind by 3 minutes
+        end_time = time_util.round_time(now - datetime.timedelta(minutes=3))
+
     # 1 minute worth of data at a time
     start_time = end_time - datetime.timedelta(minutes=1)
     return (start_time, end_time)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='download papertrail logs from their api')
+    parser.add_argument('--time', help='optional end time for download')
+    args = parser.parse_args()
+    if args.time:
+        end_time_str = args.time
+        end_time = datetime.datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+        main(end_time)
+    else:
+        main()
