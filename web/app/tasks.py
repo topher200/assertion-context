@@ -2,13 +2,13 @@ import logging
 
 from elasticsearch import Elasticsearch
 import celery
-import requests
 
 from app import (
     jira_issue_db,
     jira_issue_aservice,
     traceback_database,
     logging_util,
+    tasks_util,
     s3,
 )
 from instance import config
@@ -41,7 +41,7 @@ def update_jira_issue(issue_key):
         jira_issue_db.save_jira_issue(ES, issue)
         logger.info("updated jira issue %s", issue_key)
 
-    invalidate_cache('jira')
+    tasks_util.invalidate_cache('jira')
 
 
 @app.task
@@ -77,20 +77,9 @@ def parse_log_file(bucket, key):
         traceback_database.save_traceback(ES, tb)
 
     logger.info("saved %s tracebacks. bucket: %s, key: %s", count, bucket, key)
-    invalidate_cache('traceback')
+    tasks_util.invalidate_cache('traceback')
 
 
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
-
-
-def invalidate_cache(cache=None):
-    """
-        Call the server and invalidate a cache.
-
-        If None, invalidate all caches
-    """
-    if cache is None:
-        cache = ''
-    requests.put('http://nginx/api/invalidate_cache/%s' % cache)
