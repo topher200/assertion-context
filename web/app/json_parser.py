@@ -55,4 +55,4 @@ def yield_lines(f):
             event['severity'],
             event['program'],
             event['message'],
-        ])
+        ]) + '\n'
