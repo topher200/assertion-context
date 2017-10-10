@@ -70,8 +70,8 @@ def call_papertrail_cli(start_time, end_time):
     if res.stderr:
         try:
             logger.info('subprocess failed. err: %s', res.stderr.split('\n')[0])
-        except:
-            logger.info('subprocess failed. could not parse error logs')
+        except Exception:
+            logger.error('subprocess failed. could not parse error logs. %s', res.stderr)
         logger.debug('subprocess failed. full err: %s', res.stderr)
         return None
     else:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.time:
         end_time_str = args.time
-        end_time = datetime.datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
-        main(end_time)
+        end_time_ = datetime.datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
+        main(end_time_)
     else:
         main()
