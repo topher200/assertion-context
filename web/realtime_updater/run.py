@@ -35,12 +35,12 @@ def main(end_time=None):
     start_time, end_time = __get_times(end_time)
     logger.info('getting logs from %s -> %s', start_time, end_time)
 
-    # fill a log file with papertrail output. try 5 times
-    for _ in range(5):
+    # fill a log file with papertrail output. try on failures
+    for i in range(10):
         local_file = call_papertrail_cli(start_time, end_time)
         if local_file is not None:
             break
-        time.sleep(1)
+        time.sleep(i * 2)  # increasing backoff
     if local_file is None:
         logger.error('papertrail cli failed. %s -> %s', start_time, end_time)
         return
