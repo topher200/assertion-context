@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import logging
+import math
 import os
 import subprocess
 import tempfile
@@ -40,7 +41,7 @@ def main(end_time=None):
         local_file = call_papertrail_cli(start_time, end_time)
         if local_file is not None:
             break
-        time.sleep(i * 2)  # increasing backoff
+        time.sleep(math.pow(2, i))  # increasing backoff
     if local_file is None:
         logger.error('papertrail cli failed. %s -> %s', start_time, end_time)
         return
