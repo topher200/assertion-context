@@ -6,10 +6,10 @@
 import dogpile.cache
 import elasticsearch
 
-from .traceback import Traceback, generate_traceback_from_source
 from app import es_util
 from app import redis_util
 from app import retry
+from .traceback import Traceback, generate_traceback_from_source
 
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
@@ -85,7 +85,7 @@ def get_tracebacks(es, start_date=None, end_date=None, num_matches=10000):
     if end_date is not None:
         params_list['lte'] = "%s||/d" % end_date
 
-    if len(params_list) > 0:
+    if params_list:
         body = {
             "query": {
                 "range": {

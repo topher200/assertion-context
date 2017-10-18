@@ -127,9 +127,7 @@ class Retry(object):
         for i in range(self.__retries):
             try:
                 if self.__debug:
-                    Retry.__LOGGER.debug(
-                        '{}({},{})'.format(func.__name__, args, kwargs)
-                    )
+                    Retry.__LOGGER.debug('%s(%s,%s)', func.__name__, args, kwargs)
                 return func(*args, **kwargs)
             except self.__exceptions:
                 exc_info = sys.exc_info()

@@ -205,7 +205,7 @@ def get_all_issues():
             maxResults=BATCH_SIZE,
             fields='key'
         )
-        if len(new_results) > 0:
+        if new_results:
             logger.info('got jira issues %s - %s', start_at, start_at + BATCH_SIZE)
             for r in new_results:
                 yield r

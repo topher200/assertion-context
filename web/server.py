@@ -4,7 +4,6 @@
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
 import datetime
-import itertools
 import logging
 import os
 import time
@@ -26,9 +25,7 @@ from app import es_util
 from app import jira_issue_aservice
 from app import jira_issue_db
 from app import logging_util
-from app import s3
 from app import tasks
-from app import traceback
 from app import traceback_database
 
 
@@ -134,14 +131,13 @@ def index():
 
     # apply user's filters
     if filter_text == 'Has Ticket':
-        tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) > 0]
+        tb_meta = [tb for tb in tb_meta if tb.jira_issues]
     elif filter_text == 'No Ticket':
-        tb_meta = [tb for tb in tb_meta if len(tb.jira_issues) == 0]
+        tb_meta = [tb for tb in tb_meta if not tb.jira_issues]
     elif filter_text == 'Has Open Ticket':
         tb_meta = [
-            tb for tb in tb_meta if len(
-                [issue for issue in tb.jira_issues if issue.status != 'Closed']
-            ) > 0
+            tb for tb in tb_meta if
+            [issue for issue in tb.jira_issues if issue.status != 'Closed']
         ]
     else:
         tb_meta = tb_meta
@@ -423,7 +419,7 @@ def profile_request(_):
             timings.append('%s: %.2fs' % (t, flask.g.get(t)))
         except TypeError:
             pass  # info not present on this one
-    if len(timings) > 0:
+    if timings:
         logger.info(', '.join(timings))
 
 

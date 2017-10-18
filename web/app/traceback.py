@@ -68,18 +68,18 @@ class Traceback(object):
     @property
     def traceback_plus_context_text(self):
         # not guaranteed to exist
-        if self._traceback_plus_context_text is not None:
-            return self._traceback_plus_context_text
-        else:
+        if self._traceback_plus_context_text is None:
             return self.traceback_text
+
+        return self._traceback_plus_context_text
 
     @property
     def raw_traceback_text(self):
         # not guaranteed to exist
-        if self._raw_full_text is not None:
-            return self._raw_full_text
-        else:
+        if self._raw_full_text is None:
             return self.traceback_text
+
+        return self._raw_full_text
 
     @property
     def raw_full_text(self):

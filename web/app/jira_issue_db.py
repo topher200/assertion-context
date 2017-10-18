@@ -6,13 +6,13 @@
 
 import elasticsearch
 
-from .jira_issue import JiraIssue, generate_from_source
+import dogpile.cache
+
 from app import es_util
 from app import redis_util
 from app import retry
+from .jira_issue import JiraIssue, generate_from_source
 
-
-import dogpile.cache
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
     lambda key: (
