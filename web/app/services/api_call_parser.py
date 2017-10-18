@@ -4,7 +4,7 @@ from .parser_util import ParserUtil
 from ..entities.api_call import ApiCall
 
 
-API_CALL_REGEX = re.compile('\d+/\w\w#(?P<profile_name>\w+)-(?P<username>\S+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')
+API_CALL_REGEX = re.compile('\d+/\w\w#(?:(?P<profile_name>\w+)-)?(?P<username>[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')
 """
     Regex we can use to get information about API calls from the log message
 
@@ -12,7 +12,7 @@ API_CALL_REGEX = re.compile('\d+/\w\w#(?P<profile_name>\w+)-(?P<username>\S+).*\
         '''05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete''',
 
     Groups from this regex (with the value from our Example in parens):
-        1: profile_name (name)
+        1: profile_name (name). may be missing
         2: username (profile_name@name.com)
         3: api_name (IsGetInProgressHandler)
         4: method (GET)
@@ -58,7 +58,7 @@ class ApiCallParser(object):
             instance_id,
             program_name,
             match.group('api_name'),
-            match.group('profile_name'),
+            match.group('profile_name') if match.group('profile_name') else None,
             match.group('username'),
             match.group('method'),
             duration,

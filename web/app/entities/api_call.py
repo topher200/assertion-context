@@ -20,7 +20,7 @@ class ApiCall(object):
             example: 'aws1.engine.server.debug'
         - api_name: string of the parsed API name from the log line
             example: 'IsGetInProgressHandler'
-        - profile_name: profile name of the user who made the api call
+        - profile_name: profile name of the user who made the api call. can be None
         - username: user name of the user who made the api call
         - method: REST API method of the call. example: 'GET'
         - duration: time in ms that the API call took
@@ -131,6 +131,7 @@ class ApiCall(object):
 
     @property
     def profile_name(self):
+        # NOTE: can be None
         return self._profile_name
 
     @property

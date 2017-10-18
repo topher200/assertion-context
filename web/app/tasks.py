@@ -11,6 +11,7 @@ from app import (
     tasks_util,
     s3,
 )
+from app.ddl import api_call_db
 from instance import config
 
 app = celery.Celery('tasks', broker='redis://redis')  # redis is a hostname that Docker populates
@@ -65,19 +66,25 @@ def parse_log_file(bucket, key):
     logger.info("parsing log file. bucket: %s, key: %s", bucket, key)
 
     # use our powerful parser to run checks on the requested file
-    traceback_generator = s3.parse_s3_file(bucket, key)
-    if traceback_generator is None:
+    tracebacks, api_calls = s3.parse_s3_file(bucket, key)
+    if tracebacks is None:
         logger.error("unable to download log file from s3. bucket: %s, key: %s", bucket, key)
         return
 
-    # save the parser output to the database
+    # save the tracebacks to the database
     count = 0
-    for tb in traceback_generator:
+    for tb in tracebacks:
         count += 1
         traceback_database.save_traceback(ES, tb)
-
     logger.info("saved %s tracebacks. bucket: %s, key: %s", count, bucket, key)
     tasks_util.invalidate_cache('traceback')
+
+    # save the api calls to the database
+    count = 0
+    for call in api_calls:
+        count += 1
+        api_call_db.save(ES, call)
+    logger.info("saved %s api_calls. bucket: %s, key: %s", count, bucket, key)
 
 
 @celery.signals.setup_logging.connect
