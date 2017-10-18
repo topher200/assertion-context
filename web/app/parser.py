@@ -72,7 +72,7 @@ class Parser():
             assert isinstance(line, str), line
 
             # see if this line has an error we care about
-            if Parser.__log_line_contains_important_error(line):
+            if Parser.log_line_contains_important_error(line):
                 # we found a match! build a traceback out of it
                 origin_line = Parser.__generate_LogLine(line, None, 0)
 
@@ -310,7 +310,7 @@ class Parser():
                 line_number += 1
 
     @staticmethod
-    def __log_line_contains_important_error(log_line):
+    def log_line_contains_important_error(log_line):
         """
             Returns True if the log line contains an AssertionError (or other important error)
         """
