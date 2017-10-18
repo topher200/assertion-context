@@ -19,7 +19,7 @@ def parse_s3_file(bucket, key):
     """
         Downloads the file given described by the params and parses it.
 
-        Returns a list of L{Traceback}s. Returns None on error.
+        Returns a list of L{Traceback}s and a list of L{ApiCall}. Returns None, None on error.
     """
     s3 = boto3.client('s3')
     with tempfile.NamedTemporaryFile('wb') as local_file:
@@ -31,11 +31,11 @@ def parse_s3_file(bucket, key):
                 logger.warning(
                     "This happens when the system clock is out of date. Restart the container."
                 )
-                return None
+                return None, None
             elif e.response['Error']['Code'] == '404':
                 logger.info("'404 Not Found' error when trying to download from s3")
                 logger.info("Check your filename")
-                return None
+                return None, None
             logger.error("failed to download file from s3 with unknown error")
             raise
         return file_parser.parse_gzipped_file(local_file.name)

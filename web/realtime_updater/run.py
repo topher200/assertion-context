@@ -21,6 +21,7 @@ from app import (
     tasks_util,
     traceback_database,
 )
+from app.ddl import api_call_db
 from realtime_updater import time_util
 
 from instance import config
@@ -46,8 +47,9 @@ def main(end_time=None):
         logger.warning('papertrail cli failed. %s -> %s', start_time, end_time)
         return
 
+    tracebacks, api_calls = json_parser.parse_json_file(local_file.name)
     count = 0
-    for tb in json_parser.parse_json_file(local_file.name):
+    for tb in tracebacks:
         count += 1
         logger.info('found traceback. #%s', count)
         traceback_database.save_traceback(ES, tb)
@@ -55,6 +57,13 @@ def main(end_time=None):
     if count > 0:
         logger.info('invalidating traceback cache')
         tasks_util.invalidate_cache('traceback')
+
+    count = 0
+    for call in api_calls:
+        count += 1
+        api_call_db.save(ES, call)
+
+    logger.info('found %s api calls', count)
 
     logger.info('done with logs from %s -> %s', start_time, end_time)
 

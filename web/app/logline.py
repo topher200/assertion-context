@@ -15,7 +15,9 @@ class LogLine(object):
         L{origin_papertrail_id} and arranging them in decending L{line_number} order.
 
         - parsed_log_message: string containing the parsed log message without any metadata
-        - raw_log_message: string containing the original message as found in papertrail
+        - raw_log_message: string containing the original message as found in papertrail. note that
+            we re-create the message in this format inside our parser so that we match what
+            users see in the web UI
         - timestamp: datetime object (parsed from string) of the timestamp the message was created.
             in utc. example: 2016-08-12T03:18:39
         - papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
@@ -25,6 +27,7 @@ class LogLine(object):
             found. the "origin" line is always 0
         - instance_id: string of the parsed EC2 instance id of the log line
         - program_name: string of the parsed program name from the log line
+            example: 'aws1.engine.server.debug'
     """
     def __init__(
             self,
