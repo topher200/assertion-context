@@ -4,7 +4,7 @@ from .parser_util import ParserUtil
 from ..entities.api_call import ApiCall
 
 
-API_CALL_REGEX = re.compile('\d+/\w\w#(?:(?P<profile_name>\w+)-)?(?P<username>[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')
+API_CALL_REGEX = re.compile('\d+/\w+#(?:(?P<profile_name>\w+)-)?(?P<username>[a-zA-Z0-9_.+-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')
 """
     Regex we can use to get information about API calls from the log message
 
