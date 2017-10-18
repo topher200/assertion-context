@@ -8,8 +8,8 @@ import itertools
 import logging
 import re
 
-from web.app.services.parser_util import ParserUtil
 from .logline import LogLine
+from .services.parser_util import ParserUtil
 from .traceback import Traceback
 
 

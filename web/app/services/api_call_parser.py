@@ -1,7 +1,7 @@
 import re
 
-from web.app.entities.api_call import ApiCall
-from web.app.services.parser_util import ParserUtil
+from .parser_util import ParserUtil
+from ..entities.api_call import ApiCall
 
 
 API_CALL_REGEX = re.compile('\d+/\w\w#(?P<profile_name>\w+)-(?P<username>\S+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')

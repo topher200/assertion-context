@@ -1,6 +1,7 @@
 import logging
 import json
 
+from .services.api_call_parser import ApiCallParser
 from .parser import Parser
 
 
@@ -27,9 +28,15 @@ def parse_json_file(filename):
             "severity":"Notice",
             "facility":"User"
         }
+
+        Returns a list of L{Traceback} and a list of L{ApiCall}
     """
     with open(filename, 'r', encoding='UTF-8') as f:
-        yield from Parser.parse_stream(yield_lines(f))
+        tracebacks = list(Parser.parse_stream(yield_lines(f)))
+    with open(filename, 'r', encoding='UTF-8') as f:
+        api_calls = list(ApiCallParser.parse_stream(yield_lines(f)))
+
+    return tracebacks, api_calls
 
 
 def yield_lines(f):
