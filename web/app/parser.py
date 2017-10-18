@@ -72,7 +72,7 @@ class Parser():
             assert isinstance(line, str), line
 
             # see if this line has an error we care about
-            if Parser.__log_line_contains_important_error(line):
+            if Parser.log_line_contains_important_error(line):
                 # we found a match! build a traceback out of it
                 origin_line = Parser.__generate_LogLine(line, None, 0)
 
@@ -170,7 +170,7 @@ class Parser():
         previous_text, sep, traceback_text = parsed_log_text.rpartition(
             'Traceback (most recent call last)'
         )
-        if len(sep) == 0:
+        if not sep:
             logger.warning("unable to parse out Traceback. text: %s", parsed_log_text)
             return (None, None)
         context_lines = '\n'.join(previous_text.splitlines()[-3:])
@@ -198,13 +198,12 @@ class Parser():
         for index, line in enumerate(reversed(lines)):
             if 'Traceback (most recent call last)' in line:
                 break
+        if index is None:
+            return ''
 
         # 'index' is now the line number of the start of our traceback, counting from the bottom.
         # get it and all the lines after it
-        if index is None:
-            return ''
-        else:
-            return '\n'.join(lines[-(index + 1):])
+        return '\n'.join(lines[-(index + 1):])
 
     @staticmethod
     def __parse_papertrail_log_line(raw_log_line):
@@ -310,7 +309,7 @@ class Parser():
                 line_number += 1
 
     @staticmethod
-    def __log_line_contains_important_error(log_line):
+    def log_line_contains_important_error(log_line):
         """
             Returns True if the log line contains an AssertionError (or other important error)
         """

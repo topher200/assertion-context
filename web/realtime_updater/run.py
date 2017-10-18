@@ -69,14 +69,15 @@ def call_papertrail_cli(start_time, end_time):
     )
 
     if res.stderr:
+        # some error occured
         try:
             logger.info('subprocess failed. err: %s', res.stderr.split('\n')[0])
         except Exception:
             logger.error('subprocess failed. could not parse error logs. %s', res.stderr)
         logger.debug('subprocess failed. full err: %s', res.stderr)
         return None
-    else:
-        return local_file
+
+    return local_file
 
 
 def setup_logging(*_, **__):

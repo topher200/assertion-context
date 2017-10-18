@@ -138,17 +138,16 @@ def add_login_handling(app):
         user = User(email_address, (resp['access_token'], ''))
 
         # check if the user is authorized and log them in. if they're not authorized, send an error
-        if user.is_authenticated:
-            flask_login.login_user(user, remember=True)
-            USER_DB.put(user.email, simplejson.dumps(user.document()))
-            logger.info('redirecting to user to index')
-            return flask.redirect(flask.url_for('index'))
-        else:
+        if not user.is_authenticated:
             logger.warning('user "%s" not authorized', email_address)
             return (
                 "Email '%s' not authorized! "
                 "Please log in to Google with an authorized email address."
             ) % email_address
+        flask_login.login_user(user, remember=True)
+        USER_DB.put(user.email, simplejson.dumps(user.document()))
+        logger.info('redirecting to user to index')
+        return flask.redirect(flask.url_for('index'))
 
     @GOOGLE_OAUTH.tokengetter
     def get_google_oauth_token():  # pylint: disable=unused-variable
