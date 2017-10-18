@@ -20,6 +20,14 @@ API_CALL_REGEX = re.compile('\d+/\w+#(?:(?P<profile_name>\w+)-)?(?P<username>[a-
         5: duration in ms (11)
 """
 
+SERVERS_WE_CARE_ABOUT = frozenset((
+    'engine.server.debug',
+    'manager.debug',
+))
+"""
+    Set of server names of which we care about requests
+"""
+
 logger = logging.getLogger()
 
 
@@ -39,6 +47,22 @@ class ApiCallParser(object):
                 api_call = ApiCallParser.__generate_ApiCall(log_line)
                 if api_call is not None:
                     yield api_call
+
+    @staticmethod
+    def __log_line_contains_api_call_with_timing(log_line):
+        """
+            Checks that the given log line has an authenticated API call with timings
+        """
+        if 'milliseconds to complete' not in log_line:
+            # we don't have timings
+            return False
+        if 'MainThread' in log_line:
+            # anything with 'MainThread' doesn't have profile-level authentication
+            return False
+        if not any(server in log_line for server in SERVERS_WE_CARE_ABOUT):
+            # the request isn't coming from a server we care about
+            return False
+        return True
 
     @staticmethod
     def __generate_ApiCall(log_line):
@@ -76,17 +100,3 @@ class ApiCallParser(object):
             match.group('method'),
             duration,
         )
-
-
-    @staticmethod
-    def __log_line_contains_api_call_with_timing(log_line):
-        """
-            Checks that the given log line has an authenticated API call with timings
-        """
-        if 'milliseconds to complete' not in log_line:
-            # we don't have timings
-            return False
-        if 'MainThread' in log_line:
-            # anything with 'MainThread' doesn't have profile-level authentication
-            return False
-        return True
