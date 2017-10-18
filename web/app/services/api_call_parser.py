@@ -1,3 +1,4 @@
+import logging
 import re
 
 from .parser_util import ParserUtil
@@ -18,6 +19,8 @@ API_CALL_REGEX = re.compile('\d+/\w+#(?:(?P<profile_name>\w+)-)?(?P<username>[a-
         4: method (GET)
         5: duration in ms (11)
 """
+
+logger = logging.getLogger()
 
 
 class ApiCallParser(object):
@@ -47,7 +50,8 @@ class ApiCallParser(object):
         ) = ParserUtil.parse_papertrail_log_line(log_line)
 
         match = re.search(API_CALL_REGEX, parsed_log_message)
-        assert match, parsed_log_message
+        if not match:
+            logger.warning('Expected match failed. log line: %s', parsed_log_message)
 
         duration = int(match.group('duration'))
         return ApiCall(
