@@ -59,7 +59,7 @@ class ApiCallParser(object):
 
         match = re.search(API_CALL_REGEX, parsed_log_message)
         if not match:
-            logger.warning('Expected match failed. log line: %s', parsed_log_message)
+            logger.warning('api call parser failed on log line: %s', parsed_log_message)
             return None
 
         duration = int(match.group('duration'))
