@@ -47,7 +47,6 @@ def main():
                 break  # success! we're done with this one
             if res.status_code == 202:
                 print('Successfully queued "%s"' % key)
-                time.sleep(.1)  # rate limiting ourselves
                 break  # success! we're done with this one
             else:
                 print('Parse failed. status: %s. data: "%s"' % (res.status_code, payload))
