@@ -36,10 +36,18 @@ class ApiCallParser(object):
             assert isinstance(log_line, str), log_line
 
             if ApiCallParser.__log_line_contains_api_call_with_timing(log_line):
-                yield ApiCallParser.__generate_ApiCall(log_line)
+                api_call = ApiCallParser.__generate_ApiCall(log_line)
+                if api_call is not None:
+                    yield api_call
 
     @staticmethod
     def __generate_ApiCall(log_line):
+        """
+            Takes a raw log_line from Papertrail and creates a L{ApiCall} object
+
+            Returns None if our regex cannot parse the log line correctly. Logs the erroring line
+            with a WARNING
+        """
         (
             papertrail_id,
             timestamp,
@@ -52,6 +60,7 @@ class ApiCallParser(object):
         match = re.search(API_CALL_REGEX, parsed_log_message)
         if not match:
             logger.warning('Expected match failed. log line: %s', parsed_log_message)
+            return None
 
         duration = int(match.group('duration'))
         return ApiCall(
