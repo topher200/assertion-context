@@ -3,8 +3,11 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
+import collections
+
 import dogpile.cache
 import elasticsearch
+import elasticsearch.helpers
 
 from app import redis_util
 from app import retry
@@ -23,24 +26,27 @@ DOC_TYPE = 'api-call'
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def save(es, api_call):
+def save(es, api_calls):
     """
-        Takes a L{ApiCall} and saves it to the database
+        Takes an iterable of L{ApiCall} and saves them to the database
 
         Invalidates the dogpile cache.
 
         Returns True if successful
     """
-    assert isinstance(api_call, ApiCall), (type(api_call), api_call)
-    doc = api_call.document()
-    res = es.index(
-        index=INDEX,
-        doc_type=DOC_TYPE,
-        id=api_call.papertrail_id,
-        body=doc
-    )
+    assert isinstance(api_calls, collections.Iterable), (type(api_calls), api_calls)
+    elasticsearch.helpers.bulk(es, _create_documents(api_calls))
     invalidate_cache()
-    return res
+    return True
+
+
+def _create_documents(api_calls):
+    for api_call in api_calls:
+        yield {
+            "_index": INDEX,
+            "_type": DOC_TYPE,
+            "_source": api_call.document()
+        }
 
 
 def invalidate_cache():

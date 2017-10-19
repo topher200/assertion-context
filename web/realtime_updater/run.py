@@ -58,12 +58,8 @@ def main(end_time=None):
         logger.info('invalidating traceback cache')
         tasks_util.invalidate_cache('traceback')
 
-    count = 0
-    for call in api_calls:
-        count += 1
-        api_call_db.save(ES, call)
-
-    logger.info('found %s api calls', count)
+    logger.info('saving %s api calls', len(api_calls))
+    api_call_db.save(ES, api_calls)
 
     logger.info('done with logs from %s -> %s', start_time, end_time)
 

@@ -80,11 +80,8 @@ def parse_log_file(bucket, key):
     tasks_util.invalidate_cache('traceback')
 
     # save the api calls to the database
-    count = 0
-    for call in api_calls:
-        count += 1
-        api_call_db.save(ES, call)
-    logger.info("saved %s api_calls. bucket: %s, key: %s", count, bucket, key)
+    api_call_db.save(ES, api_calls)
+    logger.info("saved %s api_calls. bucket: %s, key: %s", len(api_calls), bucket, key)
 
 
 @celery.signals.setup_logging.connect
