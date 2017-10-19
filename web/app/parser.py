@@ -32,7 +32,7 @@ VALUE_ERROR_REGEX_NEGATIVE = re.compile(
             OR (AttributeError)
 """
 
-NUM_PREVIOUS_LOG_LINES_TO_SAVE = 50
+NUM_PREVIOUS_LOG_LINES_TO_SAVE = 100
 """
     How many log lines previous to our AssertionError we should save.
 
