@@ -60,7 +60,7 @@ token: 123456789012345678901234567890ab
 
 
 Then to start it all up:
- - `./start-servers.sh` or `./production-servers.sh`
+ - `make run-local` or `make run-prod`
   - start-servers runs its own elasticsearch, where production-servers uses an externally hosted one
 
 ## Elasticsearch
@@ -166,8 +166,8 @@ source /usr/local/bin/virtualenvwrapper.sh
  - pip install -r requirements.txt
 
 ### Running
-Once servers are started and python is installed, tests can be run with
-  - ./run-tests.sh
+Once python is installed, tests can be run with
+  - `make test`
 
 ## S3 and Lambda
 ### Papertrail
