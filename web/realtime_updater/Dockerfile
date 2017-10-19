@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     less \
     python3.6 \
     python3-pip \
+    redis-tools \
     ruby-full \
     vim
 

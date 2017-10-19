@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     less \
     python3-pip \
+    redis-tools \
     vim
 RUN pip3 install --upgrade pip
 ADD requirements.txt ./
