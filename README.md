@@ -23,7 +23,7 @@ host to get started. Installation instructions for setting up the host:
    - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
  - `pip install docker-compose`
    - optional: do this in a virtualenv
- - close this repo
+ - clone this repo
  - fill out `web/.aws_credentials` for a user that has S3 read permissions to
    the papertrail archives. this is used for our app to download the archives
    from S3. requires these fields:
