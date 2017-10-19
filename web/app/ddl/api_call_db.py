@@ -45,6 +45,7 @@ def _create_documents(api_calls):
         yield {
             "_index": INDEX,
             "_type": DOC_TYPE,
+            "_id": api_call.papertrail_id,
             "_source": api_call.document()
         }
 
