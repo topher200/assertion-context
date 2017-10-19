@@ -27,6 +27,12 @@ RUN python3.6 -m pip install -r requirements.txt
 
 ADD .papertrail.yml /root/
 
+# workaround for PAM/cron/debian issue
+# https://stackoverflow.com/a/43473861/131159
+# if this is removed, every call of our cronjob fails with
+# "Cannot make/remove an entry for the specified session"
+RUN sed -i '/session    required     pam_loginuid.so/c\#session    required   pam_loginuid.so' /etc/pam.d/cron
+
 ## setup cron
 # Add crontab file in the cron directory
 ADD crontab /etc/cron.d/run-updater
