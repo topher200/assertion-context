@@ -78,7 +78,7 @@ class ApiCallParser(object):
             instance_id,
             program_name,
             parsed_log_message,
-            formatted_line,
+            _,
         ) = ParserUtil.parse_papertrail_log_line(log_line)
 
         match = re.search(API_CALL_REGEX, parsed_log_message)
@@ -88,8 +88,6 @@ class ApiCallParser(object):
 
         duration = int(match.group('duration'))
         return ApiCall(
-            parsed_log_message,
-            formatted_line,
             timestamp,
             papertrail_id,
             instance_id,

@@ -25,8 +25,6 @@ NON_MATCHING_LOG_LINES = frozenset((
 # a raw api call and what we expect our generated ApiCall to look like
 DUMMY_API_CALL = '''742430301292376083	2016-12-05T14:00:00	2016-12-05T14:00:00Z	563850000	i-00000000000	54.85.100.30	User	Notice	aws1.engine.server.debug	05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete'''
 EXPECTED_ENTTIY_FROM_DUMMY_API_CALL = ApiCall(
-    '''05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete''',
-    '''Dec 05 09:00:00 i-00000000000 aws1.engine.server.debug:  05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete''',
     datetime.datetime.strptime('2016-12-05T09:00:00-0500', '%Y-%m-%dT%H:%M:%S%z'),
     '742430301292376083',
     'i-00000000000',

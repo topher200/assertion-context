@@ -7,10 +7,6 @@ class ApiCall(object):
 
         We log how long the call took and other useful information.
 
-        - parsed_log_message: string containing the parsed log message without any metadata
-        - raw_log_message: string containing the original message as found in papertrail. note that
-            we re-create the message in this format inside our parser so that we match what
-            users see in the web UI
         - timestamp: datetime object (parsed from string) of the timestamp the message was created.
             in utc. example: 2016-08-12T03:18:39
         - papertrail_id: the int id papertrail gave the log line. assumed to be unique. example:
@@ -27,8 +23,6 @@ class ApiCall(object):
     """
     def __init__(
             self,
-            parsed_log_message,
-            raw_log_message,
             timestamp,
             papertrail_id,
             instance_id,
@@ -39,8 +33,6 @@ class ApiCall(object):
             method,
             duration
     ):
-        self._parsed_log_message = parsed_log_message
-        self._raw_log_message = raw_log_message
         self._timestamp = timestamp
         self._papertrail_id = papertrail_id
         self._instance_id = instance_id
@@ -58,8 +50,6 @@ class ApiCall(object):
             Document form is a dictionary of <field name>: <value> pairs.
         """
         return {
-            "parsed_log_message": self._parsed_log_message,
-            "raw_log_message": self._raw_log_message,
             "timestamp": self._timestamp.strftime('%Y-%m-%dT%H:%M:%S%z'),
             "papertrail_id": self._papertrail_id,
             "instance_id": self._instance_id,
@@ -88,8 +78,6 @@ class ApiCall(object):
         )
 
         return ApiCall(
-            source["parsed_log_message"],
-            source["raw_log_message"],
             timestamp,
             source["papertrail_id"],
             source["instance_id"],
@@ -100,14 +88,6 @@ class ApiCall(object):
             source["method"],
             source["duration"],
         )
-
-    @property
-    def parsed_log_message(self):
-        return self._parsed_log_message
-
-    @property
-    def raw_log_message(self):
-        return self._raw_log_message
 
     @property
     def timestamp(self):
