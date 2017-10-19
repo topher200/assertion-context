@@ -184,24 +184,27 @@ def parse_s3():
         POST request to parse the data from a Papertrail log hosted on s3.
 
         Takes a JSON containing these fields:
-        - bucket: the name of the s3 bucket containing the file. string
-        - key: the filename of the file we should parse. must be in `bucket`. string
+        - date: date to parse. string, in YYYY-MM-DD form
 
         All fields are required.
 
-        Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
+        Returns a 400 error on bad input. Returns a 202 after we queue the jobs to be run
         asyncronously.
     """
     # parse our input
     json_request = flask.request.get_json()
-    if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
+    if json_request is None or not 'date' in json_request:
         return 'missing params', 400
-    bucket = json_request['bucket']
-    key = json_request['key']
+    date_ = json_request['date']
 
-    logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
-    tasks.parse_log_file.delay(bucket, key)
-    return 'job queued', 202
+    for hour in range(0, 24):
+        bucket = app.config['S3_BUCKET']
+        filename_string = 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, hour)
+        key = '/'.join((app.config['S3_KEY_PREFIX'], filename_string))
+        logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
+        tasks.parse_log_file.delay(bucket, key)
+
+    return 'jobs queued', 202
 
 
 @app.route("/hide_traceback", methods=['POST'])
