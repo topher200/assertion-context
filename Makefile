@@ -10,9 +10,24 @@ requirements:
 	pip install -r web/realtime_updater/requirements.txt
 
 .PHONY: run-local
-run-local:
-	./start_local_servers.sh
+run-local: build-local stop
+	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
+	docker-compose restart nginx
 
 .PHONY: run-prod
-run-prod:
-	./production-servers.sh
+run-prod: build-prod stop
+	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+	docker-compose restart nginx
+
+.PHONY: build-local
+build-local:
+	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml build
+
+.PHONY: build-prod
+build-prod:
+	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml build
+
+.PHONY: stop
+stop:
+	docker-compose kill realtime_updater
+	docker-compose stop web celery
