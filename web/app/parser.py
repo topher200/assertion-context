@@ -21,7 +21,7 @@ KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\['''
 )
 VALUE_ERROR_REGEX_NEGATIVE = re.compile(
-    '''raise ValueError|Facebook report failed due to'''
+    '''raise ValueError|Facebook leads failed due|Facebook report failed due to'''
 )
 """
     Our regexes are by the Papertrail search we perform against production, which looks like this:
