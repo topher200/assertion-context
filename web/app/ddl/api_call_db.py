@@ -35,7 +35,7 @@ def save(es, api_calls):
         Returns True if successful
     """
     assert isinstance(api_calls, collections.Iterable), (type(api_calls), api_calls)
-    elasticsearch.helpers.bulk(es, _create_documents(api_calls))
+    elasticsearch.helpers.bulk(es, _create_documents(api_calls), max_retries=5, chunk_size=100)
     invalidate_cache()
     return True
 
