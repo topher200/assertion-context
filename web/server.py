@@ -184,7 +184,33 @@ def parse_s3():
         POST request to parse the data from a Papertrail log hosted on s3.
 
         Takes a JSON containing these fields:
-        - date: date to parse. string, in YYYY-MM-DD form
+        - bucket: the name of the s3 bucket containing the file. string
+        - key: the filename of the file we should parse. must be in `bucket`. string
+
+        All fields are required.
+
+        Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
+        asyncronously.
+    """
+    # parse our input
+    json_request = flask.request.get_json()
+    if json_request is None or not all(k in json_request for k in ('bucket', 'key')):
+        return 'missing params', 400
+    bucket = json_request['bucket']
+    key = json_request['key']
+
+    logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
+    tasks.parse_log_file.delay(bucket, key)
+    return 'job queued', 202
+
+
+@app.route("/api/parse_s3_day", methods=['POST'])
+def parse_s3_day():
+    """
+        POST request to parse the data from all Papertrail logs for one day
+
+        Takes a JSON containing these fields:
+        - date: day to parse. string, in YYYY-MM-DD form
 
         All fields are required.
 

@@ -27,7 +27,7 @@ def build_dates():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--api-request-url', help='the location of our API to hit',
-                        default='http://127.0.0.1:8080/api/parse_s3')
+                        default='http://127.0.0.1:8080/api/parse_s3_day')
     args = parser.parse_args()
 
     for date_ in build_dates():
