@@ -29,5 +29,14 @@ build-prod:
 
 .PHONY: stop
 stop:
-	docker-compose kill realtime_updater
-	docker-compose stop web celery
+	docker-compose stop --timeout 120 celery
+	docker-compose stop --timeout 2 realtime_updater
+	docker-compose stop web
+
+.PHONY: stop-all
+stop-all:
+	docker-compose stop --timeout 60
+
+.PHONY: kill
+kill:
+	docker-compose stop --timeout 2 web celery realtime_updater
