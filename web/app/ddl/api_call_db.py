@@ -11,7 +11,6 @@ import elasticsearch.helpers
 
 from app import redis_util
 from app import retry
-from app.entities.api_call import ApiCall
 
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
