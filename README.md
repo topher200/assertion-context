@@ -6,6 +6,8 @@ At a high level, here's the steps we perform:
 - we download the log file and parse it for Python tracebacks. we save the tracebacks to ElasticSearch
 - we provide a Jinja templated site to show these tracebacks to our users
 
+[![Build Status](https://travis-ci.org/topher200/assertion-context.svg?branch=master)](https://travis-ci.org/topher200/assertion-context)
+
 # Parsing Papertrail logs
 
 We take the archived Papertrail logs in .tsv.gz format and unzip them. We search
