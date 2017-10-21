@@ -4,6 +4,7 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 import collections
+import logging
 
 import dogpile.cache
 import elasticsearch
@@ -23,6 +24,8 @@ DOGPILE_REGION = redis_util.make_dogpile_region(
 INDEX = 'api-call-index'
 DOC_TYPE = 'api-call'
 
+logger = logging.getLogger()
+
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def save(es, api_calls):
@@ -34,7 +37,11 @@ def save(es, api_calls):
         Returns True if successful
     """
     assert isinstance(api_calls, collections.Iterable), (type(api_calls), api_calls)
-    elasticsearch.helpers.bulk(es, _create_documents(api_calls))
+    try:
+        elasticsearch.helpers.bulk(es, _create_documents(api_calls))
+    except elasticsearch.ElasticsearchException:
+        logger.exception('api_call bulk update failed')
+        return False
     invalidate_cache()
     return True
 
