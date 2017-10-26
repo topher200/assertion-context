@@ -58,7 +58,7 @@ def main(end_time=None):
         logger.info('invalidating traceback cache')
         tasks_util.invalidate_cache('traceback')
 
-    if len(api_calls) > 0:
+    if api_calls:
         logger.info('saving %s api calls', len(api_calls))
         api_call_db.save(ES, api_calls)
     else:
