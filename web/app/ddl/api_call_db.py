@@ -21,7 +21,12 @@ DOGPILE_REGION = redis_util.make_dogpile_region(
     )
 )
 
-INDEX = 'api-call-index'
+INDEX_TEMPLATE = 'api-call-%d-%d'
+"""
+    Template for our index name.
+
+    Takes the form api-call-YEAR-MONTH where YEAR is 4 digits and MONTH is 2
+"""
 DOC_TYPE = 'api-call'
 
 logger = logging.getLogger()
@@ -48,8 +53,9 @@ def save(es, api_calls):
 
 def _create_documents(api_calls):
     for api_call in api_calls:
+        index_name = INDEX_TEMPLATE % (api_call.timestamp.year, api_call.timestamp.month)
         yield {
-            "_index": INDEX,
+            "_index": index_name,
             "_type": DOC_TYPE,
             "_id": api_call.papertrail_id,
             "_source": api_call.document()
