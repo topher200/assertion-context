@@ -98,6 +98,10 @@ def __get_times(end_time=None):
 
     # 1 minute worth of data at a time
     start_time = end_time - datetime.timedelta(minutes=1)
+
+    # papertrail's --max-time uses inclusive times, take a second off
+    end_time = end_time - datetime.timedelta(seconds=1)
+
     return (start_time, end_time)
 
 
