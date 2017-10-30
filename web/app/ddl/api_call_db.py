@@ -21,11 +21,11 @@ DOGPILE_REGION = redis_util.make_dogpile_region(
     )
 )
 
-INDEX_TEMPLATE = 'api-call-%d-%d'
+INDEX_TEMPLATE = 'api-call-%04d-%02d'
 """
     Template for our index name.
 
-    Takes the form api-call-YEAR-MONTH where YEAR is 4 digits and MONTH is 2
+    Takes the form api-call-YEAR-MONTH where YEAR is a 4 digit number and MONTH is 2
 """
 DOC_TYPE = 'api-call'
 
