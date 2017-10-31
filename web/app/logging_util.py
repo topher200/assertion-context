@@ -10,7 +10,7 @@ logger = logging.getLogger()
 def setup_logging():
     formatter = logging.Formatter(
         (
-            "[%(asctime)s] | %(levelname)s | %(process)d | "
+            "[%(asctime)s] | %(levelname)s | pid%(process)d | "
             "%(pathname)s.%(funcName)s:%(lineno)d | %(message)s"
         )
     )
