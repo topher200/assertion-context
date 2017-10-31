@@ -55,7 +55,7 @@ S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
 PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
 PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ```
- - fill out web/realtime_updater/.papertrial.yml for real-time papertrail. requires this field:
+ - fill out web/realtime_updater/.papertrail.yml for real-time papertrail. requires this field:
 ```
 token: 123456789012345678901234567890ab
 ```
