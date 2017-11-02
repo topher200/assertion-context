@@ -59,8 +59,8 @@ def main(end_time=None):
         tasks_util.invalidate_cache('traceback')
 
     if api_calls:
-        if api_calls[-1].timestamp.seconds != 59:
-            logger.warning('final timestamp is not 59, instead %s', api_calls[-1].timestamp.seconds)
+        if api_calls[-1].timestamp.second != 59:
+            logger.warning('final timestamp is not 59, instead %s', api_calls[-1].timestamp.second)
         logger.info('saving %s api calls', len(api_calls))
         api_call_db.save(ES, api_calls)
     else:
