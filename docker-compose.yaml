@@ -19,7 +19,7 @@ services:
     restart:
       always
     command:
-      [celery, -A, app.tasks, -c, '1', worker]
+      [celery, -A, app.tasks, worker]
 
   realtime_updater:
     build: web/realtime_updater/
