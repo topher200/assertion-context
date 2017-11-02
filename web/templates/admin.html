@@ -2,6 +2,14 @@
 {% import "bootstrap/utils.html" as utils %}
 
 {% block content %}
+<p>
+    <form id="parse-date-form">
+        Parse date from Papertrail logs:<br>
+        <input type="date" id="date_field" name="date_field"><br>
+        <input type="submit" value="Submit" onclick="parse_date(document.getElementById('date_field').value);"/>
+    </form>
+</p>
+<hr>
 <p>Num jira issues: {{ num_jira_issues }}</p>
 
 <p>
@@ -12,10 +20,9 @@
     </form>
     <button onclick="update_all_jira_tickets();">Update all Jira issues (async, takes a long time)</button>
 </p>
-<br>
+<hr>
 <p>Num celery tasks: {{ num_celery_tasks }}</p>
 <button onclick="purge_celery_queue();">Purge celery queue</button>
-<br>
-<br>
+<hr>
 <button onclick="invalidate_cache();">Invalidate cache</button>
 {%- endblock %}
