@@ -65,7 +65,7 @@ class ParserUtil(object):
         if timezone_string == '':
             # no timezone string == UTC
             time_with_timezone = timestamp_ignoring_timezone.replace(tzinfo=pytz.UTC)
-        elif ('-04:00', '-05:00') in timezone_string:
+        elif timezone_string in ('-04:00', '-05:00'):
             # it's one of our timezones (either in DST or not)
             time_with_timezone = pytz.timezone('America/New_York').localize(timestamp_ignoring_timezone)
         else:
