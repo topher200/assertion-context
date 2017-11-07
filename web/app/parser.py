@@ -237,15 +237,29 @@ class Parser(object):
         # infrequently-traveled code path
 
         if 'AssertionError' in log_line:
+            if not log_line.strip().starts_with('AssertionError'):
+                return False
             if re.search(ASSERTION_ERROR_REGEX_NEGATIVE, log_line) is not None:
                 return False
 
         if 'KeyError' in log_line:
+            if not log_line.strip().starts_with('KeyError'):
+                return False
             if re.search(KEY_ERROR_REGEX_NEGATIVE, log_line) is not None:
                 return False
 
+        if 'NotImplementedError' in log_line:
+            if not log_line.strip().starts_with('NotImplementedError'):
+                return False
+
         if 'ValueError' in log_line:
+            if not log_line.strip().starts_with('ValueError'):
+                return False
             if re.search(VALUE_ERROR_REGEX_NEGATIVE, log_line) is not None:
+                return False
+
+        if 'AttributeError' in log_line:
+            if not log_line.strip().starts_with('AttributeError'):
                 return False
 
         return True
