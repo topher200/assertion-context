@@ -15,13 +15,10 @@ from .traceback import Traceback
 
 ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError|AttributeError')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
-    '''(details = AssertionError)|(AssertionError.*can only join a child process)|DEBUG'''
+    '''(AssertionError.*can only join a child process)|DEBUG'''
 )
 KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\['''
-)
-VALUE_ERROR_REGEX_NEGATIVE = re.compile(
-    '''raise ValueError|Facebook leads failed due|Facebook report failed due to'''
 )
 """
     Our regexes are by the Papertrail search we perform against production, which looks like this:
@@ -254,8 +251,6 @@ class Parser(object):
 
         if 'ValueError' in log_line:
             if not log_line.strip().starts_with('ValueError'):
-                return False
-            if re.search(VALUE_ERROR_REGEX_NEGATIVE, log_line) is not None:
                 return False
 
         if 'AttributeError' in log_line:
