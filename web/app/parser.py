@@ -13,7 +13,7 @@ from .services.parser_util import ParserUtil
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError):')
+ERROR_REGEX = re.compile(': (?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError)')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''(AssertionError.*can only join a child process)|DEBUG'''
 )

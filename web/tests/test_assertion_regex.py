@@ -12,23 +12,23 @@ from app.file_parser import Parser
 
 
 LOG_LINES_THAT_SHOULD_MATCH = [
-    '\nAssertionError',
-    '\nAssertionError: join a child process',
-    '\nKeyError: i broke it',
-    '\nKeyError',
-    '\nNotImplementedError',
-    '\nNotImplementedError: sdf',
-    '\nValueError',
-    '\nValueError: sdf',
+    '\n: AssertionError',
+    '\n: AssertionError: join a child process',
+    '\n: KeyError: i broke it',
+    '\n: KeyError',
+    '\n: NotImplementedError',
+    '\n: NotImplementedError: sdf',
+    '\n: ValueError',
+    '\n: ValueError: sdf',
 ]
 
 LOG_LINES_THAT_SHOULD_NOT_MATCH = [
     '',
     'asdf details = AssertionError',
-    '\nAssertionError: can only join a child process',
-    '\nKeyError: threading.pyc',
-    '\nKeyError: args:[',
-    '\nValueE',
+    '\n: AssertionError: can only join a child process',
+    '\n: KeyError: threading.pyc',
+    '\n: KeyError: args:[',
+    '\n: ValueE',
 ]
 
 class TestAssertionRegex(unittest.TestCase):
