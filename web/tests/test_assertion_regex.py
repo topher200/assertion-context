@@ -24,7 +24,7 @@ LOG_LINES_THAT_SHOULD_MATCH = [
 
 LOG_LINES_THAT_SHOULD_NOT_MATCH = [
     '',
-    'asdf details = AssertionError',
+    'asdf details = AssertionError fdsa',
     '\nAssertionError: can only join a child process',
     '\nKeyError: threading.pyc',
     '\nKeyError: args:[',
