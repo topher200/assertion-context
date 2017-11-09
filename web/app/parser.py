@@ -13,7 +13,7 @@ from .services.parser_util import ParserUtil
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('AssertionError|KeyError|NotImplementedError|ValueError|AttributeError')
+ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError):')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''(AssertionError.*can only join a child process)|DEBUG'''
 )
@@ -234,27 +234,11 @@ class Parser(object):
         # infrequently-traveled code path
 
         if 'AssertionError' in log_line:
-            if not log_line.strip().startswith('AssertionError'):
-                return False
             if re.search(ASSERTION_ERROR_REGEX_NEGATIVE, log_line) is not None:
                 return False
 
         if 'KeyError' in log_line:
-            if not log_line.strip().startswith('KeyError'):
-                return False
             if re.search(KEY_ERROR_REGEX_NEGATIVE, log_line) is not None:
-                return False
-
-        if 'NotImplementedError' in log_line:
-            if not log_line.strip().startswith('NotImplementedError'):
-                return False
-
-        if 'ValueError' in log_line:
-            if not log_line.strip().startswith('ValueError'):
-                return False
-
-        if 'AttributeError' in log_line:
-            if not log_line.strip().startswith('AttributeError'):
                 return False
 
         return True
