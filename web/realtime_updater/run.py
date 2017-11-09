@@ -51,8 +51,8 @@ def main(end_time=None):
     count = 0
     for tb in tracebacks:
         count += 1
-        logger.info('found traceback. #%s', count)
         traceback_database.save_traceback(ES, tb)
+    logger.info("saved %s tracebacks", count)
 
     if count > 0:
         logger.info('invalidating traceback cache')
