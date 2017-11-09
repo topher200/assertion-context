@@ -94,7 +94,9 @@ def setup_logging(*_, **__):
 
 def __get_times(end_time=None):
     if end_time is None:
-        end_time = time_util.round_time(datetime.datetime.now())
+        now = datetime.datetime.now()
+        # lag behind by 3 minutes
+        end_time = time_util.round_time(now - datetime.timedelta(minutes=3))
 
     # 1 minute worth of data at a time
     start_time = end_time - datetime.timedelta(minutes=1)
