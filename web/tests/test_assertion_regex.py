@@ -29,6 +29,7 @@ LOG_LINES_THAT_SHOULD_NOT_MATCH = [
     '\nKeyError: threading.pyc',
     '\nKeyError: args:[',
     '\nValueE',
+    '\nupdate: Facebook report failed due to ValueError',
 ]
 
 class TestAssertionRegex(unittest.TestCase):
