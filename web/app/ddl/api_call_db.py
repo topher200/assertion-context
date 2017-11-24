@@ -32,7 +32,8 @@ DOC_TYPE = 'api-call'
 logger = logging.getLogger()
 
 
-@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,
+                         elasticsearch.ElasticsearchException))
 def save(es, api_calls):
     """
         Takes an iterable of L{ApiCall} and saves them to the database
@@ -42,11 +43,7 @@ def save(es, api_calls):
         Returns True if successful
     """
     assert isinstance(api_calls, collections.Iterable), (type(api_calls), api_calls)
-    try:
-        elasticsearch.helpers.bulk(es, _create_documents(api_calls))
-    except elasticsearch.ElasticsearchException:
-        logger.exception('api_call bulk update failed')
-        return False
+    elasticsearch.helpers.bulk(es, _create_documents(api_calls))
     invalidate_cache()
     return True
 

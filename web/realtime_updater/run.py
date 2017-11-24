@@ -62,7 +62,7 @@ def main(end_time=None):
         logger.info('saving %s api calls', len(api_calls))
         api_call_db.save(ES, api_calls)
     else:
-        logger.warning('no api calls found. %s to %s', start_time, end_time)
+        logger.info('no api calls found. %s to %s', start_time, end_time)
 
     logger.info('done with logs from %s -> %s', start_time, end_time)
 
