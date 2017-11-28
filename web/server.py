@@ -97,6 +97,8 @@ def index():
         flask.g.time_tracebacks = time.time() - db_start_time
 
     # create a set of tracebacks that match all the traceback texts the user has hidden
+    if DEBUG_TIMING:
+        hidden_tracebacks_start_time = time.time()
     hidden_tracebacks = set()
     if flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY) is not None:
         for traceback_text in flask.session.get(HIDDEN_TRACEBACK_TEXT_KEY):
@@ -105,6 +107,8 @@ def index():
             ):
                 hidden_tracebacks.add(tb.origin_papertrail_id)
         logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
+    if DEBUG_TIMING:
+        flask.g.time_hidden_tracebacks = time.time() - hidden_tracebacks_start_time
 
     # filter out tracebacks the user has hidden. we use a SimpleNamespace to store each traceback +
     # some metadata we'll use when rendering the html page
@@ -443,7 +447,13 @@ def profile_request(_):
     time_diff = time.time() - flask.g.start_time
     logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
     timings = []
-    for t in ('time_tracebacks', 'similar_tracebacks_time', 'jira_issues_time', 'render_time'):
+    for t in (
+            'time_tracebacks',
+            'time_hidden_tracebacks',
+            'jira_issues_time',
+            'similar_tracebacks_time',
+            'render_time'
+    ):
         try:
             timings.append('%s: %.2fs' % (t, flask.g.get(t)))
         except TypeError:
