@@ -400,6 +400,7 @@ def invalidate_cache(cache=None):
     if cache is None or cache == 'jira':
         logger.info('invalidating jira cache')
         jira_issue_db.invalidate_cache()
+    tasks.hydrate_cache.delay()
     return 'success'
 
 
