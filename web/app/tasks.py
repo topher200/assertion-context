@@ -1,5 +1,6 @@
 import datetime
 import logging
+import time
 
 from elasticsearch import Elasticsearch
 import celery
@@ -92,29 +93,33 @@ def parse_log_file(bucket, key):
 @app.task
 def hydrate_cache():
     """
-        Calls the normal GET endpoints to get data for today.
+        Calls the normal GET endpoints to get data for today's date.
 
         This will speed up subsequent requests from real humans
     """
+    start_time = time.time()
     logger.info('hydrating cache')
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     tracebacks = traceback_database.get_tracebacks(ES, today, today)
-    logger.info('found %s tracebacks', len(tracebacks))
+    logger.info('found %s tracebacks in %.2fs', len(tracebacks), time.time() - start_time)
+    start_time = time.time()
     for tb in tracebacks:
         _ = jira_issue_db.get_matching_jira_issues(
             ES, tb.traceback_text, es_util.EXACT_MATCH
         )
-    logger.info('hydrated matching_jira_issues')
+    logger.info('hydrated matching_jira_issues in %.2fs', time.time() - start_time)
+    start_time = time.time()
     for tb in tracebacks:
         _ = jira_issue_db.get_matching_jira_issues(
             ES, tb.traceback_text, es_util.SIMILAR_MATCH
         )
-    logger.info('hydrated similar_jira_issues')
+    logger.info('hydrated similar_jira_issues in %.2fs', time.time() - start_time)
+    start_time = time.time()
     for tb in tracebacks:
         _ = traceback_database.get_matching_tracebacks(
             ES, tb.traceback_text, es_util.EXACT_MATCH, 100
         )
-    logger.info('hydrated similar_tracebacks')
+    logger.info('hydrated similar_tracebacks in %.2fs', time.time() - start_time)
 
 
 @celery.signals.setup_logging.connect
