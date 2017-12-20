@@ -106,7 +106,7 @@ def hydrate_cache():
         )
         logger.info('found %s matching_jira_issues', len(matching_jira_issues))
         similar_jira_issues = jira_issue_db.get_matching_jira_issues(
-            ES, tb.traceback.traceback_text, es_util.SIMILAR_MATCH
+            ES, tb.traceback_text, es_util.SIMILAR_MATCH
         )
         logger.info('found %s similar_jira_issues', len(similar_jira_issues))
         similar_tracebacks = traceback_database.get_matching_tracebacks(
