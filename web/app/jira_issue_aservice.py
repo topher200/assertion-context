@@ -3,9 +3,9 @@ import itertools
 import logging
 import re
 
-from instance import config
 import jira
 
+from instance import config
 from .jira_issue import JiraIssue
 
 
