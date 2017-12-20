@@ -104,15 +104,15 @@ def hydrate_cache():
         matching_jira_issues = jira_issue_db.get_matching_jira_issues(
             ES, tb.traceback_text, es_util.EXACT_MATCH
         )
-        logger.info('found %s matching_jira_issues', len(matching_jira_issues))
+        # logger.info('found %s matching_jira_issues', len(matching_jira_issues))
         similar_jira_issues = jira_issue_db.get_matching_jira_issues(
             ES, tb.traceback_text, es_util.SIMILAR_MATCH
         )
-        logger.info('found %s similar_jira_issues', len(similar_jira_issues))
+        # logger.info('found %s similar_jira_issues', len(similar_jira_issues))
         similar_tracebacks = traceback_database.get_matching_tracebacks(
             ES, tb.traceback_text, es_util.EXACT_MATCH, 100
         )
-        logger.info('found %s similar_tracebacks', len(similar_tracebacks))
+        # logger.info('found %s similar_tracebacks', len(similar_tracebacks))
 
 
 @celery.signals.setup_logging.connect
