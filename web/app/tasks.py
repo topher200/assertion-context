@@ -1,9 +1,12 @@
+import datetime
 import logging
 
 from elasticsearch import Elasticsearch
 import celery
+import pytz
 
 from app import (
+    es_util,
     jira_issue_db,
     jira_issue_aservice,
     traceback_database,
@@ -85,6 +88,31 @@ def parse_log_file(bucket, key):
         logger.info("saved %s api_calls. bucket: %s, key: %s", len(api_calls), bucket, key)
     else:
         logger.error('failed to save api_calls. %s, key: %s', bucket, key)
+
+@app.task
+def hydrate_cache():
+    """
+        Calls the normal GET endpoints to get data for today.
+
+        This will speed up subsequent requests from real humans
+    """
+    logger.info('hydrating cache')
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+    tracebacks = traceback_database.get_tracebacks(ES, today, today)
+    logger.info('found %s tracebacks', len(tracebacks))
+    for tb in tracebacks:
+        matching_jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, tb.traceback_text, es_util.EXACT_MATCH
+        )
+        logger.info('found %s matching_jira_issues', len(matching_jira_issues))
+        similar_jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, tb.traceback.traceback_text, es_util.SIMILAR_MATCH
+        )
+        logger.info('found %s similar_jira_issues', len(similar_jira_issues))
+        similar_tracebacks = traceback_database.get_matching_tracebacks(
+            ES, tb.traceback_text, es_util.EXACT_MATCH, 100
+        )
+        logger.info('found %s similar_tracebacks', len(similar_tracebacks))
 
 
 @celery.signals.setup_logging.connect
