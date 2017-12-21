@@ -2,7 +2,7 @@ version: '2'
 
 services:
   web:
-    command: ["gunicorn", "--workers", "2", "--bind", ":8000", "--timeout", "60", "server:app"]
+    command: ["gunicorn", "--workers", "4", "--bind", ":8000", "--timeout", "60", "server:app"]
     logging:
         driver: syslog
         options:
