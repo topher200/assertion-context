@@ -17,9 +17,6 @@ run-local: build-local stop
 
 .PHONY: run-prod
 run-prod: build-prod stop
-	# https://github.com/docker-library/redis/issues/19
-	sudo sysctl vm.overcommit_memory=1
-
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
 	docker-compose restart nginx
 
