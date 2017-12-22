@@ -48,7 +48,7 @@ ES = Elasticsearch([app.config['ES_ADDRESS']])
 Bootstrap(app)
 
 # use redis for our session storage (ie: server side cookies)
-REDIS = redis.StrictRedis(host='redis')
+REDIS = redis.StrictRedis(host=app.config['REDIS_ADDRESS'])
 store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)

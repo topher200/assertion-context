@@ -18,7 +18,7 @@ from app import (
 from app.ddl import api_call_db
 from instance import config
 
-app = celery.Celery('tasks', broker='redis://redis')  # redis is a hostname that Docker populates
+app = celery.Celery('tasks', broker='redis://'+config.REDIS_ADDRESS)
 
 # set up database
 ES = Elasticsearch([config.ES_ADDRESS])

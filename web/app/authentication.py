@@ -10,7 +10,9 @@ from simplekv.decorator import PrefixDecorator
 from simplekv.memory.redisstore import RedisStore
 
 
-persistent_storage = RedisStore(redis.StrictRedis(host='redis'))
+persistent_storage = RedisStore(
+    redis.StrictRedis(host=flask.current_app.config['AUTHORIZED_EMAIL_REGEX'])
+)
 USER_DB = PrefixDecorator('user_', persistent_storage)
 
 logger = logging.getLogger()
