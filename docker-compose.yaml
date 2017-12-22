@@ -41,8 +41,3 @@ services:
       - ./web/static:/www/static:ro
     depends_on:
       - web
-
-  redis:
-    image: redis:3.2
-    restart:
-      always

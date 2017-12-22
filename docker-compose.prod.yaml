@@ -29,10 +29,3 @@ services:
         options:
             syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
             tag: nginx
-
-  redis:
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
-            tag: redis
