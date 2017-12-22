@@ -100,6 +100,8 @@ def hydrate_cache():
     start_time = time.time()
     logger.info('hydrating cache')
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+    today = today - datetime.timedelta(days=1)
+    logger.warning('hydrating yesterday, for science')
     tracebacks = traceback_database.get_tracebacks(ES, today, today)
     logger.info('found %s tracebacks in %.2fs', len(tracebacks), time.time() - start_time)
     start_time = time.time()
