@@ -9,10 +9,10 @@ from flask_oauthlib.client import OAuth
 from simplekv.decorator import PrefixDecorator
 from simplekv.memory.redisstore import RedisStore
 
+from instance import config
 
-persistent_storage = RedisStore(
-    redis.StrictRedis(host=flask.current_app.config['AUTHORIZED_EMAIL_REGEX'])
-)
+
+persistent_storage = RedisStore(redis.StrictRedis(host=config.REDIS_ADDRESS))
 USER_DB = PrefixDecorator('user_', persistent_storage)
 
 logger = logging.getLogger()
