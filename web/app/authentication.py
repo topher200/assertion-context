@@ -97,7 +97,7 @@ def add_login_handling(app):
     @login_manager.user_loader
     def load_user(email):  # pylint: disable=unused-variable
         try:
-            document = simplejson.loads(USER_DB.get(email))
+            document = simplejson.loads(USER_DB.get(email).decode())
         except KeyError:
             return None
         return User.generate_from_document(document)
@@ -145,7 +145,7 @@ def add_login_handling(app):
                 "Please log in to Google with an authorized email address."
             ) % email_address
         flask_login.login_user(user, remember=True)
-        USER_DB.put(user.email, simplejson.dumps(user.document()))
+        USER_DB.put(user.email, simplejson.dumps(user.document()).encode())
         logger.info('redirecting to user to index')
         return flask.redirect(flask.url_for('index'))
 
