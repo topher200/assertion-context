@@ -4,9 +4,10 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 
-import elasticsearch
+import logging
 
 import dogpile.cache
+import elasticsearch
 
 from app import es_util
 from app import redis_util
@@ -23,6 +24,8 @@ DOGPILE_REGION = redis_util.make_dogpile_region(
 
 INDEX = 'jira-issue-index'
 DOC_TYPE = 'jira-issue'
+
+logger = logging.getLogger()
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
@@ -110,12 +113,16 @@ def get_matching_jira_issues(es, traceback_text, match_level):
         traceback_text, ["description_filtered", "comments_filtered"], match_level
     )
 
-    raw_es_response = es.search(
-        index=INDEX,
-        doc_type=DOC_TYPE,
-        body=body,
-        size=1000
-    )
+    try:
+        raw_es_response = es.search(
+            index=INDEX,
+            doc_type=DOC_TYPE,
+            body=body,
+            size=1000
+        )
+    except elasticsearch.exceptions.NotFoundError:
+        logger.warning('jira index not found. has it been created?')
+        return []
     res = []
     for raw_jira_issue in raw_es_response['hits']['hits']:
         res.append(generate_from_source(raw_jira_issue['_source']))
@@ -127,8 +134,12 @@ def get_num_jira_issues(es):
     """
         Returns the total number of jira issues found in the database
     """
-    return es.count(
-        index=INDEX,
-        doc_type=DOC_TYPE,
-        body={},
-    )['count']
+    try:
+        return es.count(
+            index=INDEX,
+            doc_type=DOC_TYPE,
+            body={},
+        )['count']
+    except elasticsearch.exceptions.NotFoundError:
+        logger.warning('jira index not found. has it been created?')
+        return 0

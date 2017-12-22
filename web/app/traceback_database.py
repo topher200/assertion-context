@@ -3,6 +3,8 @@
 
     For all functions, `es` must be an instance of Elasticsearch
 """
+import logging
+
 import dogpile.cache
 import elasticsearch
 
@@ -10,6 +12,8 @@ from app import es_util
 from app import redis_util
 from app import retry
 from .traceback import Traceback, generate_traceback_from_source
+
+logger = logging.getLogger()
 
 
 DOGPILE_REGION = redis_util.make_dogpile_region(
@@ -100,13 +104,17 @@ def get_tracebacks(es, start_date=None, end_date=None, num_matches=10000):
             }
         }
 
-    raw_tracebacks = es.search(
-        index=INDEX,
-        doc_type=DOC_TYPE,
-        body=body,
-        sort='origin_timestamp:desc',
-        size=num_matches
-    )
+    try:
+        raw_tracebacks = es.search(
+            index=INDEX,
+            doc_type=DOC_TYPE,
+            body=body,
+            sort='origin_timestamp:desc',
+            size=num_matches
+        )
+    except elasticsearch.exceptions.NotFoundError:
+        logger.warning('traceback index not found. has it been created?')
+        return []
     res = []
     for raw_traceback in raw_tracebacks['hits']['hits']:
         res.append(generate_traceback_from_source(raw_traceback['_source']))

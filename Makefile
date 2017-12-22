@@ -13,6 +13,7 @@ install:
 run-local: build-local stop
 	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
 	docker-compose restart nginx
+	docker-compose stop realtime_updater
 
 .PHONY: run-prod
 run-prod: build-prod stop
