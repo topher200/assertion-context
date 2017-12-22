@@ -62,12 +62,12 @@ authentication.add_login_handling(app)
 
 logger = logging.getLogger()
 
+FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
+
 
 @app.route("/", methods=['GET'])
 @login_required
 def index():
-    FILTERS = ['Has Ticket', 'Has Open Ticket', 'No Ticket', 'All Tracebacks']
-
     # parse the query params
     days_ago_raw = flask.request.args.get('days_ago')
     if days_ago_raw is not None:
@@ -85,9 +85,12 @@ def index():
     if filter_text is None:
         filter_text = 'All Tracebacks'
 
+    return render_main_page(days_ago_int, filter_text)
+
+def render_main_page(days_ago, filter_text):
     # our papertrail logs are saved in Eastern Time
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
-    date_to_analyze = today - datetime.timedelta(days=days_ago_int)
+    date_to_analyze = today - datetime.timedelta(days=days_ago)
 
     # get all tracebacks
     if DEBUG_TIMING:
@@ -166,7 +169,7 @@ def index():
         tb_meta=tb_meta,
         show_restore_button=__user_has_hidden_tracebacks(),
         date_to_analyze=date_to_analyze,
-        days_ago=days_ago_int,
+        days_ago=days_ago,
         filter_text=filter_text
     )
     if DEBUG_TIMING:
@@ -409,7 +412,7 @@ def hydrate_cache():
     """
         Invalidate all the dogpile function caches
     """
-    _ = index()
+    _ = render_main_page(days_ago=0, filter_text=FILTERS[0])
     return 'success'
 
 
