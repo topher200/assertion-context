@@ -59,6 +59,17 @@ HIDDEN_TRACEBACK_TEXT_KEY = 'hide_tracebacks'
 # config
 DEBUG_TIMING = True
 
+# add profiling
+if 'STACKIMPACT_AGENT_KEY' in app.config:
+    print('turning on stackimpact profiling')
+    stackimpact.start(
+        agent_key = app.config['STACKIMPACT_AGENT_KEY'],
+        app_name = 'TracebacksWebServer'
+    )
+else:
+    print('profiling is not configured and is turned off')
+
+
 # add a login handler
 authentication.add_login_handling(app)
 
@@ -479,14 +490,4 @@ def profile_request(_):
 
 if __name__ == "__main__":
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
-
-    if 'STACKIMPACT_AGENT_KEY' in app.config:
-        print('turning on stackimpact profiling')
-        agent = stackimpact.start(
-            agent_key = app.config['STACKIMPACT_AGENT_KEY'],
-            app_name = 'TracebacksWebServer'
-        )
-    else:
-        print('profiling is turned off')
-
     app.run(debug=True, host='0.0.0.0', port=8000)
