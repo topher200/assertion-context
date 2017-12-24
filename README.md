@@ -49,6 +49,7 @@ JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
 DEBUG = False  # enables debug logging to file
 S3_BUCKET = <s3 bucket name. example: 'papertrail_log_bucket'>
 S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
+STACKIMPACT_AGENT_KEY = <optional stackimpact.com agent key. profiling is turned off if not provided>
 ```
  - fill out .env for docker-compose variables. requires these fields:
 ```

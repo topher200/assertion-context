@@ -14,6 +14,7 @@ import certifi
 import flask
 import pytz
 import redis
+import stackimpact
 from flask_bootstrap import Bootstrap
 from flask_kvsession import KVSessionExtension
 from flask_login import current_user, login_required
@@ -477,5 +478,12 @@ def profile_request(_):
 
 
 if __name__ == "__main__":
+    if 'STACKIMPACT_AGENT_KEY' in app.config:
+        # turn on profiling
+        agent = stackimpact.start(
+            agent_key = app.config['STACKIMPACT_AGENT_KEY'],
+            app_name = 'Tracebacks Web Server'
+        )
+
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
     app.run(debug=True, host='0.0.0.0', port=8000)
