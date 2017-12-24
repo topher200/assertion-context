@@ -478,12 +478,15 @@ def profile_request(_):
 
 
 if __name__ == "__main__":
+    app.config['LOGGER_HANDLER_POLICY'] = 'never'
+
     if 'STACKIMPACT_AGENT_KEY' in app.config:
-        # turn on profiling
+        print('turning on stackimpact profiling')
         agent = stackimpact.start(
             agent_key = app.config['STACKIMPACT_AGENT_KEY'],
             app_name = 'Tracebacks Web Server'
         )
+    else:
+        print('profiling is turned off')
 
-    app.config['LOGGER_HANDLER_POLICY'] = 'never'
     app.run(debug=True, host='0.0.0.0', port=8000)
