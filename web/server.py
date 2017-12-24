@@ -484,7 +484,7 @@ if __name__ == "__main__":
         print('turning on stackimpact profiling')
         agent = stackimpact.start(
             agent_key = app.config['STACKIMPACT_AGENT_KEY'],
-            app_name = 'Tracebacks Web Server'
+            app_name = 'TracebacksWebServer'
         )
     else:
         print('profiling is turned off')
