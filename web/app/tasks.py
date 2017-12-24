@@ -2,6 +2,7 @@ import logging
 
 from elasticsearch import Elasticsearch
 import celery
+import certifi
 import requests
 
 from app import (
@@ -18,7 +19,7 @@ from instance import config
 app = celery.Celery('tasks', broker='redis://'+config.REDIS_ADDRESS)
 
 # set up database
-ES = Elasticsearch([config.ES_ADDRESS])
+ES = Elasticsearch([config.ES_ADDRESS], ca_certs=certifi.where())
 
 logger = logging.getLogger()
 

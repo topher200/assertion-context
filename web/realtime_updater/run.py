@@ -8,6 +8,7 @@ import tempfile
 import time
 
 from elasticsearch import Elasticsearch
+import certifi
 
 # We hack the sys path so our script can see the app directory
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +28,7 @@ from realtime_updater import time_util
 from instance import config
 
 # set up database
-ES = Elasticsearch([config.ES_ADDRESS])
+ES = Elasticsearch([config.ES_ADDRESS], ca_certs=certifi.where())
 
 logger = logging.getLogger()
 

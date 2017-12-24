@@ -10,6 +10,7 @@ import time
 import types
 import urllib
 
+import certifi
 import flask
 import pytz
 import redis
@@ -42,7 +43,7 @@ app.config.from_pyfile('instance/config.py')
 app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
-ES = Elasticsearch([app.config['ES_ADDRESS']])
+ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
 
 # add bootstrap
 Bootstrap(app)
