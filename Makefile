@@ -11,13 +11,13 @@ install:
 
 .PHONY: run-local
 run-local: build-local stop
-	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d
+	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d --remove-orphans
 	docker-compose restart nginx
 	docker-compose stop realtime_updater
 
 .PHONY: run-prod
 run-prod: build-prod stop
-	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --remove-orphans
 	docker-compose restart nginx
 
 .PHONY: build-local
