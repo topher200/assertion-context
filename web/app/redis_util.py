@@ -18,9 +18,10 @@ def make_dogpile_region(key_mangler_func):
         key_mangler=key_mangler_func
     ).configure(
         'dogpile.cache.redis',
-        expiration_time=60*60*2,  # 2 hours
+        expiration_time=60*15,  # 15 minutes
         arguments={
             'host': config.REDIS_ADDRESS,
+            'redis_expiration_time': 60*20,  # 20 minutes
         }
     )
     dogpile_region.get('confirm_redis_connection')
