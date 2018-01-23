@@ -17,6 +17,7 @@ import redis
 from flask_bootstrap import Bootstrap
 from flask_kvsession import KVSessionExtension
 from flask_login import current_user, login_required
+from flask_opentracing import FlaskTracer
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
@@ -28,6 +29,7 @@ from app import jira_issue_db
 from app import logging_util
 from app import tasks
 from app import traceback_database
+from app import tracing
 
 
 # to work around https://github.com/pallets/flask/issues/1907
@@ -60,6 +62,9 @@ DEBUG_TIMING = True
 
 # add a login handler
 authentication.add_login_handling(app)
+
+# add tracing
+flask_tracer = FlaskTracer(tracing.initialize_tracer(), True, app)
 
 logger = logging.getLogger()
 
