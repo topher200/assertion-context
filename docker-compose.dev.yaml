@@ -36,6 +36,13 @@ services:
             syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
             tag: nginx
 
+  jaeger:
+    logging:
+        driver: syslog
+        options:
+            syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
+            tag: jaeger
+
   redis:
     image: redis:3.2
     restart:
