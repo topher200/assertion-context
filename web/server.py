@@ -52,6 +52,7 @@ store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 
+# add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 # config
