@@ -340,7 +340,7 @@ def before_request():
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "handling %s '%s' request: %s",
+        "handling %s '%s' request%s",
         flask.request.method, flask.request.full_path, json_str
     )
 
