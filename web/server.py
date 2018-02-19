@@ -19,6 +19,7 @@ from simplekv.decorator import PrefixDecorator
 
 from app import api_aservice
 from app import es_util
+from app import healthz
 from app import jira_issue_aservice
 from app import jira_issue_db
 from app import logging_util
