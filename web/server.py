@@ -51,6 +51,8 @@ store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
+
 # config
 DEBUG_TIMING = True
 
