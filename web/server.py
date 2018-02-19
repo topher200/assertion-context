@@ -13,13 +13,11 @@ import flask
 import redis
 from flask_bootstrap import Bootstrap
 from flask_kvsession import KVSessionExtension
-from flask_login import current_user, login_required
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
 from app import api_aservice
-from app import authentication
 from app import es_util
 from app import jira_issue_aservice
 from app import jira_issue_db
@@ -56,16 +54,12 @@ KVSessionExtension(prefixed_store, app)
 # config
 DEBUG_TIMING = True
 
-# add a login handler
-authentication.add_login_handling(app)
-
 logger = logging.getLogger()
 
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
 
 
 @app.route("/", methods=['GET'])
-@login_required
 def index():
     # parse the query params
     days_ago_raw = flask.request.args.get('days_ago')
@@ -143,7 +137,6 @@ def parse_s3_day():
 
 
 @app.route("/hide_traceback", methods=['POST'])
-@login_required
 def hide_traceback():
     json_request = flask.request.get_json()
     if json_request is None or 'traceback_text' not in json_request:
@@ -160,14 +153,12 @@ def hide_traceback():
 
 
 @app.route("/restore_all", methods=['POST'])
-@login_required
 def restore_all_tracebacks():
     flask.session[text_keys.HIDDEN_TRACEBACK] = None
     return 'success'
 
 
 @app.route("/create_jira_ticket", methods=['POST'])
-@login_required
 def create_jira_ticket():
     """
         Create a jira ticket with tracebacks that share the given traceback text
@@ -205,7 +196,6 @@ def create_jira_ticket():
 
 
 @app.route("/jira_comment", methods=['POST'])
-@login_required
 def jira_comment():
     """
         Save a comment in jira with the latest hits on this traceback
@@ -327,7 +317,6 @@ def purge_celery_queue():
 
 
 @app.route("/admin", methods=['GET'])
-@login_required
 def admin():
     num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
     num_celery_tasks = REDIS.llen('celery')
@@ -348,12 +337,11 @@ def before_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
-    user = current_user.email if not current_user.is_anonymous else 'anonymous user'
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "handling %s '%s' request from '%s'%s",
-        flask.request.method, flask.request.full_path, user, json_str
+        "handling %s '%s' request: %s",
+        flask.request.method, flask.request.full_path, json_str
     )
 
 
