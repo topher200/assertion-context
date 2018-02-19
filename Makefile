@@ -13,7 +13,7 @@ install:
 run-local: build-local stop
 	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d --remove-orphans
 	docker-compose restart nginx
-	docker-compose stop realtime_updater
+	docker-compose stop --timeout 1 realtime_updater
 
 .PHONY: run-prod
 run-prod: build-prod stop
