@@ -1,5 +1,5 @@
 """
-    Run our API.
+    Run our web server.
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
