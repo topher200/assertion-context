@@ -8,7 +8,7 @@ import requests
 
 
 MONTHS_TO_PROCESS = (
-    '2017-10-%02d',
+    '2018-02-%02d',
 )
 
 def build_dates():
