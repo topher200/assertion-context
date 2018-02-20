@@ -28,15 +28,9 @@ from app import text_keys
 from app import traceback_database
 
 
-# to work around https://github.com/pallets/flask/issues/1907
-class AutoReloadingFlask(flask.Flask):
-    def create_jinja_environment(self):
-        self.config['TEMPLATES_AUTO_RELOAD'] = True
-        return flask.Flask.create_jinja_environment(self)
-
 # create app
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
+app = flask.Flask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
 app.config.from_pyfile('instance/config.py')
 
 # set up database
