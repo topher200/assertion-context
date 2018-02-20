@@ -20,6 +20,5 @@ RUN pip3 install -r requirements.txt
 COPY .aws_credentials /root/.aws/credentials
 COPY .aws_config /root/.aws/config
 
-# web app code is added by docker-compose volume
-
+COPY ./ /code
 CMD ["python3", "server.py"]

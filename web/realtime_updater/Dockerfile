@@ -39,6 +39,5 @@ ADD crontab /etc/cron.d/run-updater
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/run-updater
 
-# web app code is added by docker-compose volume
-
+COPY ./ /code
 CMD ["cron", "-f"]

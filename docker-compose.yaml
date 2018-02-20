@@ -3,15 +3,11 @@ version: '2'
 services:
   web:
     build: web/
-    volumes:
-      - ./web:/code:ro
     restart:
       always
 
   celery:
     build: web/
-    volumes:
-      - ./web:/code:ro
     restart:
       always
     command:
@@ -19,8 +15,6 @@ services:
 
   realtime_updater:
     build: web/realtime_updater/
-    volumes:
-      - ./web:/code:ro
     restart:
       always
 
@@ -31,5 +25,3 @@ services:
       nginx/
     ports:
       - "80:80"
-    volumes:
-      - ./web/static:/www/static:ro
