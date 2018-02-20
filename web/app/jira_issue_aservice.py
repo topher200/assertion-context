@@ -57,7 +57,7 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
 
 JIRA_CLIENT = jira.JIRA(
     server=config.JIRA_SERVER,
-    basic_auth=config.JIRA_BASIC_AUTH,
+    basic_auth=(config.JIRA_BASIC_AUTH_USERNAME, config.JIRA_BASIC_AUTH_PASSWORD),
 )
 JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
 
