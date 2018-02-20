@@ -37,12 +37,9 @@ aws_secret_access_key = ###
  - (optional) fill out `web/.aws_config` as well. defaults to us-east-1
  - fill out `web/instance/config.py`. requires these fields:
 ```
-OAUTH_CLIENT_ID = <from your oauth provider>
-OAUTH_CLIENT_SECRET = <from your oauth provider>
 ES_ADDRESS = <url to ElasticSearch database>
 REDIS_ADDRESS = <url to Redis database>
 USE_DOGPILE_CACHE = <True if we should use the dogpile cache>
-AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the user. example: '@gmail.com$'>
 JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
 JIRA_BASIC_AUTH = (<jira username>, <jira password>)
 JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>

@@ -38,7 +38,6 @@ class AutoReloadingFlask(flask.Flask):
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
 app.config.from_pyfile('instance/config.py')
-app.secret_key = app.config['OAUTH_CLIENT_SECRET']
 
 # set up database
 ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
