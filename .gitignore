@@ -1,6 +1,4 @@
 .DS_Store
-.aws_config
-.aws_credentials
 .env
 .papertrail.yml
 *.pyc

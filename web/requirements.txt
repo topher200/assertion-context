@@ -2,6 +2,7 @@ Flask-Elasticsearch==0.2.5
 Flask-KVSession==0.6.2
 Gunicorn==19.6
 boto3==1.4.0
+cachetools==2.0.1
 celery[redis]==4.0.2
 certifi
 dogpile.cache==0.6.2
