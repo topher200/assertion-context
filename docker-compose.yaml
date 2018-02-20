@@ -23,7 +23,7 @@ services:
     command:
       [celery, -A, app.tasks, worker]
 
-  realtime_updater:
+  realtime-updater:
     build:
       context:
         ./web

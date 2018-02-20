@@ -16,12 +16,12 @@ services:
             syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
             tag: celery
 
-  realtime_updater:
+  realtime-updater:
     logging:
         driver: syslog
         options:
             syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
-            tag: realtime_updater
+            tag: realtime-updater
 
   nginx:
     logging:
