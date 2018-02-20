@@ -12,6 +12,7 @@ import certifi
 import flask
 import redis
 from flask_bootstrap import Bootstrap
+from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
@@ -30,8 +31,14 @@ from app import traceback_database
 
 # create app
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-app = flask.Flask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
-app.config.from_pyfile('instance/config.py')
+app = flask.Flask(__name__)
+
+# get config from env vars
+class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
+    ENV_LOAD_ALL = True # load all env variables
+
+print(EnvironmentVarConfig.REDIS_ADDRESS)
+app.config.from_object(EnvironmentVarConfig)
 
 # set up database
 ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())

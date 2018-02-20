@@ -35,8 +35,10 @@ aws_access_key_id = ###
 aws_secret_access_key = ###
 ```
  - (optional) fill out `web/.aws_config` as well. defaults to us-east-1
- - fill out `web/instance/config.py`. requires these fields:
+ - fill out .env with config variables. requires these fields:
 ```
+PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
+PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ES_ADDRESS = <url to ElasticSearch database>
 REDIS_ADDRESS = <url to Redis database>
 USE_DOGPILE_CACHE = <True if we should use the dogpile cache>
@@ -47,11 +49,6 @@ JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
 DEBUG = False  # enables debug logging to file
 S3_BUCKET = <s3 bucket name. example: 'papertrail_log_bucket'>
 S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
-```
- - fill out .env for docker-compose variables. requires these fields:
-```
-PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
-PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 ```
  - fill out web/realtime_updater/.papertrail.yml for real-time papertrail. requires this field:
 ```

@@ -6,6 +6,8 @@ services:
       ./web
     image:
       topher200/assertion-context
+    env_file:
+      ./.env
     restart:
       always
 
@@ -14,6 +16,8 @@ services:
       ./web
     image:
       topher200/assertion-context
+    env_file:
+      ./.env
     restart:
       always
     command:
@@ -27,6 +31,8 @@ services:
         Dockerfile-realtime-updater
     image:
       topher200/assertion-context-realtime-updater
+    env_file:
+      ./.env
     restart:
       always
 
