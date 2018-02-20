@@ -29,7 +29,6 @@ from realtime_updater import time_util
 
 REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
 ES_ADDRESS = config_util.get('ES_ADDRESS')
-PAPERTRAIL_API_TOKEN = config_util.get('PAPERTRAIL_API_TOKEN')
 
 # set up database
 ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
@@ -39,7 +38,6 @@ logger = logging.getLogger()
 
 def main(end_time=None):
     setup_logging()
-    set_papertrail_config_vars()
 
     start_time, end_time = __get_times(end_time)
     logger.info('getting logs from %s -> %s', start_time, end_time)
@@ -77,6 +75,7 @@ def main(end_time=None):
 def call_papertrail_cli(start_time, end_time):
     local_file = tempfile.NamedTemporaryFile('wb')
     res = subprocess.run(
+        # Note: this expects that the env var PAPERTRAIL_API_TOKEN is populated
         ['/usr/local/bin/papertrail', '--min-time', str(start_time), '--max-time', str(end_time), '-j'],
         stdout=local_file,
         stderr=subprocess.PIPE,
@@ -97,17 +96,6 @@ def call_papertrail_cli(start_time, end_time):
 
 def setup_logging(*_, **__):
     logging_util.setup_logging()
-
-
-def set_papertrail_config_vars():
-    # there's no way to pass creds into the papertrail process with the CLI... we just need to have
-    # them waiting in a config file
-
-    if os.path.isfile('~/.papertrail.yml'):
-        return  # it's already there
-
-    with open('~/.papertrail.yml', 'w') as f:
-        f.write('token: %s\n' % PAPERTRAIL_API_TOKEN)
 
 
 def __get_times(end_time=None):
