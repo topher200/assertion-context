@@ -7,7 +7,6 @@ test: install
 install:
 	pip install -r requirements.txt
 	pip install -r web/requirements.txt
-	pip install -r web/realtime_updater/requirements.txt
 
 .PHONY: run-local
 run-local: build-local stop
