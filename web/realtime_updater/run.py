@@ -17,6 +17,7 @@ import sys
 sys.path.append(ROOT)
 
 from app import (
+    config_util,
     json_parser,
     logging_util,
     tasks_util,
@@ -25,10 +26,12 @@ from app import (
 from app.ddl import api_call_db
 from realtime_updater import time_util
 
-from instance import config
+
+REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
+ES_ADDRESS = config_util.get('ES_ADDRESS')
 
 # set up database
-ES = Elasticsearch([config.ES_ADDRESS], ca_certs=certifi.where())
+ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
 
 logger = logging.getLogger()
 

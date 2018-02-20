@@ -2,14 +2,17 @@ import logging
 
 import dogpile.cache
 
-from instance import config
+from . import config_util
+
+USE_DOGPILE_CACHE = config_util.get('USE_DOGPILE_CACHE')
+REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
 
 
 logger = logging.getLogger()
 
 
 def make_dogpile_region(key_mangler_func):
-    if not config.USE_DOGPILE_CACHE:
+    if not USE_DOGPILE_CACHE:
         dogpile_region = dogpile.cache.make_region().configure('dogpile.cache.null')
         logger.info("dogpile cache turned off")
         return dogpile_region
@@ -20,10 +23,10 @@ def make_dogpile_region(key_mangler_func):
         'dogpile.cache.redis',
         expiration_time=60*15,  # 15 minutes
         arguments={
-            'host': config.REDIS_ADDRESS,
+            'host': REDIS_ADDRESS,
             'redis_expiration_time': 60*20,  # 20 minutes
         }
     )
     dogpile_region.get('confirm_redis_connection')
-    logger.info("using dogpile cache from redis at %s", config.REDIS_ADDRESS)
+    logger.info("using dogpile cache from redis at %s", REDIS_ADDRESS)
     return dogpile_region

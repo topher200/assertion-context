@@ -6,6 +6,7 @@ import certifi
 import requests
 
 from app import (
+    config_util,
     jira_issue_db,
     jira_issue_aservice,
     traceback_database,
@@ -14,12 +15,14 @@ from app import (
     s3,
 )
 from app.ddl import api_call_db
-from instance import config
 
-app = celery.Celery('tasks', broker='redis://'+config.REDIS_ADDRESS)
+REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
+ES_ADDRESS = config_util.get('ES_ADDRESS')
+
+app = celery.Celery('tasks', broker='redis://'+REDIS_ADDRESS)
 
 # set up database
-ES = Elasticsearch([config.ES_ADDRESS], ca_certs=certifi.where())
+ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
 
 logger = logging.getLogger()
 

@@ -1,10 +1,11 @@
 import logging
 import logging.handlers
 
-from instance import config
+from . import config_util
 
 
 logger = logging.getLogger()
+DEBUG_MODE = config_util.get('DEBUG')
 
 
 def setup_logging():
@@ -21,7 +22,7 @@ def setup_logging():
     handler.setLevel(logging.INFO)
     logger.addHandler(handler)
 
-    if config.DEBUG:
+    if DEBUG_MODE:
         logger.setLevel(logging.DEBUG)
         # rotating file handler with more verbosity
         handler = logging.handlers.RotatingFileHandler(
