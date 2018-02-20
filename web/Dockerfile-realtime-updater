@@ -1,5 +1,5 @@
 # initial setup
-FROM ubuntu:17.04
+FROM ubuntu:17.10
 MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi' >> /root/.bashrc
