@@ -51,12 +51,10 @@ S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
 AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
 AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
 AWS_REGION=us-east-1 # to download papertrail archives from s3
-```
- - fill out web/realtime_updater/.papertrail.yml for real-time papertrail. requires this field:
-```
-token: 123456789012345678901234567890ab
-```
 
+# token for Papertrail CLI access. used by realtime-updater
+PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
+```
 
 Then to start it all up:
  - `make run-local` or `make run-prod`
