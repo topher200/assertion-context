@@ -28,7 +28,7 @@ host to get started. Installation instructions for setting up the host:
  - clone this repo
  - fill out .env with config variables. requires these fields:
 ```
-DEBUG = False  # enables debug logging to file
+DEBUG_LOGGING = False  # enables logging to file
 
 # logging
 PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
