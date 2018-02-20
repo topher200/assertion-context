@@ -2,22 +2,31 @@ version: '2'
 
 services:
   web:
-    build: ./web
-    image: topher200/assertion-context
+    build:
+      ./web
+    image:
+      topher200/assertion-context
     restart:
       always
 
   celery:
-    build: ./web
-    image: topher200/assertion-context
+    build:
+      ./web
+    image:
+      topher200/assertion-context
     restart:
       always
     command:
       [celery, -A, app.tasks, worker]
 
   realtime_updater:
-    build: ./web/realtime_updater
-    image: topher200/assertion-context-realtime-updater
+    build:
+      context:
+        ./web
+      dockerfile:
+        Dockerfile-realtime-updater
+    image:
+      topher200/assertion-context-realtime-updater
     restart:
       always
 

@@ -22,10 +22,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN gem install papertrail
 RUN pip3 install --upgrade pip
-ADD requirements.txt ./
+ADD ./realtime_updater/requirements.txt ./
 RUN python3.6 -m pip install -r requirements.txt
 
-ADD .papertrail.yml /root/
+ADD ./realtime_updater/.papertrail.yml /root/
 
 # workaround for PAM/cron/debian issue
 # https://stackoverflow.com/a/43473861/131159
@@ -35,7 +35,7 @@ RUN sed -i '/session    required     pam_loginuid.so/c\#session    required   pa
 
 ## setup cron
 # Add crontab file in the cron directory
-ADD crontab /etc/cron.d/run-updater
+ADD ./realtime_updater/crontab /etc/cron.d/run-updater
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/run-updater
 
