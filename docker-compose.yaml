@@ -33,5 +33,3 @@ services:
       - "80:80"
     volumes:
       - ./web/static:/www/static:ro
-    depends_on:
-      - web
