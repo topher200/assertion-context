@@ -24,6 +24,7 @@ from app import healthz
 from app import jira_issue_aservice
 from app import jira_issue_db
 from app import logging_util
+from app import realtime_updater
 from app import tasks
 from app import text_keys
 from app import traceback_database
@@ -138,6 +139,29 @@ def parse_s3_day():
         tasks.parse_log_file.delay(bucket, key)
 
     return 'jobs queued', 202
+
+
+@app.route("/realtime_update", methods=['POST'])
+def realtime_update():
+    """
+        POST request to parse data directly from Papertrail in real time.
+
+        Takes a JSON containing these fields:
+        - end_time: datetime to parse. string, in '%Y-%m-%d %H:%M:%S' form
+
+        All fields are optional.
+
+        Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
+        asyncronously.
+    """
+    # parse our input
+    json_request = flask.request.get_json()
+    if json_request is None or not 'end_time' in json_request:
+        return 'missing params', 400
+    end_time = json_request['end_time']
+
+    realtime_updater.enqueue(end_time)
+    return 'job queued', 202
 
 
 @app.route("/hide_traceback", methods=['POST'])

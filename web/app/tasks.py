@@ -13,6 +13,7 @@ from app import (
     logging_util,
     tasks_util,
     s3,
+    realtime_updater,
 )
 from app.ddl import api_call_db
 
@@ -90,6 +91,12 @@ def parse_log_file(bucket, key):
         logger.info("saved %s api_calls. bucket: %s, key: %s", len(api_calls), bucket, key)
     else:
         logger.error('failed to save api_calls. %s, key: %s', bucket, key)
+
+
+@app.task
+def realtime_update(start_time, end_time):
+    logger.info("running realtime updater. %s to %s", start_time, end_time)
+    realtime_updater.run(ES, start_time, end_time)
 
 
 @app.task
