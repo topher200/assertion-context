@@ -72,10 +72,11 @@ def run(ES, start_time, end_time):
 def __call_papertrail_cli(start_time, end_time):
     local_file = tempfile.NamedTemporaryFile('wb')
     res = subprocess.run(
-        # Note: this expects that the env var PAPERTRAIL_API_TOKEN is populated
+        # NOTE: this expects that the env var PAPERTRAIL_API_TOKEN is populated
         ['/usr/local/bin/papertrail', '--min-time', str(start_time), '--max-time', str(end_time), '-j'],
         stdout=local_file,
         stderr=subprocess.PIPE,
+        # NOTE: this requires python3.6 or greater
         encoding="utf-8"
     )
 
