@@ -154,11 +154,11 @@ def realtime_update():
         Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
         asyncronously.
     """
-    # parse our input
+    # parse our input. it's optional!
+    end_time = None
     json_request = flask.request.get_json()
-    if json_request is None or not 'end_time' in json_request:
-        return 'missing params', 400
-    end_time = json_request['end_time']
+    if json_request is not None and 'end_time' in json_request:
+        end_time = json_request['end_time']
 
     realtime_updater.enqueue(end_time)
     return 'job queued', 202
