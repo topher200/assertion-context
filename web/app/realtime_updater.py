@@ -31,7 +31,7 @@ def enqueue(end_time):
 
     start_time, end_time = __get_times(end_time)
     logger.info('queueing realtime updater for logs from %s -> %s', start_time, end_time)
-    tasks.realtime_update.delay(start_time, end_time)
+    tasks.realtime_update.apply_async((start_time, end_time), expires=60) # expire after a minute
 
 
 def run(ES, start_time, end_time):
