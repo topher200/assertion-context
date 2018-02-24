@@ -12,7 +12,6 @@ install:
 run-local: build-local stop
 	docker-compose -f docker-compose.yaml -f docker-compose.dev.yaml up -d --remove-orphans
 	docker-compose restart nginx
-	docker-compose stop --timeout 1 realtime-updater
 
 .PHONY: run-prod
 run-prod: build-prod stop
@@ -30,7 +29,6 @@ build-prod:
 .PHONY: stop
 stop:
 	docker-compose stop --timeout 120 celery
-	docker-compose stop --timeout 2 realtime-updater
 	docker-compose stop web
 
 .PHONY: stop-all
@@ -39,4 +37,4 @@ stop-all:
 
 .PHONY: kill
 kill:
-	docker-compose stop --timeout 2 web celery realtime-updater
+	docker-compose stop --timeout 2 web celery

@@ -23,19 +23,6 @@ services:
     command:
       [celery, -A, app.tasks, worker]
 
-  realtime-updater:
-    build:
-      context:
-        ./web
-      dockerfile:
-        Dockerfile-realtime-updater
-    image:
-      topher200/assertion-context-realtime-updater
-    env_file:
-      ./.env
-    restart:
-      always
-
   nginx:
     restart:
       always

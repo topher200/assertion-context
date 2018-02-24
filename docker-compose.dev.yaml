@@ -22,13 +22,6 @@ services:
             syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
             tag: celery
 
-  realtime-updater:
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
-            tag: realtime-updater
-
   nginx:
     logging:
         driver: syslog
