@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import logging
 import math
@@ -6,9 +5,6 @@ import os
 import subprocess
 import tempfile
 import time
-
-from elasticsearch import Elasticsearch
-import certifi
 
 # We hack the sys path so our script can see the app directory
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,29 +14,34 @@ sys.path.append(ROOT)
 
 from app import (
     json_parser,
-    logging_util,
+    tasks,
     tasks_util,
     traceback_database,
+    time_util,
 )
 from app.ddl import api_call_db
-from realtime_updater import time_util
 
-from instance import config
-
-# set up database
-ES = Elasticsearch([config.ES_ADDRESS], ca_certs=certifi.where())
 
 logger = logging.getLogger()
 
 
-def main(end_time=None):
-    setup_logging()
+def enqueue(end_time):
+    """ add a realtime_update job to the queue """
+    assert end_time is None or isinstance(end_time, datetime.datetime), end_time
+
     start_time, end_time = __get_times(end_time)
-    logger.info('getting logs from %s -> %s', start_time, end_time)
+    logger.info('queueing realtime updater for logs from %s -> %s', start_time, end_time)
+    tasks.realtime_update.apply_async((start_time, end_time), expires=60) # expire after a minute
+
+
+def run(ES, start_time, end_time):
+    """ run the realtime updater for the given times """
+    assert isinstance(start_time, str), (type(start_time), start_time)
+    assert isinstance(end_time, str), (type(end_time), end_time)
 
     # fill a log file with papertrail output. retry on failures
     for i in range(10):
-        local_file = call_papertrail_cli(start_time, end_time)
+        local_file = __call_papertrail_cli(start_time, end_time)
         if local_file is not None:
             break
         time.sleep(math.pow(2, i))  # increasing backoff
@@ -68,12 +69,14 @@ def main(end_time=None):
     logger.info('done with logs from %s -> %s', start_time, end_time)
 
 
-def call_papertrail_cli(start_time, end_time):
+def __call_papertrail_cli(start_time, end_time):
     local_file = tempfile.NamedTemporaryFile('wb')
     res = subprocess.run(
+        # NOTE: this expects that the env var PAPERTRAIL_API_TOKEN is populated
         ['/usr/local/bin/papertrail', '--min-time', str(start_time), '--max-time', str(end_time), '-j'],
         stdout=local_file,
         stderr=subprocess.PIPE,
+        # NOTE: this requires python3.6 or greater
         encoding="utf-8"
     )
 
@@ -89,10 +92,6 @@ def call_papertrail_cli(start_time, end_time):
     return local_file
 
 
-def setup_logging(*_, **__):
-    logging_util.setup_logging()
-
-
 def __get_times(end_time=None):
     if end_time is None:
         now = datetime.datetime.now()
@@ -106,15 +105,3 @@ def __get_times(end_time=None):
     end_time = end_time - datetime.timedelta(seconds=1)
 
     return (start_time, end_time)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='download papertrail logs from their api')
-    parser.add_argument('--time', help='optional end time for download')
-    args = parser.parse_args()
-    if args.time:
-        end_time_str = args.time
-        end_time_ = datetime.datetime.strptime(end_time_str, '%Y-%m-%d %H:%M:%S')
-        main(end_time_)
-    else:
-        main()

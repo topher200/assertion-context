@@ -1,10 +1,7 @@
 .DS_Store
-.aws_config
-.aws_credentials
 .env
 .papertrail.yml
 *.pyc
 run-populate-db.sh
-instance/
 differ/diff1.txt
 differ/diff2.txt

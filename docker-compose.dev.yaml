@@ -22,13 +22,6 @@ services:
             syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
             tag: celery
 
-  realtime_updater:
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_DEVELOPMENT_URL}
-            tag: realtime_updater
-
   nginx:
     logging:
         driver: syslog
@@ -72,8 +65,6 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:5.2.1
-    depends_on:
-      - elasticsearch
     environment:
       - xpack.security.enabled=false
     ports:

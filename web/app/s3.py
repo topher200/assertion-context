@@ -7,11 +7,16 @@ import tempfile
 import boto3
 import botocore
 
+from . import config_util
 from . import file_parser
 from . import retry
 
 
 logger = logging.getLogger()
+
+AWS_REGION = config_util.get('AWS_REGION')
+AWS_ACCESS_KEY_ID = config_util.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config_util.get('AWS_SECRET_ACCESS_KEY')
 
 
 @retry.Retry(exceptions=(EOFError,))
@@ -21,7 +26,12 @@ def parse_s3_file(bucket, key):
 
         Returns a list of L{Traceback}s and a list of L{ApiCall}. Returns None, None on error.
     """
-    s3 = boto3.client('s3')
+    s3 = boto3.client(
+        's3',
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    )
     with tempfile.NamedTemporaryFile('wb') as local_file:
         try:
             s3.download_fileobj(bucket, key, local_file)

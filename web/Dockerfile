@@ -1,25 +1,26 @@
 # initial setup
-FROM ubuntu:16.04
+FROM python:3.6
 MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1
 
+# set my timezone to eastern, so we send our company's standard time to papertrail
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # install dependencies
 RUN apt-get update && apt-get install -y \
     iputils-ping \
     less \
-    python3-pip \
     redis-tools \
+    ruby-full \
     vim
-RUN pip3 install --upgrade pip
-ADD requirements.txt ./
-RUN pip3 install -r requirements.txt
+RUN gem install papertrail
 
-# setup aws creds
-COPY .aws_credentials /root/.aws/credentials
-COPY .aws_config /root/.aws/config
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# web app code is added by docker-compose volume
+COPY ./ /code
 
-CMD ["python3", "server.py"]
+CMD ["python", "server.py"]

@@ -12,3 +12,5 @@ RUN rm /etc/nginx/conf.d/default.conf
 # add our files
 COPY nginx.conf /etc/nginx
 COPY tracebacks_app.conf /etc/nginx/conf.d
+
+COPY static /www/static

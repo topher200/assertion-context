@@ -26,40 +26,35 @@ host to get started. Installation instructions for setting up the host:
  - `pip install docker-compose`
    - optional: do this in a virtualenv
  - clone this repo
- - fill out `web/.aws_credentials` for a user that has S3 read permissions to
-   the papertrail archives. this is used for our app to download the archives
-   from S3. requires these fields:
+ - fill out .env with config variables. requires these fields:
 ```
-[default]
-aws_access_key_id = ###
-aws_secret_access_key = ###
-```
- - (optional) fill out `web/.aws_config` as well. defaults to us-east-1
- - fill out `web/instance/config.py`. requires these fields:
-```
-OAUTH_CLIENT_ID = <from your oauth provider>
-OAUTH_CLIENT_SECRET = <from your oauth provider>
+DEBUG_LOGGING = False  # enables logging to file
+
+# logging
+PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
+PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
+
+# databases/storage
 ES_ADDRESS = <url to ElasticSearch database>
 REDIS_ADDRESS = <url to Redis database>
 USE_DOGPILE_CACHE = <True if we should use the dogpile cache>
-AUTHORIZED_EMAIL_REGEX = <regex checked against the google oauth'd email of the user. example: '@gmail.com$'>
+
+# jira account to use for getting and creating issues
 JIRA_SERVER = <url of the jira server. example: 'https://example.atlassian.net>
-JIRA_BASIC_AUTH = (<jira username>, <jira password>)
+JIRA_BASIC_AUTH_USERNAME=name@server.com
+JIRA_BASIC_AUTH_PASSWORD=hunter2
 JIRA_PROJECT_KEY = <the project key of your JIRA project. example: 'SAN'>
-DEBUG = False  # enables debug logging to file
+
+# to download papertrail archives from s3
 S3_BUCKET = <s3 bucket name. example: 'papertrail_log_bucket'>
 S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
-```
- - fill out .env for docker-compose variables. requires these fields:
-```
-PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
-PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
-```
- - fill out web/realtime_updater/.papertrail.yml for real-time papertrail. requires this field:
-```
-token: 123456789012345678901234567890ab
-```
+AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
+AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
+AWS_REGION=us-east-1 # to download papertrail archives from s3
 
+# token for Papertrail CLI access. used by realtime-updater
+PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
+```
 
 Then to start it all up:
  - `make run-local` or `make run-prod`

@@ -5,9 +5,14 @@ import re
 
 import jira
 
-from instance import config
+from . import config_util
 from .jira_issue import JiraIssue
 
+
+JIRA_SERVER=config_util.get('JIRA_SERVER')
+JIRA_BASIC_AUTH_USERNAME=config_util.get('JIRA_BASIC_AUTH_USERNAME')
+JIRA_BASIC_AUTH_PASSWORD=config_util.get('JIRA_BASIC_AUTH_PASSWORD')
+JIRA_PROJECT_KEY=config_util.get('JIRA_PROJECT_KEY')
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -56,10 +61,10 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
 """
 
 JIRA_CLIENT = jira.JIRA(
-    server=config.JIRA_SERVER,
-    basic_auth=config.JIRA_BASIC_AUTH,
+    server=JIRA_SERVER,
+    basic_auth=(JIRA_BASIC_AUTH_USERNAME, JIRA_BASIC_AUTH_PASSWORD),
 )
-JIRA_PROJECT_KEY = config.JIRA_PROJECT_KEY
+JIRA_PROJECT_KEY = JIRA_PROJECT_KEY
 
 COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
 """
@@ -222,7 +227,7 @@ def get_link_to_issue(issue_key):
     """
     assert isinstance(issue_key, str), (type(issue_key), issue_key)
 
-    server = config.JIRA_SERVER
+    server = JIRA_SERVER
     return '%s/browse/%s' % (server, issue_key)
 
 

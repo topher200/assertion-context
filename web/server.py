@@ -12,6 +12,7 @@ import certifi
 import flask
 import redis
 from flask_bootstrap import Bootstrap
+from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
@@ -23,22 +24,22 @@ from app import healthz
 from app import jira_issue_aservice
 from app import jira_issue_db
 from app import logging_util
+from app import realtime_updater
 from app import tasks
 from app import text_keys
 from app import traceback_database
 
 
-# to work around https://github.com/pallets/flask/issues/1907
-class AutoReloadingFlask(flask.Flask):
-    def create_jinja_environment(self):
-        self.config['TEMPLATES_AUTO_RELOAD'] = True
-        return flask.Flask.create_jinja_environment(self)
-
 # create app
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-app = AutoReloadingFlask(__name__, instance_path=os.path.join(ROOT_DIR, 'instance'))
-app.config.from_pyfile('instance/config.py')
-app.secret_key = app.config['OAUTH_CLIENT_SECRET']
+app = flask.Flask(__name__)
+
+# get config from env vars
+class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
+    ENV_LOAD_ALL = True # load all env variables
+
+print(EnvironmentVarConfig.REDIS_ADDRESS)
+app.config.from_object(EnvironmentVarConfig)
 
 # set up database
 ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
@@ -138,6 +139,29 @@ def parse_s3_day():
         tasks.parse_log_file.delay(bucket, key)
 
     return 'jobs queued', 202
+
+
+@app.route("/realtime_update", methods=['POST'])
+def realtime_update():
+    """
+        POST request to parse data directly from Papertrail in real time.
+
+        Takes a JSON containing these fields:
+        - end_time: datetime to parse. string, in '%Y-%m-%d %H:%M:%S' form
+
+        All fields are optional.
+
+        Returns a 400 error on bad input. Returns a 202 after we queue the job to be run
+        asyncronously.
+    """
+    # parse our input. it's optional!
+    end_time = None
+    json_request = flask.request.get_json()
+    if json_request is not None and 'end_time' in json_request:
+        end_time = json_request['end_time']
+
+    realtime_updater.enqueue(end_time)
+    return 'job queued', 202
 
 
 @app.route("/hide_traceback", methods=['POST'])
