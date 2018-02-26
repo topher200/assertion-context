@@ -34,6 +34,9 @@ DEBUG_LOGGING = False  # enables logging to file
 PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
 PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
 
+# token for Papertrail CLI access. used by realtime-updater
+PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
+
 # databases/storage
 ES_ADDRESS = <url to ElasticSearch database>
 REDIS_ADDRESS = <url to Redis database>
@@ -51,9 +54,6 @@ S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
 AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
 AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
 AWS_REGION=us-east-1 # to download papertrail archives from s3
-
-# token for Papertrail CLI access. used by realtime-updater
-PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
 ```
 
 Then to start it all up:
