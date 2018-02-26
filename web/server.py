@@ -38,7 +38,6 @@ app = flask.Flask(__name__)
 class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
     ENV_LOAD_ALL = True # load all env variables
 
-print(EnvironmentVarConfig.REDIS_ADDRESS)
 app.config.from_object(EnvironmentVarConfig)
 
 # set up database
