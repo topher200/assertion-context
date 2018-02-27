@@ -358,7 +358,7 @@ def invalidate_cache(cache=None):
     if cache is None or cache == 'jira':
         logger.info('invalidating jira cache')
         jira_issue_db.invalidate_cache()
-    tasks.hydrate_cache.delay()
+    tasks.hydrate_cache.apply_async(tuple(), expires=60) # expire after a minute
     return 'success'
 
 
