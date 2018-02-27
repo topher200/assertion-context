@@ -20,6 +20,8 @@ class ApiCall(object):
         - username: user name of the user who made the api call
         - method: REST API method of the call. example: 'GET'
         - duration: time in ms that the API call took
+        - memory_final: final python process memory usage (in MB)
+        - memory_delta: change from start of call until end of python process memory usage (in MB)
     """
     def __init__(
             self,
@@ -31,7 +33,9 @@ class ApiCall(object):
             profile_name,
             username,
             method,
-            duration
+            duration,
+            memory_final,
+            memory_delta,
     ):
         self._timestamp = timestamp
         self._papertrail_id = papertrail_id
@@ -42,6 +46,8 @@ class ApiCall(object):
         self._username = username
         self._method = method
         self._duration = duration
+        self._memory_final = memory_final
+        self._memory_delta = memory_delta
 
     def document(self):
         """
@@ -59,6 +65,8 @@ class ApiCall(object):
             "username": self._username,
             "method": self._method,
             "duration": self._duration,
+            "memory_final": self._memory_final,
+            "memory_delta": self._memory_delta,
         }
 
     def __repr__(self):
@@ -77,6 +85,10 @@ class ApiCall(object):
             '%Y-%m-%dT%H:%M:%S%z'
         )
 
+        # memory fields are optional and may not be present on all API calls
+        memory_final = source.get("memory_final")
+        memory_delta = source.get("memory_delta")
+
         return ApiCall(
             timestamp,
             source["papertrail_id"],
@@ -87,6 +99,8 @@ class ApiCall(object):
             source["username"],
             source["method"],
             source["duration"],
+            memory_final,
+            memory_delta,
         )
 
     @property
@@ -125,3 +139,13 @@ class ApiCall(object):
     @property
     def duration(self):
         return self._duration
+
+    @property
+    def memory_final(self):
+        # NOTE: can be None
+        return self._memory_final
+
+    @property
+    def memory_delta(self):
+        # NOTE: can be None
+        return self._memory_delta

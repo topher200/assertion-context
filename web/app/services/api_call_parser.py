@@ -5,12 +5,18 @@ from .parser_util import ParserUtil
 from ..entities.api_call import ApiCall
 
 
-API_CALL_REGEX = re.compile('\d+/\w+#(?:(?P<profile_name>\w+)-)?(?P<username>[a-zA-Z0-9_.+-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) took (?P<duration>\d+) milliseconds')
+API_CALL_REGEX = re.compile((
+    '\d+/\w+#(?:(?P<profile_name>\w+)-)?'
+    '(?P<username>[a-zA-Z0-9_.+-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) '
+    'took (?P<duration>\d+) milliseconds to complete and final memory '
+    '(?P<memory_final>-?\d+)MB \(delta (?P<memory_delta>-?\d+)MB\)'
+))
 """
     Regex we can use to get information about API calls from the log message
 
     Example log message:
-        '''05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete''',
+        05/Dec/2016:09:00:00.004 6012/WS#name-profile_name@name.com   : DEBUG    wordstream.services: f,1480946399.9936 IsGetInProgressHandler (GET) took 11 milliseconds to complete and final memory 236MB (delta -1MB)
+
 
     Groups from this regex (with the value from our Example in parens):
         1: profile_name (name). may be missing
@@ -87,6 +93,8 @@ class ApiCallParser(object):
             return None
 
         duration = int(match.group('duration'))
+        memory_final = int(match.group('memory_final'))
+        memory_delta = int(match.group('memory_delta'))
         return ApiCall(
             timestamp,
             papertrail_id,
@@ -97,4 +105,6 @@ class ApiCallParser(object):
             match.group('username'),
             match.group('method'),
             duration,
+            memory_final,
+            memory_delta,
         )
