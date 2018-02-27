@@ -29,7 +29,7 @@ logger = logging.getLogger()
 
 
 @app.task
-def update_jira_issue(issue_key):
+def update_jira_issue(issue_key, invalidate_cache):
     """
         update a jira issue in our database, given its key
 
@@ -48,7 +48,8 @@ def update_jira_issue(issue_key):
         jira_issue_db.save_jira_issue(ES, issue)
         logger.info("updated jira issue %s", issue_key)
 
-    tasks_util.invalidate_cache('jira')
+    if invalidate_cache:
+        tasks_util.invalidate_cache('jira')
 
 
 @app.task
@@ -60,7 +61,7 @@ def update_all_jira_issues():
     count = 0
     for issue in jira_issue_aservice.get_all_issues():
         count += 1
-        update_jira_issue.delay(issue.key)
+        update_jira_issue.delay(issue.key, invalidate_cache=False)
     logger.info("queued %s jira issues", count)
 
 

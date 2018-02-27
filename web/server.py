@@ -300,7 +300,7 @@ def update_jira_db():
     if 'issue_key' in json_request:
         # save the given issue to ES
         issue_key = json_request['issue_key']
-        tasks.update_jira_issue.delay(issue_key)
+        tasks.update_jira_issue.delay(issue_key, invalidate_cache=True)
         return 'job queued', 202
     else:
         if json_request['all'] != True:
