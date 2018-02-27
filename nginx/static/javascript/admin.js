@@ -16,6 +16,25 @@ function parse_date(date){
     });
 }
 
+function parse_date_range(start_date, end_date){
+    var payload = {
+        start_date: start_date,
+        end_date: end_date
+    };
+    $.ajax({
+        type: "POST",
+        url: "/api/parse_s3_date_range",
+        data: JSON.stringify(payload),
+        success: function() {
+            location.reload();
+        },
+        error: function() {
+            location.reload();
+        },
+        contentType: "application/json"
+    });
+}
+
 function update_jira_db(issue_key){
     var payload = {
         issue_key: issue_key

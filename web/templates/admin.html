@@ -4,11 +4,30 @@
 {% block content %}
 <p>
 <p><a href="/">Home</a> | <a href="/healthz">Health Check</a> | <a href="/environment">Environment Dump</a></p>
+<hr>
 <p>
     <form id="parse-date-form">
         Parse date from Papertrail logs:<br>
         <input type="date" id="date_field" name="date_field"><br>
         <input type="submit" value="Submit" onclick="parse_date(document.getElementById('date_field').value);"/>
+    </form>
+</p>
+<hr>
+<p>
+    <form id="parse-date-range-form">
+        Parse date range from Papertrail logs:<br>
+        <input type="date"
+               id="date_field_start"
+               name="date_field_start">
+        <input
+            type="date"
+            id="date_field_end"
+            name="date_field_end">
+        <br>
+        <input type="submit"
+               value="Submit"
+               onclick="parse_date_range(document.getElementById('date_field_start').value, document.getElementById('date_field_end').value);"
+        />
     </form>
 </p>
 <hr>

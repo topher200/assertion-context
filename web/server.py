@@ -3,6 +3,7 @@
 
     Provides endpoints for saving data to DB and for analyzing the data that's been saved.
 """
+import datetime
 import logging
 import os
 import time
@@ -130,12 +131,47 @@ def parse_s3_day():
         return 'missing params', 400
     date_ = json_request['date']
 
-    for hour in range(0, 24):
-        bucket = app.config['S3_BUCKET']
-        filename_string = 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, hour)
-        key = '/'.join((app.config['S3_KEY_PREFIX'], filename_string))
-        logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
-        tasks.parse_log_file.delay(bucket, key)
+    api_aservice.parse_s3_for_date(date_, app.config['S3_BUCKET'], app.config['S3_KEY_PREFIX'])
+    return 'jobs queued', 202
+
+
+@app.route("/api/parse_s3_date_range", methods=['POST'])
+def parse_s3_date_range():
+    """
+        POST request to parse the data from all Papertrail logs for a date range
+
+        Takes a JSON containing these fields:
+        - start_date: starting day to parse. string, in YYYY-MM-DD form
+        - end_date: starting day to parse. string, in YYYY-MM-DD form
+
+        All fields are required.
+
+        Returns a 400 error on bad input. Returns a 202 after we queue the jobs to be run
+        asyncronously.
+    """
+    # parse our input
+    json_request = flask.request.get_json()
+    if (
+            json_request is None
+            or not 'start_date' in json_request
+            or not 'end_date' in json_request
+    ):
+        return 'missing params', 400
+    start_date_str = json_request['start_date']
+    end_date_str   = json_request['end_date']
+
+    # dates come in as a string - convert to datetime.date
+    try:
+        start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date   = datetime.datetime.strptime(end_date_str,   '%Y-%m-%d').date()
+    except ValueError:
+        return 'failed to parse date from params', 400
+
+    # iterate through all dates between start_date and end_date
+    date_ = start_date
+    while date_ <= end_date:
+        api_aservice.parse_s3_for_date(date_, app.config['S3_BUCKET'], app.config['S3_KEY_PREFIX'])
+        date_ += datetime.timedelta(days=1)
 
     return 'jobs queued', 202
 

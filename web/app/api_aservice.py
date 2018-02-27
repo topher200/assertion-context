@@ -11,6 +11,7 @@ import pytz
 from app import (
     es_util,
     jira_issue_db,
+    tasks,
     text_keys,
     traceback_database,
 )
@@ -116,3 +117,14 @@ def __user_has_hidden_tracebacks():
         Returns True if the user has hidden any tracebacks using /hide_traceback this session
     """
     return flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None
+
+
+def parse_s3_for_date(date_, bucket, key_prefix):
+    """
+        Queues jobs to parse s3 for the given date
+    """
+    for hour in range(0, 24):
+        filename_string = 'dt=%s/%s-%02d.tsv.gz' % (date_, date_, hour)
+        key = '/'.join((key_prefix, filename_string))
+        logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
+        tasks.parse_log_file.delay(bucket, key)
