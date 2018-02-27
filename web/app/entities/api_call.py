@@ -20,8 +20,9 @@ class ApiCall(object):
         - username: user name of the user who made the api call
         - method: REST API method of the call. example: 'GET'
         - duration: time in ms that the API call took
-        - memory_final: final python process memory usage (in MB)
-        - memory_delta: change from start of call until end of python process memory usage (in MB)
+        - memory_final: final python process memory usage (in MB), as an int or None
+        - memory_delta: change from start of call until end of python process memory usage (in MB),
+            as an int or None
     """
     def __init__(
             self,

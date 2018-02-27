@@ -8,8 +8,8 @@ from ..entities.api_call import ApiCall
 API_CALL_REGEX = re.compile((
     '\d+/\w+#(?:(?P<profile_name>\w+)-)?'
     '(?P<username>[a-zA-Z0-9_\.+\-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) '
-    'took (?P<duration>\d+) milliseconds to complete and final memory '
-    '(?P<memory_final>-?\d+)MB \(delta (?P<memory_delta>-?\d+)MB\)'
+    'took (?P<duration>\d+) milliseconds to complete'
+    '(?: and final memory (?P<memory_final>-?\d+)MB \(delta (?P<memory_delta>-?\d+)MB\))?'
 ))
 """
     Regex we can use to get information about API calls from the log message
@@ -93,8 +93,17 @@ class ApiCallParser(object):
             return None
 
         duration = int(match.group('duration'))
-        memory_final = int(match.group('memory_final'))
-        memory_delta = int(match.group('memory_delta'))
+
+        # memory stats are only available in more modern log files
+        memory_final = None
+        memory_delta = None
+        memory_final_str = match.group('memory_final')
+        memory_delta_str = match.group('memory_delta')
+        if memory_final_str:
+            memory_final = int(memory_final_str)
+        if memory_delta_str:
+            memory_delta = int(memory_delta_str)
+
         return ApiCall(
             timestamp,
             papertrail_id,

@@ -12,6 +12,7 @@ MATCHING_LOG_LINES = frozenset((
     '''742430307403477003	2016-12-05T14:00:01	2016-12-05T14:00:01Z	563850000	i-00000000000	54.85.100.30	User	Notice	aws1.engine.server.debug	05/Dec/2016:09:00:01.459 5754/WS#profile_name-adwords@email.com: DEBUG    wordstream.services: f,1480946401.4130 AddNegativesAlertHandler (POST) took 46 milliseconds to complete and final memory 236MB (delta -1MB)''',
     '''742430307768381446	2016-12-05T14:00:01	2016-12-05T14:00:01Z	563850000	i-00000000000	54.85.100.30	User	Notice	aws1.engine.server.debug	05/Dec/2016:09:00:01.548 5945/WS#profile_name-adwords@email.com: DEBUG    wordstream.services: f,1480946401.4818 BingAccountsHandler (GET) took 66 milliseconds to complete and final memory 236MB (delta 100MB)''',
     '''742430324398809120	2016-12-05T14:00:05	2016-12-05T14:00:05Z	563860000	i-00000000000	54.234.100.165	User	Notice	aws3.engine.server.debug	05/Dec/2016:09:00:05.516 17560/UV#name@email.com    : DEBUG    wordstream.services: f,1480946405.3795 BillingAccountIdHandler (GET) took 137 milliseconds to complete and final memory 236MB (delta -1MB)''',
+    '''742430324398809120	2016-12-05T14:00:05	2016-12-05T14:00:05Z	563860000	i-00000000000	54.234.100.165	User	Notice	aws3.engine.server.debug	05/Dec/2016:09:00:05.516 17560/UV#name@email.com    : DEBUG    wordstream.services: f,1480946405.3795 BillingAccountIdHandler (GET) took 137 milliseconds to complete''',
 ))
 
 NON_MATCHING_LOG_LINES = frozenset((
