@@ -64,7 +64,7 @@ services:
       - elasticsearch:/usr/share/elasticsearch/data
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:5.2.1
+    image: docker.elastic.co/kibana/kibana:6.2.2
     environment:
       - xpack.security.enabled=false
     ports:
