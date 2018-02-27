@@ -7,7 +7,7 @@ from ..entities.api_call import ApiCall
 
 API_CALL_REGEX = re.compile((
     '\d+/\w+#(?:(?P<profile_name>\w+)-)?'
-    '(?P<username>[a-zA-Z0-9_.+-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) '
+    '(?P<username>[a-zA-Z0-9_\.+\-@]+).*\s(?P<api_name>\w+)\s\((?P<method>[A-Z]+)\) '
     'took (?P<duration>\d+) milliseconds to complete and final memory '
     '(?P<memory_final>-?\d+)MB \(delta (?P<memory_delta>-?\d+)MB\)'
 ))
