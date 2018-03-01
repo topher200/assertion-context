@@ -41,17 +41,8 @@ class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
 
 app.config.from_object(EnvironmentVarConfig)
 
-# set up database
-ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
-
 # add bootstrap
 Bootstrap(app)
-
-# use redis for our session storage (ie: server side cookies)
-REDIS = redis.StrictRedis(host=app.config['REDIS_ADDRESS'])
-store = RedisStore(REDIS)
-prefixed_store = PrefixDecorator('sessions_', store)
-KVSessionExtension(prefixed_store, app)
 
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
@@ -62,6 +53,10 @@ DEBUG_TIMING = True
 logger = logging.getLogger()
 
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
+
+# database objects, initialized before the first request
+ES = None
+REDIS = None
 
 
 @app.route("/", methods=['GET'])
@@ -391,8 +386,18 @@ def admin():
 
 
 @app.before_first_request
-def setup_logging():
+def setup_logging_and_databases():
+    # setup logging
     logging_util.setup_logging()
+
+    # setup database
+    ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
+
+    # use redis for our session storage (ie: server side cookies)
+    REDIS = redis.StrictRedis(host=app.config['REDIS_ADDRESS'])
+    store = RedisStore(REDIS)
+    prefixed_store = PrefixDecorator('sessions_', store)
+    KVSessionExtension(prefixed_store, app)
 
 
 @app.before_request
