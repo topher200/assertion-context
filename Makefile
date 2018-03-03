@@ -38,3 +38,8 @@ stop-all:
 .PHONY: kill
 kill:
 	docker-compose stop --timeout 2 web celery
+
+.PHONY: push-to-docker
+push-to-docker:
+	cat VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
+	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
