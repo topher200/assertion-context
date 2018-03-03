@@ -44,9 +44,6 @@ app.config.from_object(EnvironmentVarConfig)
 # add bootstrap
 Bootstrap(app)
 
-# add route to /healthz healthchecks
-healthz.add_healthcheck_endpoint(app, ES, REDIS)
-
 # config
 DEBUG_TIMING = True
 
@@ -57,6 +54,9 @@ FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
 # database objects, initialized before the first request
 ES = None
 REDIS = None
+
+# add route to /healthz healthchecks
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 
 @app.route("/", methods=['GET'])
