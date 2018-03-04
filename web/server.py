@@ -376,12 +376,24 @@ def purge_celery_queue():
 
 @app.route("/admin", methods=['GET'])
 def admin():
-    num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
-    num_celery_tasks = REDIS.llen('celery')
+    error = False
+    num_jira_issues = None
+    try:
+        num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
+    except Exception:
+        logger.warning('unable to find number of jira issues', exc_info=True)
+        error = True
+    num_celery_tasks = None
+    try:
+        num_celery_tasks = REDIS.llen('celery')
+    except Exception:
+        logger.warning('unable to find number of celery tasks', exc_info=True)
+        error = True
     return flask.render_template(
         'admin.html',
         num_jira_issues=num_jira_issues,
-        num_celery_tasks=num_celery_tasks
+        num_celery_tasks=num_celery_tasks,
+        error=error,
     )
 
 
