@@ -402,8 +402,8 @@ def setup_logging_and_databases():
     # setup logging
     logging_util.setup_logging()
 
-    logger.debug('elasticsearch address: %s', app.config['ES_ADDRESS'])
-    logger.debug('redis address: %s', app.config['REDIS_ADDRESS'])
+    logger.info('elasticsearch address: %s', app.config['ES_ADDRESS'])
+    logger.info('redis address: %s', app.config['REDIS_ADDRESS'])
 
     # setup database
     ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
