@@ -43,3 +43,14 @@ kill:
 push-to-docker:
 	cat VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
 	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
+
+.PHONY: deploy-to-kubernetes
+fresh-deploy-to-k8s: cleanup-kubernetes
+	kubectl create configmap assertion-context-env-file --from-env-file .env
+	kubectl create -f kubernetes/
+
+.PHONY: cleanup-kubernetes
+cleanup-k8s:
+	kubectl delete configmap --all
+	kubectl delete deploy --all
+	kubectl delete service --all
