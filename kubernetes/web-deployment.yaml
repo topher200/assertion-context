@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web
+        tier: frontend
+    spec:
+      containers:
+        - image: topher200/assertion-context:0.0.06
+          name: web
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: assertion-context-env-file
+      restartPolicy: Always
