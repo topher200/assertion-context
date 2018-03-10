@@ -35,3 +35,6 @@ def setup_logging():
         logger.addHandler(handler)
     else:
         logger.setLevel(logging.INFO)
+
+        werkzeug_logger = logging.getLogger('werkzeug')
+        werkzeug_logger.setLevel(logging.WARNING)
