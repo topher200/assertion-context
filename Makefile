@@ -46,6 +46,11 @@ push-to-docker:
 	cat VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
 	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context-nginx:{}
 
+.PHONY: deploy-latest-version
+deploy-latest-version:
+	cat VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy web web=topher200/assertion-context:{}
+	cat VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
+
 .PHONY: deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap assertion-context-env-file --from-env-file .env
