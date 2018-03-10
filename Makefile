@@ -43,6 +43,8 @@ kill:
 push-to-docker:
 	cat VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
 	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
+	cat VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
+	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context-nginx:{}
 
 .PHONY: deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes

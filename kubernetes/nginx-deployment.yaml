@@ -12,18 +12,9 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: nginx
+      - image: topher200/assertion-context-nginx:0.0.07
         name: nginx
         ports:
         - containerPort: 80
-        volumeMounts:
-          - name: nginx
-            mountPath: /etc/nginx/nginx.conf
-            subPath: nginx.conf
-            readOnly: true
-      volumes:
-        - name: nginx
-          configMap:
-            name: nginx
       restartPolicy: Always
 status: {}
