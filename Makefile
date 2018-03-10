@@ -42,23 +42,21 @@ kill:
 .PHONY: push-to-docker
 push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
-	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context-nginx:{}
-	cat web/VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
-	cat web/VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
+	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
+	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
+	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
 
 .PHONY: deploy-latest-version
 deploy-latest-version:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
-	cat web/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy web web=topher200/assertion-context:{}
+	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web   web=topher200/assertion-context:{}
 
 .PHONY: deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
+	$(MAKE) deploy-latest-version
 
 .PHONY: cleanup-kubernetes
 cleanup-kubernetes:
-	kubectl delete deploy --all
-	kubectl delete service --all
-	kubectl delete daemonsets --all
-	kubectl delete configmap --all
+	kubectl delete all --all
