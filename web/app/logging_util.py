@@ -36,5 +36,8 @@ def setup_logging():
     else:
         logger.setLevel(logging.INFO)
 
-        werkzeug_logger = logging.getLogger('werkzeug')
-        werkzeug_logger.setLevel(logging.WARNING)
+        # quieter library logging levels, otherwise we get spam like
+        # - /usr/local/lib/python3.6/site-packages/werkzeug/_internal.py._log:88 | 172.17.0.8 - - [09/Mar/2018 23:54:52] "GET /healthz HTTP/1.0" 200 -
+        # - /usr/local/lib/python3.6/site-packages/elasticsearch/connection/base.py.log_request_success:83 | GET http://elasticsearch.default.svc.cluster.local:9200/ [status:200 request:0.002s]
+        logging.getLogger('werkzeug').setLevel(logging.WARNING)
+        logging.getLogger('elasticsearch').setLevel(logging.WARNING)
