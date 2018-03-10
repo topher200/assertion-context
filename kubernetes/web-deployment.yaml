@@ -18,4 +18,11 @@ spec:
           envFrom:
             - configMapRef:
                 name: assertion-context-env-file
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            timeoutSeconds: 1
       restartPolicy: Always
