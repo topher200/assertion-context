@@ -41,15 +41,15 @@ kill:
 
 .PHONY: push-to-docker
 push-to-docker:
-	cat VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
-	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
-	cat VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
-	cat VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context-nginx:{}
+	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
+	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context-nginx:{}
+	cat web/VERSION | tr -d '\n' | xargs -I {} docker build web/ --tag topher200/assertion-context:{}
+	cat web/VERSION | tr -d '\n' | xargs -I {} docker push topher200/assertion-context:{}
 
 .PHONY: deploy-latest-version
 deploy-latest-version:
-	cat VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy web web=topher200/assertion-context:{}
-	cat VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
+	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
+	cat web/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy web web=topher200/assertion-context:{}
 
 .PHONY: deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
