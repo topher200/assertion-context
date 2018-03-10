@@ -51,7 +51,7 @@ deploy-latest-version:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web   web=topher200/assertion-context:{}
 
-.PHONY: deploy-to-kubernetes
+.PHONY: fresh-deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
