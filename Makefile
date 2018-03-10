@@ -58,6 +58,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 
 .PHONY: cleanup-kubernetes
 cleanup-kubernetes:
-	kubectl delete configmap --all
 	kubectl delete deploy --all
 	kubectl delete service --all
+	kubectl delete daemonsets --all
+	kubectl delete configmap --all
