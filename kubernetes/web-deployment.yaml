@@ -23,6 +23,6 @@ spec:
               path: /healthz
               port: 8000
             initialDelaySeconds: 1
-            periodSeconds: 2
+            periodSeconds: 10
             timeoutSeconds: 1
       restartPolicy: Always
