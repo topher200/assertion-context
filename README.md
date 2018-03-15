@@ -28,7 +28,6 @@ host to get started. Installation instructions for setting up the host:
  - clone this repo
  - fill out .env with config variables. requires these fields:
 ```
-
 # logging
 FLUENT_PAPERTRAIL_HOST="logs8.papertrailapp.com"
 FLUENT_PAPERTRAIL_PORT="12345"
@@ -55,6 +54,13 @@ S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
 AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
 AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
 AWS_REGION=us-east-1 # to download papertrail archives from s3
+```
+ - fill out .env.kube-system with config variables. requires these fields:
+```
+# logging
+FLUENT_PAPERTRAIL_HOST=logs8.papertrailapp.com
+FLUENT_PAPERTRAIL_PORT=12345
+FLUENT_HOSTNAME=k8s-prod
 ```
 
 Then to start it all up:

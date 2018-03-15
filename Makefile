@@ -54,6 +54,7 @@ deploy-latest-version:
 .PHONY: fresh-deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap assertion-context-env-file --from-env-file .env
+	kubectl create configmap assertion-context-env-file --from-env-file .env.kube-system --namespace kube-system
 	kubectl create -f kubernetes/
 	$(MAKE) deploy-latest-version
 
@@ -61,6 +62,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 cleanup-kubernetes:
 	kubectl delete all --all
 	kubectl delete configmap --all
+	kubectl delete configmap --all --namespace kube-system
 	kubectl delete daemonset --all --namespace kube-system
 	kubectl delete role --all
 	kubectl delete rolebinding --all

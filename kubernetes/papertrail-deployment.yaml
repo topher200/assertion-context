@@ -29,6 +29,9 @@ spec:
           requests:
             cpu: 100m
             memory: 200Mi
+        envFrom:
+          - configMapRef:
+              name: assertion-context-env-file
         volumeMounts:
         - name: varlog
           mountPath: /var/log
