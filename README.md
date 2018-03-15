@@ -28,11 +28,12 @@ host to get started. Installation instructions for setting up the host:
  - clone this repo
  - fill out .env with config variables. requires these fields:
 ```
-DEBUG_LOGGING = False  # enables logging to file
 
 # logging
-PAPERTRAIL_PRODUCTION_URL=udp://logs4.papertrailapp.com:35000
-PAPERTRAIL_DEVELOPMENT_URL=udp://logs4.papertrailapp.com:31000
+FLUENT_PAPERTRAIL_HOST="logs8.papertrailapp.com"
+FLUENT_PAPERTRAIL_PORT="12345"
+FLUENT_HOSTNAME="k8s-prod"
+DEBUG_LOGGING = False  # enables logging to file, very verbose
 
 # token for Papertrail CLI access. used by realtime-updater
 PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
