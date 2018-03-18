@@ -21,5 +21,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: assertion-context-env-file
+          resources:
+            requests:
+              cpu: 2000m
+              memory: 600Mi
       restartPolicy: Always
 status: {}
