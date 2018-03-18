@@ -23,7 +23,7 @@ spec:
                 name: assertion-context-env-file
           resources:
             requests:
-              cpu: 2000m
+              cpu: 500m
               memory: 600Mi
       restartPolicy: Always
 status: {}
