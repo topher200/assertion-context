@@ -22,6 +22,8 @@ def setup_logging():
     handler.setLevel(logging.INFO)
     logger.addHandler(handler)
 
+    logger.info('Setting up logging. Debug? "%s"', DEBUG_LOGGING)
+
     if DEBUG_LOGGING:
         logger.setLevel(logging.DEBUG)
         # rotating file handler with more verbosity
