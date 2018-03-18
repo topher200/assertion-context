@@ -18,6 +18,8 @@ spec:
           - -A
           - app.tasks
           - worker
+          - --concurrency
+          - "1"
           envFrom:
             - configMapRef:
                 name: assertion-context-env-file
