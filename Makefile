@@ -48,8 +48,9 @@ push-to-docker:
 
 .PHONY: deploy-latest-version
 deploy-latest-version:
-	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx nginx=topher200/assertion-context-nginx:{}
-	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web   web=topher200/assertion-context:{}
+	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx  nginx=topher200/assertion-context-nginx:{}
+	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web    web=topher200/assertion-context:{}
+	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy celery celery=topher200/assertion-context:{}
 
 .PHONY: fresh-deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes

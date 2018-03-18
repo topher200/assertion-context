@@ -11,7 +11,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - image: topher200/assertion-context:0.0.06
+        - image: topher200/assertion-context:0.1.00
           name: celery
           args:
           - celery
