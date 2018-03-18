@@ -41,4 +41,5 @@ def setup_logging():
         # - /usr/local/lib/python3.6/site-packages/elasticsearch/connection/base.py.log_request_success:83 | GET http://elasticsearch.default.svc.cluster.local:9200/ [status:200 request:0.002s]
         logging.getLogger('werkzeug').setLevel(logging.WARNING)
         logging.getLogger('elasticsearch').setLevel(logging.WARNING)
+        logging.getLogger('requests').setLevel(logging.WARNING)
         logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
