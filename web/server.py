@@ -60,7 +60,7 @@ KVSessionExtension(prefixed_store, app)
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 # add tracing
-flask_tracer = FlaskTracer(tracing.initialize_tracer(), True, app)
+FlaskTracer(tracing.initialize_tracer(), True, app)
 
 # config
 DEBUG_TIMING = True
