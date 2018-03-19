@@ -14,9 +14,21 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
 	kubectl create configmap      assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
-	helm init
-	helm install stable/redis -n redis-master --set usePassword=false
+	helm init --wait
+	helm install stable/redis                --name redis-master         --set usePassword=false
+	helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set rbac.clusterAdminRole=true
+	helm install stable/heapster             --name heapster
 	$(MAKE) deploy-latest-version
+
+.PHONY: cleanup-kubernetes
+cleanup-kubernetes:
+	helm ls --short | xargs helm delete --purge
+	-helm reset
+	-kubectl delete -f kubernetes-elasticsearch/
+	-kubectl delete -f kubernetes/
+	-kubectl delete configmap assertion-context-env-file
+	-kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
+	-kubectl delete secret papertrail-destination
 
 .PHONY: deploy-latest-version
 deploy-latest-version:
@@ -30,13 +42,3 @@ push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
-
-.PHONY: cleanup-kubernetes
-cleanup-kubernetes:
-	kubectl delete all --all
-	kubectl delete configmap --all
-	kubectl delete configmap --all --namespace kube-system
-	kubectl delete daemonset --all --namespace kube-system
-	kubectl delete role --all
-	kubectl delete rolebinding --all
-	kubectl delete serviceaccount --all
