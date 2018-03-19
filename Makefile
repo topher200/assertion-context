@@ -57,6 +57,8 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap assertion-context-env-file --from-env-file .env
 	kubectl create configmap assertion-context-env-file --from-env-file .env.kube-system --namespace kube-system
 	kubectl create -f kubernetes/
+	helm init
+	helm install stable/redis -n redis-master --set usePassword=false
 	$(MAKE) deploy-latest-version
 
 .PHONY: cleanup-kubernetes
