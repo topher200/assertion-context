@@ -408,14 +408,14 @@ def setup_logging():
 
 
 @app.before_request
-def before_request():
+def start_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "start %s '%s' request from %s%s",
+        "received %s '%s' request from %s%s",
         flask.request.method,
         flask.request.full_path,
         flask.request.remote_addr,
@@ -429,7 +429,7 @@ def after_request(response):
     # since that 500 is already logged via @app.errorhandler.
     if response.status_code != 500:
         logger.info(
-            "end %s '%s' request from %s. %s",
+            "finished %s '%s' request from %s. %s",
             flask.request.method,
             flask.request.full_path,
             flask.request.remote_addr,
