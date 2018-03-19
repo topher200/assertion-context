@@ -7,6 +7,7 @@ import datetime
 import logging
 import os
 import time
+import traceback
 import urllib
 
 import certifi
@@ -439,7 +440,7 @@ def after_request(response):
 
 
 @app.errorhandler(Exception)
-def exceptions(e):
+def exceptions(_):
     """ Logging after every Exception. """
     tb = traceback.format_exc()
     logger.error(
