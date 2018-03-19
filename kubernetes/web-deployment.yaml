@@ -11,7 +11,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - image: topher200/assertion-context:0.1.04
+        - image: topher200/assertion-context:1.0.00
           name: web
           ports:
             - containerPort: 8000

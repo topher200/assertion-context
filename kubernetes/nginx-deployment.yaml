@@ -12,7 +12,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: topher200/assertion-context-nginx:0.1.00
+      - image: topher200/assertion-context-nginx:1.0.00
         name: nginx
         ports:
         - containerPort: 80
