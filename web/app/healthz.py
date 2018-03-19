@@ -1,7 +1,16 @@
 import healthcheck
+from elasticsearch import Elasticsearch
+import certifi
+import redis
+
 
 def add_healthcheck_endpoint(app, ES, REDIS):
     health = healthcheck.HealthCheck(app, "/healthz")
+
+    ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
+
+    # use redis for our session storage (ie: server side cookies)
+    REDIS = redis.StrictRedis(host=app.config['REDIS_ADDRESS'])
 
     def elasticsearch_available():
         ES.info()

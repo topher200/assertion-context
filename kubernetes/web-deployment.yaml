@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: web
+        tier: frontend
+    spec:
+      containers:
+        - image: topher200/assertion-context:0.1.04
+          name: web
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: assertion-context-env-file
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 300Mi
+      restartPolicy: Always

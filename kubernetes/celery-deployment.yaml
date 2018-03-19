@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: celery
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: celery
+        tier: backend
+    spec:
+      containers:
+        - image: topher200/assertion-context:0.1.04
+          name: celery
+          args:
+          - celery
+          - -A
+          - app.tasks
+          - worker
+          - --concurrency
+          - "1"
+          envFrom:
+            - configMapRef:
+                name: assertion-context-env-file
+          resources:
+            requests:
+              cpu: 500m
+              memory: 600Mi
+      restartPolicy: Always
+status: {}

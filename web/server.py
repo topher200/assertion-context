@@ -41,11 +41,11 @@ class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
 
 app.config.from_object(EnvironmentVarConfig)
 
-# set up database
-ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
-
 # add bootstrap
 Bootstrap(app)
+
+# set up database
+ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
 
 # use redis for our session storage (ie: server side cookies)
 REDIS = redis.StrictRedis(host=app.config['REDIS_ADDRESS'])
@@ -381,12 +381,24 @@ def purge_celery_queue():
 
 @app.route("/admin", methods=['GET'])
 def admin():
-    num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
-    num_celery_tasks = REDIS.llen('celery')
+    error = False
+    num_jira_issues = None
+    try:
+        num_jira_issues = jira_issue_db.get_num_jira_issues(ES)
+    except Exception:
+        logger.warning('unable to find number of jira issues', exc_info=True)
+        error = True
+    num_celery_tasks = None
+    try:
+        num_celery_tasks = REDIS.llen('celery')
+    except Exception:
+        logger.warning('unable to find number of celery tasks', exc_info=True)
+        error = True
     return flask.render_template(
         'admin.html',
         num_jira_issues=num_jira_issues,
-        num_celery_tasks=num_celery_tasks
+        num_celery_tasks=num_celery_tasks,
+        error=error,
     )
 
 
@@ -396,17 +408,49 @@ def setup_logging():
 
 
 @app.before_request
-def before_request():
+def start_request():
     # save the start_time and endpoint hit for logging purposes
     flask.g.start_time = time.time()
     flask.g.endpoint = flask.request.endpoint
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "handling %s '%s' request%s",
-        flask.request.method, flask.request.full_path, json_str
+        "received %s '%s' request from %s%s",
+        flask.request.method,
+        flask.request.full_path,
+        flask.request.remote_addr,
+        json_str,
     )
 
+@app.after_request
+def after_request(response):
+    """ Logging after every request. """
+    # This avoids the duplication of registry in the log,
+    # since that 500 is already logged via @app.errorhandler.
+    if response.status_code != 500:
+        logger.info(
+            "finished %s '%s' request from %s. %s",
+            flask.request.method,
+            flask.request.full_path,
+            flask.request.remote_addr,
+            response.status
+        )
+    return response
+
+
+@app.errorhandler(Exception)
+def exceptions(e):
+    """ Logging after every Exception. """
+    tb = traceback.format_exc()
+    logger.error(
+        "error %s '%s' request from %s. 5xx internal server error\n%s",
+        flask.request.method,
+        flask.request.full_path,
+        flask.request.remote_addr,
+        tb,
+    )
+
+    return "Internal Server Error", 500
 
 @app.teardown_request
 def profile_request(_):

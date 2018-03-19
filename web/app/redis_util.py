@@ -27,6 +27,8 @@ def make_dogpile_region(key_mangler_func):
             'redis_expiration_time': 60*20,  # 20 minutes
         }
     )
-    dogpile_region.get('confirm_redis_connection')
     logger.info("using dogpile cache from redis at %s", REDIS_ADDRESS)
+
+    # we purposely don't check that the redis connection is available here; we let our healthcheck
+    # endpoint handle that for us
     return dogpile_region
