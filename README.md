@@ -19,19 +19,12 @@ machine previous to the offending line.
 
 # Getting it set up
 ## Server installation instructions
-We run everything in Docker, but there's some things you need to set up on the
-host to get started. Installation instructions for setting up the host:
- - install docker
-   - http://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html
- - `pip install docker-compose`
-   - optional: do this in a virtualenv
+We run everything in kubernetes. Please set up a kubernetes cluster. Then, on
+your development machine...
+ - install kubernetes-helm
  - clone this repo
  - fill out .env with config variables. requires these fields:
 ```
-# logging
-FLUENT_PAPERTRAIL_HOST="logs8.papertrailapp.com"
-FLUENT_PAPERTRAIL_PORT="12345"
-FLUENT_HOSTNAME="k8s-prod"
 DEBUG_LOGGING = False  # enables logging to file, very verbose
 
 # token for Papertrail CLI access. used by realtime-updater
@@ -55,17 +48,17 @@ AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
 AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
 AWS_REGION=us-east-1 # to download papertrail archives from s3
 ```
- - fill out .env.kube-system with config variables. requires these fields:
+ - fill out .env.papertrail with config variables. requires these fields:
 ```
 # logging
-FLUENT_PAPERTRAIL_HOST=logs8.papertrailapp.com
-FLUENT_PAPERTRAIL_PORT=12345
-FLUENT_HOSTNAME=k8s-prod
+papertrail-destination=syslog://logs9.papertrailapp.com:12345
 ```
 
 Then to start it all up:
- - `make run-local` or `make run-prod`
-  - start-servers runs its own elasticsearch, where production-servers uses an externally hosted one
+ - `make fresh-deploy-to-k8s`
+ - if you don't have an externally hosted elasticsearch, also run 
+   `kubectl create -f kubernetes-elasticsearch` to start elasticsearch in the cluster
+  - in your .env file, set ES_ADDRESS to `elasticsearch.default.svc.cluster.local:9200`
 
 ## Elasticsearch
 
