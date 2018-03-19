@@ -415,8 +415,11 @@ def before_request():
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
-        "handling %s '%s' request%s",
-        flask.request.method, flask.request.full_path, json_str
+        "start %s '%s' request from %s%s",
+        flask.request.method,
+        flask.request.full_path,
+        flask.request.remote_addr,
+        json_str,
     )
 
 @app.after_request
@@ -425,14 +428,11 @@ def after_request(response):
     # This avoids the duplication of registry in the log,
     # since that 500 is already logged via @app.errorhandler.
     if response.status_code != 500:
-        ts = time.strftime('[%Y-%b-%d %H:%M]')
-        logger.error(
-            '%s %s %s %s %s %s',
-            ts,
-            flask.request.remote_addr,
+        logger.info(
+            "end %s '%s' request from %s. %s",
             flask.request.method,
-            flask.request.scheme,
             flask.request.full_path,
+            flask.request.remote_addr,
             response.status
         )
     return response
@@ -441,17 +441,15 @@ def after_request(response):
 @app.errorhandler(Exception)
 def exceptions(e):
     """ Logging after every Exception. """
-    ts = time.strftime('[%Y-%b-%d %H:%M]')
     tb = traceback.format_exc()
     logger.error(
-        '%s %s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
-        ts,
-        flask.request.remote_addr,
+        "error %s '%s' request from %s. 5xx internal server error\n%s",
         flask.request.method,
-        flask.request.scheme,
         flask.request.full_path,
-        tb
+        flask.request.remote_addr,
+        tb,
     )
+
     return "Internal Server Error", 500
 
 @app.teardown_request
