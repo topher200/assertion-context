@@ -23,7 +23,7 @@ def setup_logging():
     logger.addHandler(handler)
 
     logger.setLevel(logging.INFO)
-    logger.info('Setting up logging. Debug? "%s"', bool(DEBUG_LOGGING))
+    logger.info('Setting up logging. Debug? %s', bool(DEBUG_LOGGING))
 
     if DEBUG_LOGGING:
         logger.setLevel(logging.DEBUG)
