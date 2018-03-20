@@ -41,5 +41,5 @@ spec:
             protocol: UDP
           command:
           - "/go/bin/agent-linux"
-          - "--collector.host-port=jaeger-collector.jaeger-infra.svc:14267"
+          - "--collector.host-port=jaeger-collector.default.svc:14267"
       restartPolicy: Always
