@@ -59,9 +59,6 @@ KVSessionExtension(prefixed_store, app)
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
-# add tracing
-FlaskTracer(tracing.initialize_tracer(), True, app)
-
 # config
 DEBUG_TIMING = True
 
@@ -411,6 +408,9 @@ def admin():
 @app.before_first_request
 def setup_logging():
     logging_util.setup_logging()
+
+    # add tracing
+    FlaskTracer(tracing.initialize_tracer(), True, app)
 
 
 @app.before_request
