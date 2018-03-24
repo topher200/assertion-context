@@ -16,6 +16,7 @@ import redis
 from flask_bootstrap import Bootstrap
 from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
+from flask_opentracing import FlaskTracer
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
@@ -30,6 +31,7 @@ from app import realtime_updater
 from app import tasks
 from app import text_keys
 from app import traceback_database
+from app import tracing
 
 
 # create app
@@ -56,6 +58,9 @@ KVSessionExtension(prefixed_store, app)
 
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
+
+# add tracing
+FlaskTracer(tracing.initialize_tracer(), True, app)
 
 # config
 DEBUG_TIMING = True
