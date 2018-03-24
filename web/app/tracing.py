@@ -7,7 +7,8 @@ def initialize_tracer():
             'sampler': {'type': 'const', 'param': 1},
             'logging': True,
         },
-        service_name='tracebacks'
+        service_name='tracebacks',
+        validate=True,
     )
 
     return config.initialize_tracer() # also sets opentracing.tracer
