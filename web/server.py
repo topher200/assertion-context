@@ -460,8 +460,12 @@ def exceptions(_):
 
 @app.teardown_request
 def profile_request(_):
-    time_diff = time.time() - flask.g.start_time
-    logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
+    try:
+        time_diff = time.time() - flask.g.start_time
+    except AttributeError:
+        logger.warning('/%s: unable to log request timing', flask.g.endpoint)
+    else:
+        logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
     timings = []
     for t in (
             'time_tracebacks',
