@@ -6,7 +6,6 @@ def initialize_tracer():
         config = {
             'sampler': {'type': 'const', 'param': 1},
             'logging': True,
-            'local_agent': {'reporting_host': 'jaeger'},
         },
         service_name='tracebacks'
     )
