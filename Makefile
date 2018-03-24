@@ -18,6 +18,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	helm install stable/redis                --name redis-master         --set usePassword=false
 	helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set rbac.clusterAdminRole=true
 	helm install stable/heapster             --name heapster
+	helm install incubator/jaeger            --name jaeger               --set provisionDataStore.cassandra=false  --set provisionDataStore.elasticsearch=true --namespace jaeger-infra --set query.service.type=NodePort --set storage.type=elasticsearch
 	$(MAKE) deploy-latest-version
 
 .PHONY: cleanup-kubernetes
