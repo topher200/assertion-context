@@ -15,6 +15,16 @@ spec:
       - image: topher200/assertion-context-nginx:1.0.00
         name: nginx
         ports:
-        - containerPort: 80
+          - containerPort: 80
       restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - nginx
+            topologyKey: kubernetes.io/hostname
 status: {}
