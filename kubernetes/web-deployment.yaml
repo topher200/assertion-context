@@ -42,4 +42,16 @@ spec:
           command:
           - "/go/bin/agent-linux"
           - "--collector.host-port=jaeger-collector.jaeger-infra.svc:14267"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - web
+                topologyKey: kubernetes.io/hostname
       restartPolicy: Always
