@@ -13,7 +13,7 @@ from .services.parser_util import ParserUtil
 from .traceback import Traceback
 
 
-ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError)(?:$|:)')
+ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError|LockFailed)(?:$|:)')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''can only join a child process|DEBUG|can only test a child process'''
 )
@@ -30,6 +30,7 @@ VALUE_ERROR_REGEX_NEGATIVE = re.compile(
             OR (NotImplementedError)
             OR (ValueError)
             OR (AttributeError)
+            OR (LockFailed)
 """
 
 NUM_PREVIOUS_LOG_LINES_TO_SAVE = 100
