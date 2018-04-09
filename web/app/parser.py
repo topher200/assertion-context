@@ -128,6 +128,7 @@ class Parser(object):
         parsed_text = ''.join(logline.parsed_log_message for logline in log_lines2)
         traceback_text, traceback_plus_context_text = Parser.__get_last_traceback_text(parsed_text)
         if traceback_text is None or traceback_plus_context_text is None:
+            logger.warning("unable to parse out Traceback. id: %s", origin_logline.papertrail_id)
             return None
 
         return Traceback(
@@ -163,7 +164,6 @@ class Parser(object):
             'Traceback (most recent call last)'
         )
         if not sep:
-            logger.warning("unable to parse out Traceback. text: %s", parsed_log_text)
             return (None, None)
         context_lines = '\n'.join(previous_text.splitlines()[-3:])
         return sep + traceback_text, context_lines + '\n' + sep + traceback_text
