@@ -1,0 +1,8 @@
+Version 1.2.0
+- jaeger tracing is now version 3.9.0 (finally built for python 3!)
+
+Version 1.1.0
+- reduced logging output to avoid log recursion in papertrail
+
+Version 1.0.0
+- Add Jaeger tracing
