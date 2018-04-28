@@ -435,6 +435,8 @@ def start_request():
         span = tracer.start_span(operation_name='server', child_of=span_ctx)
     except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:
         span = tracer.start_span(operation_name='server', tags={"Extract failed": str(e)})
+    span.set_tag('path', flask.request.full_path)
+    span.set_tag('method', flask.request.method)
     flask.g.tracer_root_span = span
 
 @app.after_request
