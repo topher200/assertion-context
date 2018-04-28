@@ -29,7 +29,7 @@ def parse(traceback: Traceback) -> Traceback:
         # Apr 16 23:37:09 i-dskfj-j update.debug:  Traceback (most recent call last):
 
         # the error line also contains our profile name
-        match = re.search('#upd:(\S+?)\s*:', precursor_lines[index])
+        match = re.search('#upd:(\S+?):', precursor_lines[index])
         if not match: return None
         profile_name = match.groups()[0]
 
