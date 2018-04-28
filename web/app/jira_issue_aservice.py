@@ -112,9 +112,7 @@ def create_jira_hits_list(tracebacks):
         Creates a well formatted list of strings, given a list of tracebacks
     """
     return '\n'.join(
-        (
-            ' - ' + traceback_formatter.jira_formatted_string(t)
-        ) for t in tracebacks
+        traceback_formatter.jira_formatted_string(t) for t in tracebacks
     )
 
 
