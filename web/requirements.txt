@@ -1,7 +1,6 @@
 Flask-Elasticsearch==0.2.5
 Flask-Env==1.0.1
 Flask-KVSession==0.6.2
-Flask-Opentracing==0.1.8
 Gunicorn==19.6
 boto3==1.4.0
 cachetools==2.0.1

@@ -6,20 +6,21 @@
 import datetime
 import logging
 import os
-import time
 import traceback
 import urllib
 
 import certifi
 import flask
+import opentracing
 import redis
 from flask_bootstrap import Bootstrap
 from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
-from flask_opentracing import FlaskTracer
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
+
+from opentracing_instrumentation.request_context import span_in_context
 
 from app import api_aservice
 from app import es_util
@@ -56,13 +57,17 @@ store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 
-# add route to /healthz healthchecks
-healthz.add_healthcheck_endpoint(app, ES, REDIS)
-
 # config
 DEBUG_TIMING = True
 
 logger = logging.getLogger()
+logging_util.setup_logging()
+
+# add tracing
+tracer = tracing.initialize_tracer()
+
+# add route to /healthz healthchecks
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
 
@@ -86,7 +91,8 @@ def index():
     if filter_text is None:
         filter_text = 'All Tracebacks'
 
-    return api_aservice.render_main_page(ES, days_ago_int, filter_text)
+    with span_in_context(flask.g.tracer_root_span):
+        return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text)
 
 
 @app.route("/api/parse_s3", methods=['POST'])
@@ -370,7 +376,7 @@ def hydrate_cache():
     """
         Invalidate all the dogpile function caches
     """
-    _ = api_aservice.render_main_page(ES, days_ago=0, filter_text=FILTERS[0])
+    _ = api_aservice.render_main_page(ES, tracer, days_ago=0, filter_text=FILTERS[0])
     return 'success'
 
 
@@ -405,19 +411,9 @@ def admin():
     )
 
 
-@app.before_first_request
-def setup_logging():
-    logging_util.setup_logging()
-
-    # add tracing
-    FlaskTracer(tracing.initialize_tracer(), True, app)
-
-
 @app.before_request
 def start_request():
-    # save the start_time and endpoint hit for logging purposes
-    flask.g.start_time = time.time()
-    flask.g.endpoint = flask.request.endpoint
+    # log the request
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
@@ -428,11 +424,24 @@ def start_request():
         json_str,
     )
 
+    # start an opentracing span
+    headers = {}
+    for k, v in flask.request.headers:
+        headers[k.lower()] = v
+    try:
+        span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
+        span = tracer.start_span(operation_name='server', child_of=span_ctx)
+    except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:
+        span = tracer.start_span(operation_name='server', tags={"Extract failed": str(e)})
+    flask.g.tracer_root_span = span
+
 @app.after_request
 def after_request(response):
-    """ Logging after every request. """
-    # This avoids the duplication of registry in the log,
-    # since that 500 is already logged via @app.errorhandler.
+    """ End tracing and record a log after every request. """
+    flask.g.tracer_root_span.finish()
+
+    # This 'if' avoids the duplication of registry in the log, since that 500 is already logged via
+    # @app.errorhandler.
     if response.status_code != 500:
         logger.info(
             "finished %s '%s' request from %s. %s",
@@ -457,29 +466,6 @@ def exceptions(_):
     )
 
     return "Internal Server Error", 500
-
-@app.teardown_request
-def profile_request(_):
-    try:
-        time_diff = time.time() - flask.g.start_time
-    except AttributeError:
-        logger.warning('/%s: unable to log request timing', flask.g.endpoint)
-    else:
-        logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
-    timings = []
-    for t in (
-            'time_tracebacks',
-            'time_hidden_tracebacks',
-            'jira_issues_time',
-            'similar_tracebacks_time',
-            'render_time'
-    ):
-        try:
-            timings.append('%s: %.2fs' % (t, flask.g.get(t)))
-        except TypeError:
-            pass  # info not present on this one
-    if timings:
-        logger.info(', '.join(timings))
 
 
 if __name__ == "__main__":
