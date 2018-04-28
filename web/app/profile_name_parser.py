@@ -91,10 +91,8 @@ def parse(traceback: Traceback) -> Traceback:
                 'zauto' in profile_name or 'zauto' in username
             )
     ):
-        print('before: ', profile_name, username)
         # automation has weird names. let's fix it manually
         profile_name, username = re.match('(\S*)-(zauto\S+?)$', profile_name + '-' + username).groups()[:2]
-        print('after: ', profile_name, username)
 
     # modify the traceback if we found anything
     modified = False
