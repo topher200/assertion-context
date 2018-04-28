@@ -17,7 +17,6 @@ import redis
 from flask_bootstrap import Bootstrap
 from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
-from flask_opentracing import FlaskTracer
 from elasticsearch import Elasticsearch
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
