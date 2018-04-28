@@ -8,6 +8,7 @@ import itertools
 import logging
 import re
 
+from . import profile_name_parser
 from .logline import LogLine
 from .services.parser_util import ParserUtil
 from .traceback import Traceback
@@ -78,6 +79,7 @@ class Parser(object):
 
                 traceback = Parser.__generate_Traceback(origin_line, reversed(previous_log_lines))
                 if traceback is not None:
+                    profile_name_parser.parse(traceback)
                     yield traceback
 
             # now that we're done processing this line, add it to the buffer
