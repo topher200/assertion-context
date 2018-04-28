@@ -35,7 +35,7 @@ class Traceback(object):
         - program_name: string of the parsed program name. all our log lines shared the same
             program name. example: manager.debug
         - profile_name: the profile name that hit the error. may be None
-        - user_name: the user name that hit the error. may be None
+        - username: the user name that hit the error. may be None
     """
     def __init__(
             self,
@@ -48,7 +48,7 @@ class Traceback(object):
             instance_id,
             program_name,
             profile_name=None,
-            user_name=None,
+            username=None,
     ):
         assert isinstance(origin_timestamp, datetime.datetime), (
             type(origin_timestamp), origin_timestamp
@@ -63,7 +63,7 @@ class Traceback(object):
         self._instance_id = instance_id
         self._program_name = program_name
         self._profile_name = profile_name
-        self._user_name = user_name
+        self._username = username
 
     def __repr__(self):
         return str(self.document())
@@ -117,12 +117,12 @@ class Traceback(object):
         self._profile_name = name
 
     @property
-    def user_name(self):
-        return self._user_name
+    def username(self):
+        return self._username
 
-    @user_name.setter
-    def user_name(self, name: str) -> typing.Optional[str]:
-        self._user_name = name
+    @username.setter
+    def username(self, name: str) -> typing.Optional[str]:
+        self._username = name
 
     def document(self):
         """
@@ -140,7 +140,7 @@ class Traceback(object):
             "instance_id": self._instance_id,
             "program_name": self._program_name,
             "profile_name": self._profile_name,
-            "user_name": self._user_name,
+            "username": self._username,
         }
 
 
@@ -173,5 +173,5 @@ def generate_traceback_from_source(source):
         source["instance_id"],
         source["program_name"],
         source.get("profile_name", None),  # not guaranteed to exist
-        source.get("user_name", None),  # not guaranteed to exist
+        source.get("username", None),  # not guaranteed to exist
     )

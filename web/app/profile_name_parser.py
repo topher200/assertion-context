@@ -1,4 +1,4 @@
-""" Finds the relevant profile and/or user name for a given Traceback """
+""" Finds the relevant profile and/or username name for a given Traceback """
 
 import logging
 import re
@@ -25,7 +25,7 @@ def parse(traceback: Traceback) -> Traceback:
     if index is None: return None
 
     profile_name = None
-    user_name = None
+    username = None
     if 'update.debug' in traceback.program_name:
         # Apr 16 23:37:09 i-dskfj-j update.debug:  16/Apr/2018:23:37:09.674 23502/#upd:qa-jgon_0918-aws2:3fab             : ERROR    w.update: Failed to update profile `qa-jgon_0918-aws2' (145 of 226)
         # Apr 16 23:37:09 i-dskfj-j update.debug:  Traceback (most recent call last):
@@ -37,7 +37,7 @@ def parse(traceback: Traceback) -> Traceback:
 
         # in some cases, we can get a user name instead of a profile name. check
         if '@' in potential_profile_name:
-            user_name = profile_name
+            username = profile_name
         else:
             # ok, it's a profile name
             profile_name = potential_profile_name
@@ -83,17 +83,28 @@ def parse(traceback: Traceback) -> Traceback:
         match = re.search('/(?:WS|PV)#(\S+)-(\S*@\S+)\s*:', precursor_lines[index2])
         if not match: return None
         profile_name = match.groups()[0]
-        user_name = match.groups()[1]
+        username = match.groups()[1]
+
+    if (
+            (profile_name and username)
+            and (
+                'zauto' in profile_name or 'zauto' in username
+            )
+    ):
+        print('before: ', profile_name, username)
+        # automation has weird names. let's fix it manually
+        profile_name, username = re.match('(\S*)-(zauto\S+?)$', profile_name + '-' + username).groups()[:2]
+        print('after: ', profile_name, username)
 
     # modify the traceback if we found anything
     modified = False
     if profile_name:
         traceback.profile_name = profile_name
         modified = True
-    if user_name:
-        traceback.user_name = user_name
+    if username:
+        traceback.username = username
         modified = True
-    if modified:
+    if not modified:
         return None
     return traceback
 
