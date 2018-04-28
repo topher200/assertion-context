@@ -64,7 +64,7 @@ logger = logging.getLogger()
 logging_util.setup_logging()
 
 # add tracing
-tracer = FlaskTracer(tracing.initialize_tracer, trace_all_requests=True, app=app)
+tracer = tracing.initialize_tracer()
 
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
@@ -412,9 +412,7 @@ def admin():
 
 @app.before_request
 def start_request():
-    # save the start_time and endpoint hit for logging purposes
-    flask.g.start_time = time.time()
-    flask.g.endpoint = flask.request.endpoint
+    # log the request
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
@@ -424,6 +422,17 @@ def start_request():
         flask.request.remote_addr,
         json_str,
     )
+
+    # start an opentracing span
+    headers = {}
+    for k, v in flask.request.headers:
+        headers[k.lower()] = v
+    try:
+        span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
+        span = tracer.start_span(operation_name='server', child_of=span_ctx)
+    except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:
+        span = tracer.start_span(operation_name='server', tags={"Extract failed": str(e)})
+    flask.g.tracer_root_span = span
 
 @app.after_request
 def after_request(response):
@@ -439,6 +448,8 @@ def after_request(response):
             response.status
         )
     return response
+
+    flask.g.tracer_root_span.finish()
 
 
 @app.errorhandler(Exception)
