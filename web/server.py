@@ -410,11 +410,6 @@ def admin():
     )
 
 
-@app.before_first_request
-def setup_logging():
-    logging_util.setup_logging()
-
-
 @app.before_request
 def start_request():
     # save the start_time and endpoint hit for logging purposes
