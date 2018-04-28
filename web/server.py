@@ -411,9 +411,19 @@ def admin():
     )
 
 
+@app.before_first_request
+def setup_logging():
+    logging_util.setup_logging()
+
+    # add tracing
+    FlaskTracer(tracing.initialize_tracer(), True, app)
+
+
 @app.before_request
 def start_request():
-    # log the request
+    # save the start_time and endpoint hit for logging purposes
+    flask.g.start_time = time.time()
+    flask.g.endpoint = flask.request.endpoint
     json_request = flask.request.get_json()
     json_str = '. json: %s' % str(json_request)[:100] if json_request is not None else ''
     logger.info(
@@ -424,25 +434,9 @@ def start_request():
         json_str,
     )
 
-    # start an opentracing span
-    try:
-        span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, flask.request.headers)
-    except Exception:
-        logger.exception('No existing span found')
-    if(span_ctx):
-        span = tracer.start_span(operation_name='server', child_of=span_ctx)
-    else:
-        span = tracer.start_span(operation_name='server')
-    flask.g.tracer_root_span = span
-
-
-
 @app.after_request
 def after_request(response):
     """ Logging after every request. """
-    # close our root span
-    flask.g.tracer_root_span.finish()
-
     # This avoids the duplication of registry in the log,
     # since that 500 is already logged via @app.errorhandler.
     if response.status_code != 500:
@@ -469,6 +463,29 @@ def exceptions(_):
     )
 
     return "Internal Server Error", 500
+
+@app.teardown_request
+def profile_request(_):
+    try:
+        time_diff = time.time() - flask.g.start_time
+    except AttributeError:
+        logger.warning('/%s: unable to log request timing', flask.g.endpoint)
+    else:
+        logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
+    timings = []
+    for t in (
+            'time_tracebacks',
+            'time_hidden_tracebacks',
+            'jira_issues_time',
+            'similar_tracebacks_time',
+            'render_time'
+    ):
+        try:
+            timings.append('%s: %.2fs' % (t, flask.g.get(t)))
+        except TypeError:
+            pass  # info not present on this one
+    if timings:
+        logger.info(', '.join(timings))
 
 
 if __name__ == "__main__":
