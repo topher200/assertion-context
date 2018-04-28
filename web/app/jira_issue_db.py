@@ -9,6 +9,8 @@ import logging
 import dogpile.cache
 import elasticsearch
 
+from opentracing_instrumentation.request_context import get_current_span
+
 from app import es_util
 from app import redis_util
 from app import retry
@@ -91,7 +93,7 @@ def refresh(es):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_matching_jira_issues(es, traceback_text, match_level):
+def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     """
         Queries the database for any jira issues that include the traceback_text
 
@@ -113,16 +115,18 @@ def get_matching_jira_issues(es, traceback_text, match_level):
         traceback_text, ["description_filtered", "comments_filtered"], match_level
     )
 
-    try:
-        raw_es_response = es.search(
-            index=INDEX,
-            doc_type=DOC_TYPE,
-            body=body,
-            size=1000
-        )
-    except elasticsearch.exceptions.NotFoundError:
-        logger.warning('jira index not found. has it been created?')
-        return []
+    root_span = get_current_span()
+    with tracer.start_span('elasticsearch', child_of=root_span) as span:
+        try:
+            raw_es_response = es.search(
+                index=INDEX,
+                doc_type=DOC_TYPE,
+                body=body,
+                size=1000
+            )
+        except elasticsearch.exceptions.NotFoundError:
+            logger.warning('jira index not found. has it been created?')
+            return []
     res = []
     for raw_jira_issue in raw_es_response['hits']['hits']:
         res.append(generate_from_source(raw_jira_issue['_source']))
