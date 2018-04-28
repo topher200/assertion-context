@@ -91,7 +91,9 @@ def index():
     if filter_text is None:
         filter_text = 'All Tracebacks'
 
-    with span_in_context(flask.g.tracer_root_span):
+    span = flask.g.tracer_root_span
+    with span_in_context(span):
+        span.set_tag({'filter': filter_text})
         return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text)
 
 
