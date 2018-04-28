@@ -8,7 +8,7 @@ import logging
 import dogpile.cache
 import elasticsearch
 
-from opentracing_instrumentation.request_context import get_current_span, span_in_context
+from opentracing_instrumentation.request_context import get_current_span
 
 from app import es_util
 from app import redis_util
@@ -106,20 +106,19 @@ def get_tracebacks(es, tracer, start_date=None, end_date=None, num_matches=10000
             }
         }
 
-    try:
-        root_span = get_current_span()
-        with tracer.start_span('elasticsearch', child_of=root_span) as span:
-            with span_in_context(span):
-                raw_tracebacks = es.search(
-                    index=INDEX,
-                    doc_type=DOC_TYPE,
-                    body=body,
-                    sort='origin_timestamp:desc',
-                    size=num_matches
-                )
-    except elasticsearch.exceptions.NotFoundError:
-        logger.warning('traceback index not found. has it been created?')
-        return []
+    root_span = get_current_span()
+    with tracer.start_span('elasticsearch', child_of=root_span) as span:
+        try:
+            raw_tracebacks = es.search(
+                index=INDEX,
+                doc_type=DOC_TYPE,
+                body=body,
+                sort='origin_timestamp:desc',
+                size=num_matches
+            )
+        except elasticsearch.exceptions.NotFoundError:
+            logger.warning('traceback index not found. has it been created?')
+            return []
     res = []
     for raw_traceback in raw_tracebacks['hits']['hits']:
         res.append(generate_traceback_from_source(raw_traceback['_source']))
@@ -148,14 +147,13 @@ def get_matching_tracebacks(es, tracer, traceback_text, match_level, num_matches
 
     root_span = get_current_span()
     with tracer.start_span('elasticsearch', child_of=root_span) as span:
-        with span_in_context(span):
-            raw_es_response = es.search(
-                index=INDEX,
-                doc_type=DOC_TYPE,
-                body=body,
-                sort='origin_timestamp:desc',
-                size=num_matches
-            )
+        raw_es_response = es.search(
+            index=INDEX,
+            doc_type=DOC_TYPE,
+            body=body,
+            sort='origin_timestamp:desc',
+            size=num_matches
+        )
     res = []
     for raw_traceback in raw_es_response['hits']['hits']:
         res.append(generate_traceback_from_source(raw_traceback['_source']))
