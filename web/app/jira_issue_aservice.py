@@ -107,17 +107,11 @@ def create_description(similar_tracebacks):
     tracebacks, master_traceback_generator = itertools.tee(similar_tracebacks)
     master_traceback = next(master_traceback_generator)
 
-    list_of_tracebacks_string = '\n'.join(
-        SIMILAR_LIST_TEMPLATE % (
-            t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
-            t.instance_id,
-            t.origin_papertrail_id
-        ) for t in tracebacks
-    )
     return DESCRIPTION_TEMPLATE % (
         master_traceback.traceback_plus_context_text.rstrip(),
-        list_of_tracebacks_string
+        create_hits_list(tracebacks)
     )
+
 
 def create_comment_with_hits_list(tracebacks):
     """
@@ -126,15 +120,21 @@ def create_comment_with_hits_list(tracebacks):
         Sorts them so that the latest one is first
     """
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
-    list_of_tracebacks_string = '\n'.join(
+    return COMMENT_TEMPLATE % (create_hits_list(tracebacks))
+
+
+def create_hits_list(tracebacks):
+    """
+        Creates a well formatted list of strings, given a list of tracebacks
+
+    Example output:
+    """
+    return '\n'.join(
         SIMILAR_LIST_TEMPLATE % (
             t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
             t.instance_id,
             t.origin_papertrail_id
         ) for t in tracebacks
-    )
-    return COMMENT_TEMPLATE % (
-        list_of_tracebacks_string
     )
 
 
