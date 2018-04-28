@@ -6,7 +6,6 @@
 import datetime
 import logging
 import os
-import time
 import traceback
 import urllib
 
@@ -18,9 +17,10 @@ from flask_bootstrap import Bootstrap
 from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
 from elasticsearch import Elasticsearch
-from opentracing_instrumentation.request_context import span_in_context
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
+
+from opentracing_instrumentation.request_context import span_in_context
 
 from app import api_aservice
 from app import es_util
