@@ -116,7 +116,7 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     )
 
     root_span = get_current_span()
-    with tracer.start_span('elasticsearch', child_of=root_span) as span:
+    with tracer.start_span('elasticsearch', child_of=root_span):
         try:
             raw_es_response = es.search(
                 index=INDEX,

@@ -107,7 +107,7 @@ def get_tracebacks(es, tracer, start_date=None, end_date=None, num_matches=10000
         }
 
     root_span = get_current_span()
-    with tracer.start_span('elasticsearch', child_of=root_span) as span:
+    with tracer.start_span('elasticsearch', child_of=root_span):
         try:
             raw_tracebacks = es.search(
                 index=INDEX,
@@ -146,7 +146,7 @@ def get_matching_tracebacks(es, tracer, traceback_text, match_level, num_matches
     body = es_util.generate_text_match_payload(traceback_text, ["traceback_text"], match_level)
 
     root_span = get_current_span()
-    with tracer.start_span('elasticsearch', child_of=root_span) as span:
+    with tracer.start_span('elasticsearch', child_of=root_span):
         raw_es_response = es.search(
             index=INDEX,
             doc_type=DOC_TYPE,
