@@ -14,9 +14,11 @@ from app import (
     tasks,
     text_keys,
     traceback_database,
+    tracing,
 )
 
 logger = logging.getLogger()
+tracer = tracing.get_tracer()
 
 DEBUG_TIMING = True # TODO: remove when we add opentracing
 
@@ -27,11 +29,13 @@ def render_main_page(ES, days_ago, filter_text):
     date_to_analyze = today - datetime.timedelta(days=days_ago)
 
     # get all tracebacks
-    if DEBUG_TIMING:
-        db_start_time = time.time()
-    tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
-    if DEBUG_TIMING:
-        flask.g.time_tracebacks = time.time() - db_start_time
+    with tracer.start_span('get_all_tracebacks') as span:
+        span.log_kv({'event': 'get all tracebacks'})
+        if DEBUG_TIMING:
+            db_start_time = time.time()
+        tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
+        if DEBUG_TIMING:
+            flask.g.time_tracebacks = time.time() - db_start_time
 
     # create a set of tracebacks that match all the traceback texts the user has hidden
     if DEBUG_TIMING:
