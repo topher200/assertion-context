@@ -57,9 +57,6 @@ store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 
-# add route to /healthz healthchecks
-healthz.add_healthcheck_endpoint(app, ES, REDIS)
-
 # config
 DEBUG_TIMING = True
 
@@ -69,6 +66,9 @@ logging_util.setup_logging()
 # add tracing
 tracer = tracing.initialize_tracer()
 FlaskTracer(tracer, True, app)
+
+# add route to /healthz healthchecks
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
 
