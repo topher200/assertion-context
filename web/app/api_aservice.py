@@ -30,7 +30,7 @@ def render_main_page(ES, tracer, days_ago, filter_text):
     # get all tracebacks
     with tracer.start_span('get all tracebacks', child_of=root_span) as span:
         with span_in_context(span):
-            tracebacks = traceback_database.get_tracebacks(ES, date_to_analyze, date_to_analyze)
+            tracebacks = traceback_database.get_tracebacks(ES, tracer, date_to_analyze, date_to_analyze)
 
     # create a set of tracebacks that match all the traceback texts the user has hidden
     with tracer.start_span('determine hidden tracebacks', child_of=root_span) as span:
@@ -39,7 +39,7 @@ def render_main_page(ES, tracer, days_ago, filter_text):
             if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
                 for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
                     for tb in traceback_database.get_matching_tracebacks(
-                            ES, traceback_text, es_util.EXACT_MATCH, 10000
+                            ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
                     ):
                         hidden_tracebacks.add(tb.origin_papertrail_id)
                 logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
@@ -86,7 +86,7 @@ def render_main_page(ES, tracer, days_ago, filter_text):
         with span_in_context(span):
             for tb in tb_meta:
                 tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
-                    ES, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
+                    ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
                 )
 
     with tracer.start_span('render page', child_of=root_span) as span:

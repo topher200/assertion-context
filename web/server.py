@@ -250,7 +250,7 @@ def create_jira_ticket():
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, traceback_text, es_util.EXACT_MATCH, 50
+        ES, tracer, traceback_text, es_util.EXACT_MATCH, 50
     )
 
     # create a description using the list of tracebacks
@@ -296,7 +296,7 @@ def jira_comment():
 
     # find a list of tracebacks that use the given traceback text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, traceback_text, es_util.EXACT_MATCH, 10000
+        ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
     )
 
     # filter out any tracebacks that are after the latest one already on that ticket
