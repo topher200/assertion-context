@@ -92,7 +92,7 @@ def index():
         filter_text = 'All Tracebacks'
 
     with span_in_context(flask.g.tracer_root_span):
-        return api_aservice.render_main_page(ES, days_ago_int, filter_text)
+        return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text)
 
 
 @app.route("/api/parse_s3", methods=['POST'])
@@ -376,7 +376,7 @@ def hydrate_cache():
     """
         Invalidate all the dogpile function caches
     """
-    _ = api_aservice.render_main_page(ES, days_ago=0, filter_text=FILTERS[0])
+    _ = api_aservice.render_main_page(ES, tracer, days_ago=0, filter_text=FILTERS[0])
     return 'success'
 
 
