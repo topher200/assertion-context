@@ -18,6 +18,7 @@ from flask_bootstrap import Bootstrap
 from flask_env import MetaFlaskEnv
 from flask_kvsession import KVSessionExtension
 from elasticsearch import Elasticsearch
+from opentracing_instrumentation.request_context import span_in_context
 from simplekv.memory.redisstore import RedisStore
 from simplekv.decorator import PrefixDecorator
 
@@ -90,7 +91,8 @@ def index():
     if filter_text is None:
         filter_text = 'All Tracebacks'
 
-    return api_aservice.render_main_page(ES, days_ago_int, filter_text)
+    with span_in_context(flask.g.tracer_root_span):
+        return api_aservice.render_main_page(ES, days_ago_int, filter_text)
 
 
 @app.route("/api/parse_s3", methods=['POST'])
