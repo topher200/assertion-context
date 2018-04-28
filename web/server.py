@@ -93,7 +93,7 @@ def index():
 
     span = flask.g.tracer_root_span
     with span_in_context(span):
-        span.set_tag({'filter': filter_text})
+        span.set_tag('filter', filter_text)
         return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text)
 
 
