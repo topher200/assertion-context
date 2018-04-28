@@ -64,8 +64,8 @@ logger = logging.getLogger()
 logging_util.setup_logging()
 
 # add tracing
-tracer = tracing.initialize_tracer()
-FlaskTracer(tracer, trace_all_requests=True, app=app)
+tracer = tracing.initialize_tracer
+FlaskTracer(tracing.initialize_tracer(), trace_all_requests=True, app=app)
 
 # # add route to /healthz healthchecks
 # healthz.add_healthcheck_endpoint(app, ES, REDIS)
@@ -418,9 +418,6 @@ def admin():
 @app.before_first_request
 def setup_logging():
     logging_util.setup_logging()
-
-    # add tracing
-    FlaskTracer(tracing.initialize_tracer(), True, app)
 
 
 @app.before_request
