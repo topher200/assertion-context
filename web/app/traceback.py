@@ -1,4 +1,5 @@
 import datetime
+import typing
 
 
 class Traceback(object):
@@ -33,6 +34,7 @@ class Traceback(object):
             instance_id. example: i-2ee330b7
         - program_name: string of the parsed program name. all our log lines shared the same
             program name. example: manager.debug
+        - profile_name: the profile name that hit the error. may be None
     """
     def __init__(
             self,
@@ -44,6 +46,7 @@ class Traceback(object):
             origin_timestamp,
             instance_id,
             program_name,
+            profile_name,
     ):
         assert isinstance(origin_timestamp, datetime.datetime), (
             type(origin_timestamp), origin_timestamp
@@ -57,6 +60,7 @@ class Traceback(object):
         self._origin_timestamp = origin_timestamp
         self._instance_id = instance_id
         self._program_name = program_name
+        self._profile_name = profile_name
 
     def __repr__(self):
         return str(self.document())
@@ -101,6 +105,14 @@ class Traceback(object):
     def program_name(self):
         return self._program_name
 
+    @property
+    def profile_name(self):
+        return self._profile_name
+
+    @profile_name.setter
+    def profile_name(self, name: str) -> typing.Optional[str]:
+        self._profile_name = name
+
     def document(self):
         """
             Returns the document form of this logline for ElasticSearch.
@@ -116,6 +128,7 @@ class Traceback(object):
             "origin_timestamp": self._origin_timestamp.strftime('%Y-%m-%dT%H:%M:%S%z'),
             "instance_id": self._instance_id,
             "program_name": self._program_name,
+            "profile_name": self._profile_name,
         }
 
 
@@ -147,4 +160,5 @@ def generate_traceback_from_source(source):
         timestamp,
         source["instance_id"],
         source["program_name"],
+        source.get("profile_name", None),  # not guaranteed to exist
     )
