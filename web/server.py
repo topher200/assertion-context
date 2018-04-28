@@ -465,29 +465,6 @@ def exceptions(_):
 
     return "Internal Server Error", 500
 
-@app.teardown_request
-def profile_request(_):
-    try:
-        time_diff = time.time() - flask.g.start_time
-    except AttributeError:
-        logger.warning('/%s: unable to log request timing', flask.g.endpoint)
-    else:
-        logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
-    timings = []
-    for t in (
-            'time_tracebacks',
-            'time_hidden_tracebacks',
-            'jira_issues_time',
-            'similar_tracebacks_time',
-            'render_time'
-    ):
-        try:
-            timings.append('%s: %.2fs' % (t, flask.g.get(t)))
-        except TypeError:
-            pass  # info not present on this one
-    if timings:
-        logger.info(', '.join(timings))
-
 
 if __name__ == "__main__":
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
