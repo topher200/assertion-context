@@ -435,9 +435,11 @@ def start_request():
 
 @app.after_request
 def after_request(response):
-    """ Logging after every request. """
-    # This avoids the duplication of registry in the log,
-    # since that 500 is already logged via @app.errorhandler.
+    """ End tracing and record a log after every request. """
+    flask.g.tracer_root_span.finish()
+
+    # This 'if' avoids the duplication of registry in the log, since that 500 is already logged via
+    # @app.errorhandler.
     if response.status_code != 500:
         logger.info(
             "finished %s '%s' request from %s. %s",
@@ -447,8 +449,6 @@ def after_request(response):
             response.status
         )
     return response
-
-    flask.g.tracer_root_span.finish()
 
 
 @app.errorhandler(Exception)
