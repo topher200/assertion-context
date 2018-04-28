@@ -62,7 +62,9 @@
             <button type="button" class="btn btn-default" onclick="hide_traceback_text(this)" value="{{ t.traceback.traceback_text }}">
                 <span class="glyphicon glyphicon-eye-close"></span> Hide all Tracebacks like this
             </button>
-            <a href="/jira_formatted_list/{{ t.traceback.origin_papertrail_id }}">Jira formatted list</a>
+            <p>
+                <a href="/jira_formatted_list/{{ t.traceback.origin_papertrail_id }}">Jira formatted list</a>
+            </p>
         </p>
     </div>
     <div class="traceback-text col-md-9">
