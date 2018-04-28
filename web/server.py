@@ -67,15 +67,11 @@ logging_util.setup_logging()
 tracer = tracing.initialize_tracer()
 FlaskTracer(tracer, trace_all_requests=True, app=app)
 
-# # add route to /healthz healthchecks
-# healthz.add_healthcheck_endpoint(app, ES, REDIS)
+# add route to /healthz healthchecks
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
 
-
-@app.route('/healthz', methods=['GET'])
-def fake_healthz():
-    return 'fake-ok'
 
 @app.route("/", methods=['GET'])
 def index():
