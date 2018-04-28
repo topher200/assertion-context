@@ -8,7 +8,7 @@ def initialize_tracer():
     config = jaeger_client.Config(
         config = {
             'sampler': {'type': 'const', 'param': 1},
-            'logging': True,
+            'logging': False,
         },
         service_name='tracebacks'
     )
