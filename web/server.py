@@ -353,7 +353,7 @@ def jira_formatted_list(traceback_origin_id):
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
 
-    return jira_issue_aservice.create_jira_hits_list(tracebacks)
+    return jira_issue_aservice.create_jira_hits_list(tracebacks), 200, {'Content-Type': 'text/plain'}
 
 
 @app.route("/api/update_jira_db", methods=['PUT'])
