@@ -25,7 +25,7 @@ PAPERTRAIL_LINK_TEMPLATE = "[{timestamp}|https://papertrailapp.com/systems/{inst
     - papertrail log line id. example: 926921020000000000
 """
 
-PROFILE_NAME_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_name}"
+PROFILE_NAME_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_name}]"
 """
     A template for the profile name, with a link to that profile in the product.
 
@@ -34,7 +34,7 @@ PROFILE_NAME_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_na
     - product_url, with no trailing slash
 """
 
-USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}"
+USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
 """
     A template for the username, with a link to that user in the product.
 
@@ -43,19 +43,14 @@ USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}"
     - product_url, with no trailing slash
 """
 
-KIBANA_TEMPLATE = "{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))"
+ARCHIVE_TEMPLATE = "[Archive|{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))]"
 """
-    A template for linking to a papertrail object in kibana.
+    A template for linking to a papertrail object archive.
 
     Caller must provide:
     - a link to the kibana domain, no trailing slash. example: 'https://kibana.company.com'
     - the papertrail id to highlight on. example: '926890000000000000'
 """
-
-
-def human_readable_string(traceback: Traceback) -> str:
-    """ Given a traceback, returns a well formatted string for presentation """
-    pass
 
 
 def jira_formatted_string(t: Traceback) -> str:
@@ -90,8 +85,7 @@ def jira_formatted_string(t: Traceback) -> str:
         )
 
     # link to kibana archive
-    kibana_link = KIBANA_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
-    archive_str = "[Archive|%s]" % (kibana_link)
+    archive_str = ARCHIVE_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
 
     # put it all together
     combined_str = ', '.join(
