@@ -57,7 +57,13 @@
                 >
                     <a href="https://papertrailapp.com/systems/{{ similar_traceback.instance_id }}/events?focus={{ similar_traceback.origin_papertrail_id }}">
                         {{ similar_traceback.origin_timestamp.strftime('%b %d %Y %H:%M:%S') }}
-                    </a>
+                    </a>,
+                    {% if t.traceback.profile_name %}
+                    {{ t.traceback.profile_name }},
+                    {% endif %}
+                    {% if t.traceback.username %}
+                    {{ t.traceback.username }},
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>
