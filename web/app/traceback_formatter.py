@@ -40,6 +40,7 @@ def jira_formatted_string(t: Traceback) -> str:
         - a user name, with a link to the product's user. may not exist
         - a link to the kibana archive of the traceback
     """
+    # timestamp and link to papertrail
     timestamp_str = (
         "[{timestamp}|"
         "https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
@@ -48,10 +49,16 @@ def jira_formatted_string(t: Traceback) -> str:
         instance_id=t.instance_id,
         papertrail_id=t.origin_papertrail_id,
     )
+
+    # link to kibana archive
     kibana_link = KIBANA_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
-    archive_str = "[Archive|%s" % (kibana_link)
-    combined_str = ', '.join((
-        timestamp_str,
-        archive_str,
-    ))
+    archive_str = "[Archive|%s]" % (kibana_link)
+
+    # put it all together
+    combined_str = ', '.join(
+        s for s in (
+            timestamp_str,
+            archive_str,
+        ) if s is not None
+    )
     return ' - %s' % combined_str
