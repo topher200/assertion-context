@@ -5,6 +5,7 @@ from . import (
 )
 
 
+ES_ADDRESS=config_util.get('ES_ADDRESS')
 PRODUCT_URL=config_util.get('PRODUCT_URL')
 
 TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
@@ -13,6 +14,16 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
 
     To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
 """
+
+KIBANA_TEMPLATE = "{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))"
+"""
+    A template for linking to a papertrail object in kibana.
+
+    Caller must provide:
+    - a link to the kibana domain, no trailing slash. example: 'https://kibana.company.com'
+    - the papertrail id to highlight on. example: '926899256000330036'
+"""
+
 
 def human_readable_string(traceback: Traceback) -> str:
     """ Given a traceback, returns a well formatted string for presentation """
@@ -37,4 +48,10 @@ def jira_formatted_string(t: Traceback) -> str:
         instance_id=t.instance_id,
         papertrail_id=t.origin_papertrail_id,
     )
-    return ' - %s' % timestamp_str
+    kibana_link = KIBANA_TEMPLATE.format(kibana_address=ES_ADDRESS, papertrail_id=t.origin_papertrail_id)
+    archive_str = "[Archive|%s" % (kibana_link)
+    combined_str = ', '.join((
+        timestamp_str,
+        archive_str,
+    ))
+    return ' - %s' % combined_str
