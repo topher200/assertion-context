@@ -48,7 +48,7 @@ def jira_formatted_string(t: Traceback) -> str:
         instance_id=t.instance_id,
         papertrail_id=t.origin_papertrail_id,
     )
-    kibana_link = KIBANA_TEMPLATE.format(kibana_address=ES_ADDRESS, papertrail_id=t.origin_papertrail_id)
+    kibana_link = KIBANA_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
     archive_str = "[Archive|%s" % (kibana_link)
     combined_str = ', '.join((
         timestamp_str,
