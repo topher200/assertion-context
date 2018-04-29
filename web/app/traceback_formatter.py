@@ -15,7 +15,7 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
     To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
 """
 
-PAPERTRAIL_LINK_TEMPLATE = "[{timestamp}|https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
+PAPERTRAIL_LINK_TEMPLATE = "[{{{timestamp}}}|https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
 """
     A template for a link to papertrail, with the timestamp as the human-readable string.
 
