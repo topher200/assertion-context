@@ -25,6 +25,24 @@ PAPERTRAIL_LINK_TEMPLATE = "[{timestamp}|https://papertrailapp.com/systems/{inst
     - papertrail log line id. example: 926921020000000000
 """
 
+PROFILE_NAME_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_name}"
+"""
+    A template for the profile name, with a link to that profile in the product.
+
+    Requires these strings:
+    - profile_name
+    - product_url, with no trailing slash
+"""
+
+USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}"
+"""
+    A template for the username, with a link to that user in the product.
+
+    Requires these strings:
+    - username
+    - product_url, with no trailing slash
+"""
+
 KIBANA_TEMPLATE = "{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))"
 """
     A template for linking to a papertrail object in kibana.
@@ -57,7 +75,19 @@ def jira_formatted_string(t: Traceback) -> str:
         papertrail_id=t.origin_papertrail_id,
     )
 
-    # link to profile
+    # link to profile and user
+    profile_str = None
+    if t.profile_name:
+        profile_str = PROFILE_NAME_TEMPLATE.format(
+            profile_name=t.profile_name,
+            product_url=PRODUCT_URL
+        )
+    user_str = None
+    if t.user_name:
+        user_str = USERNAME_TEMPLATE.format(
+            username=t.username,
+            product_url=PRODUCT_URL
+        )
 
     # link to kibana archive
     kibana_link = KIBANA_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
@@ -67,6 +97,8 @@ def jira_formatted_string(t: Traceback) -> str:
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
+            profile_str,
+            user_str,
             archive_str,
         ) if s is not None
     )
