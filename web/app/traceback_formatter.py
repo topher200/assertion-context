@@ -1,17 +1,11 @@
 from .traceback import Traceback
 
+from . import (
+    config_util,
+)
 
-JIRA_STRING_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
-"""
-    A template for the list of hits on this traceback for jira.
 
-    We list the date of the hit and have that text be a link to the traceback itself.
-
-    Implementer needs to provide:
-        - the timestamp of the hit
-        - the instance_id of the hit
-        - the id of the logline that we want to link to (ie: origin_papertrail_id)
-"""
+PRODUCT_URL=config_util.get('PRODUCT_URL')
 
 TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
 """
@@ -26,9 +20,21 @@ def human_readable_string(traceback: Traceback) -> str:
 
 
 def jira_formatted_string(t: Traceback) -> str:
-    """ Given a traceback, returns a wall formatting string in Jira's bad formatting """
-    return JIRA_STRING_TEMPLATE % (
-        t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
-        t.instance_id,
-        t.origin_papertrail_id
+    """
+        Given a traceback, returns a wall formatting string in Jira's bad formatting
+
+        We have four parts to our formatted string:
+        - a timestamp, with a link to papertrail
+        - a profile name, with a link to the product's profile. may not exist
+        - a user name, with a link to the product's user. may not exist
+        - a link to the kibana archive of the traceback
+    """
+    timestamp_str = (
+        "[{timestamp}|"
+        "https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
+    ).format(
+        timestamp=t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
+        instance_id=t.instance_id,
+        papertrail_id=t.origin_papertrail_id,
     )
+    return ' - %s' % timestamp_str
