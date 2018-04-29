@@ -5,7 +5,7 @@ from . import (
 )
 
 
-ES_ADDRESS=config_util.get('ES_ADDRESS')
+KIBANA_ADDRESS=config_util.get('KIBANA_ADDRESS')
 PRODUCT_URL=config_util.get('PRODUCT_URL')
 
 TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
