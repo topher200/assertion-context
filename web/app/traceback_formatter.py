@@ -78,7 +78,7 @@ def jira_formatted_string(t: Traceback) -> str:
             product_url=PRODUCT_URL
         )
     user_str = None
-    if t.user_name:
+    if t.username:
         user_str = USERNAME_TEMPLATE.format(
             username=t.username,
             product_url=PRODUCT_URL
