@@ -59,10 +59,10 @@
                         {{ similar_traceback.origin_timestamp.strftime('%b %d %Y %H:%M:%S') }}
                     </a>
                     {% if t.traceback.profile_name %}
-                    \n{{ t.traceback.profile_name }}
+                    <p>{{ t.traceback.profile_name }}</p>
                     {% endif %}
                     {% if t.traceback.username %}
-                    \n{{ t.traceback.username }}
+                    <p>{{ t.traceback.username }}</p>
                     {% endif %}
                 </li>
                 {% endfor %}
