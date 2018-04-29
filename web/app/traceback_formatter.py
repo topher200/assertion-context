@@ -15,13 +15,23 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
     To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
 """
 
+PAPERTRAIL_LINK_TEMPLATE = "[{timestamp}|https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
+"""
+    A template for a link to papertrail, with the timestamp as the human-readable string.
+
+    Requires these strings:
+    - timestamp, from TIMESTAMP_TEMPLATE
+    - papertrail instance id. example: i-029b0000000000000
+    - papertrail log line id. example: 926921020000000000
+"""
+
 KIBANA_TEMPLATE = "{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))"
 """
     A template for linking to a papertrail object in kibana.
 
     Caller must provide:
     - a link to the kibana domain, no trailing slash. example: 'https://kibana.company.com'
-    - the papertrail id to highlight on. example: '926899256000330036'
+    - the papertrail id to highlight on. example: '926890000000000000'
 """
 
 
@@ -41,14 +51,13 @@ def jira_formatted_string(t: Traceback) -> str:
         - a link to the kibana archive of the traceback
     """
     # timestamp and link to papertrail
-    timestamp_str = (
-        "[{timestamp}|"
-        "https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
-    ).format(
+    timestamp_str = PAPERTRAIL_LINK_TEMPLATE.format(
         timestamp=t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
         instance_id=t.instance_id,
         papertrail_id=t.origin_papertrail_id,
     )
+
+    # link to profile
 
     # link to kibana archive
     kibana_link = KIBANA_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
