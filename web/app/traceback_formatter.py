@@ -85,7 +85,10 @@ def jira_formatted_string(t: Traceback) -> str:
         )
 
     # link to kibana archive
-    archive_str = ARCHIVE_TEMPLATE.format(kibana_address=KIBANA_REDIRECT_URL, papertrail_id=t.origin_papertrail_id)
+    archive_str = ARCHIVE_TEMPLATE.format(
+        kibana_redirect_url=KIBANA_REDIRECT_URL,
+        papertrail_id=t.origin_papertrail_id
+    )
 
     # put it all together
     combined_str = ', '.join(
