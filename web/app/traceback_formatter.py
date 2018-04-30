@@ -43,7 +43,7 @@ USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
     - product_url, with no trailing slash
 """
 
-ARCHIVE_TEMPLATE = "[Archive|https://{kibana_redirect_url}/api/traceback/{papertrail_id}"
+ARCHIVE_TEMPLATE = "[Archive|{kibana_redirect_url}/api/traceback/{papertrail_id}]"
 """
     A template for linking to a papertrail object archive.
 
