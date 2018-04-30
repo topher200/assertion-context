@@ -92,7 +92,10 @@ def parse(traceback: Traceback) -> Traceback:
             )
     ):
         # automation has weird names. let's fix it manually
-        profile_name, username = re.match('(\S*)-(zauto\S+?)$', profile_name + '-' + username).groups()[:2]
+        try:
+            profile_name, username = re.match('(\S*)-(zauto\S+?)$', profile_name + '-' + username).groups()[:2]
+        except Exception:
+            print('unable to handle zauto. %s, %s' % profile_name, username)
 
     # modify the traceback if we found anything
     modified = False
