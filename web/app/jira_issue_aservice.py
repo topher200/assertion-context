@@ -125,9 +125,9 @@ def create_jira_hits_list(tracebacks):
             include_profile_link = False
         if t.username not in seen_usernames:
             include_username_link = True
+            seen_usernames.add(t.username)
         else:
             include_username_link = False
-            seen_usernames.add(t.username)
 
         # we've seen this one already, no links
         hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
