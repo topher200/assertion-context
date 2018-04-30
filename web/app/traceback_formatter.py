@@ -15,14 +15,17 @@ TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
     To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
 """
 
-PAPERTRAIL_LINK_TEMPLATE = "[{{{{{timestamp}}}}}|https://papertrailapp.com/systems/{instance_id}/events?focus={papertrail_id}]"
+PAPERTRAIL_LINK_TEMPLATE = "[{{{{{timestamp}}}}}|{kibana_redirect_url}/api/traceback/{papertrail_id}]"
 """
     A template for a link to papertrail, with the timestamp as the human-readable string.
 
-    Requires these strings:
+    Instead of linking directly to papertrail, we include a redirect service. This lets us
+    dynamically link to the Elasticsearch archive after the papertrail link has been recycled.
+
+    Caller must provide:
     - timestamp, from TIMESTAMP_TEMPLATE
-    - papertrail instance id. example: i-029b0000000000000
-    - papertrail log line id. example: 926921020000000000
+    - a link to a service that redirects to kibana. example: 'https://kibana-redirect.company.com'
+    - the papertrail id document to open. example: '926890000000000000'
 """
 
 PROFILE_NAME_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_name}]"
@@ -43,34 +46,24 @@ USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
     - product_url, with no trailing slash
 """
 
-ARCHIVE_TEMPLATE = "[Archive|{kibana_redirect_url}/api/traceback/{papertrail_id}]"
-"""
-    A template for linking to a papertrail object archive.
-
-    Caller must provide:
-    - a link to a service that redirects to kibana. example: 'https://kibana-redirect.company.com'
-    - the papertrail id document to open. example: '926890000000000000'
-"""
-
 
 def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user_link: bool) -> str:
     """
         Given a traceback, returns a wall formatting string in Jira's bad formatting
 
         We have four parts to our formatted string:
-        - a timestamp, with a link to papertrail
+        - a timestamp, with a link to our papertrail/kibana redirect service
         - a profile name, with a link to the product's profile. may not exist
         - a user name, with a link to the product's user. may not exist
-        - a link to the kibana archive of the traceback
 
         We include two booleans to control extra links. The reason we do that is because we easily
-        run up against Jira's max comment size. Adding these booleans lets us reduce size.
+        run up against Jira's max comment size. Adding these booleans lets us reduce comment size.
     """
     # timestamp and link to papertrail
     timestamp_str = PAPERTRAIL_LINK_TEMPLATE.format(
         timestamp=t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
-        instance_id=t.instance_id,
-        papertrail_id=t.origin_papertrail_id,
+        kibana_redirect_url=KIBANA_REDIRECT_URL,
+        papertrail_id=t.origin_papertrail_id
     )
 
     # link to profile and user
@@ -93,19 +86,12 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
         else:
             user_str = t.username
 
-    # link to kibana archive
-    archive_str = ARCHIVE_TEMPLATE.format(
-        kibana_redirect_url=KIBANA_REDIRECT_URL,
-        papertrail_id=t.origin_papertrail_id
-    )
-
     # put it all together
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
             profile_str,
             user_str,
-            archive_str,
         ) if s is not None
     )
     return ' - %s' % combined_str
