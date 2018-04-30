@@ -53,7 +53,7 @@ ARCHIVE_TEMPLATE = "[Archive|{kibana_redirect_url}/api/traceback/{papertrail_id}
 """
 
 
-def jira_formatted_string(t: Traceback) -> str:
+def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user_link: bool) -> str:
     """
         Given a traceback, returns a wall formatting string in Jira's bad formatting
 
@@ -62,6 +62,9 @@ def jira_formatted_string(t: Traceback) -> str:
         - a profile name, with a link to the product's profile. may not exist
         - a user name, with a link to the product's user. may not exist
         - a link to the kibana archive of the traceback
+
+        We include two booleans to control extra links. The reason we do that is because we easily
+        run up against Jira's max comment size. Adding these booleans lets us reduce size.
     """
     # timestamp and link to papertrail
     timestamp_str = PAPERTRAIL_LINK_TEMPLATE.format(
@@ -73,16 +76,22 @@ def jira_formatted_string(t: Traceback) -> str:
     # link to profile and user
     profile_str = None
     if t.profile_name:
-        profile_str = PROFILE_NAME_TEMPLATE.format(
-            profile_name=t.profile_name,
-            product_url=PRODUCT_URL
-        )
+        if include_profile_link:
+            profile_str = PROFILE_NAME_TEMPLATE.format(
+                profile_name=t.profile_name,
+                product_url=PRODUCT_URL
+            )
+        else:
+            profile_str = t.profile_name
     user_str = None
     if t.username:
-        user_str = USERNAME_TEMPLATE.format(
-            username=t.username,
-            product_url=PRODUCT_URL
-        )
+        if include_user_link:
+            user_str = USERNAME_TEMPLATE.format(
+                username=t.username,
+                product_url=PRODUCT_URL
+            )
+        else:
+            user_str = t.username
 
     # link to kibana archive
     archive_str = ARCHIVE_TEMPLATE.format(

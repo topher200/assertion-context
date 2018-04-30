@@ -113,9 +113,26 @@ def create_jira_hits_list(tracebacks):
 
         Jira has a limit of 32767 characters per comment. We will try to keep it under 25000.
     """
-    hits_list = [traceback_formatter.jira_formatted_string(t) for t in tracebacks]
+    seen_profile_names = set()
+    seen_usernames = set()
+    hits_list = []
+    for t in tracebacks:
+        # if it's the first time seeing this profile or username, include links to them
+        if t.profile_name not in seen_profile_names:
+            include_profile_link = True
+            seen_profile_names.add(t.profile_name)
+        else:
+            include_profile_link = False
+        if t.username not in seen_usernames:
+            include_username_link = True
+        else:
+            include_username_link = False
+            seen_usernames.add(t.username)
 
-    # keep trying smaller and smaller number of comments until we fit
+        # we've seen this one already, no links
+        hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
+
+    # keep trying fewer and fewer comments until we fit
     for index in range(1, len(hits_list)):
         comment_string = '\n'.join(hits_list[:-index])
         if len(comment_string) < 25000:
