@@ -326,6 +326,36 @@ def jira_comment():
     return 'Created a comment on <a href="%s" class="alert-link">%s</a>' % (url, issue_key)
 
 
+@app.route("/jira_formatted_list/<traceback_origin_id>", methods=['GET'])
+def jira_formatted_list(traceback_origin_id):
+    """
+        Retrieves a formatted list fit for jira, with the latest hits on this traceback
+
+        Takes a query param with these fields:
+        - traceback_origin_id: the traceback to find papertrail matches for
+
+        The frontend is expecting this API to return a human readable string in the event of
+        success (200 response code)
+    """
+    try:
+        traceback_id = int(traceback_origin_id)
+    except ValueError:
+        return 'bad traceback id', 400
+    if not traceback_id:
+        return 'missing traceback id', 400
+
+    # get the referenced traceback
+    tb = traceback_database.get_traceback(ES, traceback_id)
+
+    # find a list of tracebacks that use the given traceback text
+    tracebacks = traceback_database.get_matching_tracebacks(
+        ES, tracer, tb.traceback_text, es_util.EXACT_MATCH, 10000
+    )
+    tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
+
+    return jira_issue_aservice.create_jira_hits_list(tracebacks), 200, {'Content-Type': 'text/plain'}
+
+
 @app.route("/api/update_jira_db", methods=['PUT'])
 def update_jira_db():
     """

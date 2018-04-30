@@ -158,3 +158,13 @@ def get_matching_tracebacks(es, tracer, traceback_text, match_level, num_matches
     for raw_traceback in raw_es_response['hits']['hits']:
         res.append(generate_traceback_from_source(raw_traceback['_source']))
     return res
+
+
+def get_traceback(es, id_: int) -> Traceback:
+    """ Retrieves the traceback referenced by the given ID """
+    raw_es_response = es.get(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        id=id_
+    )
+    return generate_traceback_from_source(raw_es_response['_source'])

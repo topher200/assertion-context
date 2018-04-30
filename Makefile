@@ -1,3 +1,6 @@
+.PHONY: deploy-k8s
+deploy-k8s: push-to-docker deploy-current-version
+
 .PHONY: install
 install:
 	pip install -r requirements.txt
@@ -19,7 +22,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set rbac.clusterAdminRole=true
 	helm install stable/heapster             --name heapster
 	helm install incubator/jaeger            --name jaeger               --set provisionDataStore.cassandra=false  --set provisionDataStore.elasticsearch=true --namespace jaeger-infra --set query.service.type=NodePort --set storage.type=elasticsearch
-	$(MAKE) deploy-latest-version
+	$(MAKE) deploy-current-version
 
 .PHONY: cleanup-kubernetes
 cleanup-kubernetes:
@@ -31,8 +34,8 @@ cleanup-kubernetes:
 	-kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
 	-kubectl delete secret papertrail-destination
 
-.PHONY: deploy-latest-version
-deploy-latest-version:
+.PHONY: deploy-current-version
+deploy-current-version:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx  nginx=topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web    web=topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy celery celery=topher200/assertion-context:{}

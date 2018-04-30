@@ -5,7 +5,10 @@ import re
 
 import jira
 
-from . import config_util
+from . import (
+    config_util,
+    traceback_formatter,
+)
 from .jira_issue import JiraIssue
 
 
@@ -39,25 +42,6 @@ COMMENT_TEMPLATE = '''Errors observed in production:
 
     Implementer needs to provide:
         - a list of instances of this traceback
-"""
-
-SIMILAR_LIST_TEMPLATE = ''' - [%s|https://papertrailapp.com/systems/%s/events?focus=%s]'''
-"""
-    A template for the list of hits on this traceback.
-
-    We list the date of the hit and have that text be a link to the traceback itself.
-
-    Implementer needs to provide:
-        - the timestamp of the hit
-        - the instance_id of the hit
-        - the id of the logline that we want to link to (ie: origin_papertrail_id)
-"""
-
-TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
-"""
-    A template for human-readable timestamps. Timezone info is ignored.
-
-    To be used by datetime a datetime object like this: `dt.strftime(TIMESTAMP_TEMPLATE)`
 """
 
 JIRA_CLIENT = jira.JIRA(
@@ -107,17 +91,11 @@ def create_description(similar_tracebacks):
     tracebacks, master_traceback_generator = itertools.tee(similar_tracebacks)
     master_traceback = next(master_traceback_generator)
 
-    list_of_tracebacks_string = '\n'.join(
-        SIMILAR_LIST_TEMPLATE % (
-            t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
-            t.instance_id,
-            t.origin_papertrail_id
-        ) for t in tracebacks
-    )
     return DESCRIPTION_TEMPLATE % (
         master_traceback.traceback_plus_context_text.rstrip(),
-        list_of_tracebacks_string
+        create_jira_hits_list(tracebacks)
     )
+
 
 def create_comment_with_hits_list(tracebacks):
     """
@@ -126,15 +104,15 @@ def create_comment_with_hits_list(tracebacks):
         Sorts them so that the latest one is first
     """
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
-    list_of_tracebacks_string = '\n'.join(
-        SIMILAR_LIST_TEMPLATE % (
-            t.origin_timestamp.strftime(TIMESTAMP_TEMPLATE),
-            t.instance_id,
-            t.origin_papertrail_id
-        ) for t in tracebacks
-    )
-    return COMMENT_TEMPLATE % (
-        list_of_tracebacks_string
+    return COMMENT_TEMPLATE % (create_jira_hits_list(tracebacks))
+
+
+def create_jira_hits_list(tracebacks):
+    """
+        Creates a well formatted list of strings, given a list of tracebacks
+    """
+    return '\n'.join(
+        traceback_formatter.jira_formatted_string(t) for t in tracebacks
     )
 
 
