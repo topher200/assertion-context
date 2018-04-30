@@ -5,7 +5,7 @@ from . import (
 )
 
 
-KIBANA_ADDRESS=config_util.get('KIBANA_ADDRESS')
+KIBANA_REDIRECT_URL=config_util.get('KIBANA_REDIRECT_URL')
 PRODUCT_URL=config_util.get('PRODUCT_URL')
 
 TIMESTAMP_TEMPLATE = '%b %d %Y %H:%M:%S'
@@ -43,13 +43,13 @@ USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
     - product_url, with no trailing slash
 """
 
-ARCHIVE_TEMPLATE = "[Archive|{kibana_address}/_plugin/kibana/app/kibana#/discover?_g=(time:(from:now-50y))&_a=(query:(language:lucene,query:'{papertrail_id}'))]"
+ARCHIVE_TEMPLATE = "[Archive|https://{kibana_redirect_url}/api/traceback/{papertrail_id}"
 """
     A template for linking to a papertrail object archive.
 
     Caller must provide:
-    - a link to the kibana domain, no trailing slash. example: 'https://kibana.company.com'
-    - the papertrail id to highlight on. example: '926890000000000000'
+    - a link to a service that redirects to kibana. example: 'https://kibana-redirect.company.com'
+    - the papertrail id document to open. example: '926890000000000000'
 """
 
 
@@ -85,7 +85,7 @@ def jira_formatted_string(t: Traceback) -> str:
         )
 
     # link to kibana archive
-    archive_str = ARCHIVE_TEMPLATE.format(kibana_address=KIBANA_ADDRESS, papertrail_id=t.origin_papertrail_id)
+    archive_str = ARCHIVE_TEMPLATE.format(kibana_address=KIBANA_REDIRECT_URL, papertrail_id=t.origin_papertrail_id)
 
     # put it all together
     combined_str = ', '.join(
