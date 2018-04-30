@@ -110,10 +110,18 @@ def create_comment_with_hits_list(tracebacks):
 def create_jira_hits_list(tracebacks):
     """
         Creates a well formatted list of strings, given a list of tracebacks
+
+        Jira has a limit of 32767 characters per comment. We will try to keep it under 25000.
     """
-    return '\n'.join(
-        traceback_formatter.jira_formatted_string(t) for t in tracebacks
-    )
+    hits_list = [traceback_formatter.jira_formatted_string(t) for t in tracebacks]
+
+    # keep trying smaller and smaller number of comments until we fit
+    for index in range(1, len(hits_list)):
+        comment_string = '\n'.join(hits_list[:-index])
+        if len(comment_string) < 25000:
+            break
+
+    return comment_string
 
 
 def create_comment(issue, comment_string):
