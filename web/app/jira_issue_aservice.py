@@ -133,7 +133,7 @@ def create_jira_hits_list(tracebacks):
         hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
 
     # keep trying fewer and fewer comments until we fit
-    for index in range(1, len(hits_list)):
+    for index in range(0, len(hits_list)):
         comment_string = '\n'.join(hits_list[:-index])
         if len(comment_string) < 25000:
             break
