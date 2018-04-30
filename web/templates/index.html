@@ -58,11 +58,11 @@
                     <a href="https://papertrailapp.com/systems/{{ similar_traceback.instance_id }}/events?focus={{ similar_traceback.origin_papertrail_id }}">
                         {{ similar_traceback.origin_timestamp.strftime('%b %d %Y %H:%M:%S') }}
                     </a>
-                    {% if t.traceback.profile_name %}
-                    <br>{{ t.traceback.profile_name }}
+                    {% if similar_traceback.profile_name %}
+                    <br>{{ similar_traceback.profile_name }}
                     {% endif %}
-                    {% if t.traceback.username %}
-                    <br>{{ t.traceback.username }}
+                    {% if similar_traceback.username %}
+                    <br>{{ similar_traceback.username }}
                     {% endif %}
                 </li>
                 {% endfor %}
