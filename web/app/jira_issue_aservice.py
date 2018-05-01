@@ -142,7 +142,7 @@ def create_jira_hits_list(tracebacks):
         if len(comment_string) < 25000:
             break
 
-    logger.debug(
+    logger.info(
         'for %s tracebacks, built %s hits and took the first %s for a %s char comment',
         len(tracebacks), len(hits_list), index, len(comment_string)
     )
