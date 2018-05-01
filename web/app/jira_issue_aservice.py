@@ -130,7 +130,7 @@ def create_jira_hits_list(tracebacks):
             include_username_link = False
 
         # don't include links to admin users
-        if t.username.startswith('@'):
+        if t.username and t.username.startswith('@'):
             include_username_link = False
 
         hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
