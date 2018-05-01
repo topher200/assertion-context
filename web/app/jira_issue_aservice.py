@@ -129,7 +129,10 @@ def create_jira_hits_list(tracebacks):
         else:
             include_username_link = False
 
-        # we've seen this one already, no links
+        # don't include links to admin users
+        if t.username.startswith('@'):
+            include_username_link = False
+
         hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
 
     # keep trying fewer and fewer comments until we fit
