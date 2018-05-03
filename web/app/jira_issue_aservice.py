@@ -87,9 +87,10 @@ def create_description(similar_tracebacks):
         print. This is arbitrary and could be improved in the future by taking the one that user
         selects instead.
     """
-    # grab the first as the master, while leaving the "similar" generator intact
-    tracebacks, master_traceback_generator = itertools.tee(similar_tracebacks)
-    master_traceback = next(master_traceback_generator)
+    tracebacks = list(similar_tracebacks)
+    assert tracebacks, tracebacks
+    # grab the first as the master
+    master_traceback = tracebacks[0]
 
     return DESCRIPTION_TEMPLATE % (
         master_traceback.traceback_plus_context_text.rstrip(),
