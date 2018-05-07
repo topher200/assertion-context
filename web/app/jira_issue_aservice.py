@@ -67,15 +67,15 @@ def create_title(traceback_text):
         line.
     """
     try:
-        last_line = traceback_text.splitlines()[-1]
-        if len(last_line.split()) > 1:
-            return last_line.strip()
+        last_line = traceback_text.splitlines()[-1].strip()
+        if len(last_line) > 1:
+            return last_line
 
         second_to_last_line = traceback_text.splitlines()[-2]
-        return '%s: %s' % (last_line.strip(), second_to_last_line.strip())
+        return '%s: %s' % (last_line, second_to_last_line.strip())
     except IndexError:
-        logger.warning('text as fewer lines than expected. text: "%s"', traceback_text)
-        return 'Unknown error'
+        logger.warning('text as fewer lines than expected')
+        return 'Error: Bad Jira title'
 
 
 def create_description(similar_tracebacks):
