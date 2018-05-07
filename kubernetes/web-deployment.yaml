@@ -25,6 +25,13 @@ spec:
             initialDelaySeconds: 1
             periodSeconds: 10
             timeoutSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            timeoutSeconds: 1
           resources:
             requests:
               cpu: 100m
