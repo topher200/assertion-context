@@ -1,5 +1,4 @@
 # pylint: disable=line-too-long
-import itertools
 import logging
 import re
 
