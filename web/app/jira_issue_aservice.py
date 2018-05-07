@@ -76,7 +76,7 @@ def create_title(traceback_text):
     if len(last_line) > 250:
         # jira has a title limit of 250. use the second-to-last line instead
         return second_to_last_line
-    else if len(last_line) > 1:
+    elif len(last_line) > 1:
         # last line is good, use that
         return last_line
     else:
