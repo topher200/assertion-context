@@ -1,3 +1,6 @@
+Version 2.2.0
+	- long jira titles are no longer used
+
 Version 2.1.0
 	- new jira comment formatting
 	- added a link to a "Jira formatted list" to index page
