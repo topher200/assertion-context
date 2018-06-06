@@ -19,7 +19,7 @@ ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
     '''can only join a child process|DEBUG|can only test a child process'''
 )
 KEY_ERROR_REGEX_NEGATIVE = re.compile(
-    '''threading.pyc|args:\['''
+    '''threading.pyc|args:\[|Process worker'''
 )
 VALUE_ERROR_REGEX_NEGATIVE = re.compile(
     '''raise ValueError|Facebook leads failed due|Facebook report failed due to'''

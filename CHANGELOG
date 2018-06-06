@@ -1,3 +1,6 @@
+Version 2.3.0
+	- ignore log lines like this: `KeyError: 'Process worker 13'`
+
 Version 2.2.0
 	- long jira titles are no longer used
 
