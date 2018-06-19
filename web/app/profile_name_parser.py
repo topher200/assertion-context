@@ -122,10 +122,21 @@ def __strip_traceback_text(log_lines: typing.List[str]) -> typing.Optional[typin
 
 
 def __find_first_error_line(log_lines: typing.List[str]) -> typing.Optional[int]:
-    """ Looks backwards at the log lines until it founds the first line with ERROR """
+    """
+        Looks backwards at the log lines until it founds the first line with ERROR.
+
+        Some programs instead swallow the exception with a line like this:
+            'update: Collected exception:'
+        We catch that as well.
+    """
+
     index = None
     for index in range(len(log_lines) - 1, -1, -1):
-        if 'ERROR' in log_lines[index]:
+        if (
+                ('ERROR' in log_lines[index])
+                or
+                ('Collected exception:' in log_lines[index])
+        ):
             break
     else:
         # we looked all the way back but never found an error line
