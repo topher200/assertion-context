@@ -127,4 +127,7 @@ def __find_first_error_line(log_lines: typing.List[str]) -> typing.Optional[int]
     for index in range(len(log_lines) - 1, -1, -1):
         if 'ERROR' in log_lines[index]:
             break
+    else:
+        # we looked all the way back but never found an error line
+        return None
     return index
