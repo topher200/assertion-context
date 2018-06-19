@@ -1,3 +1,7 @@
+Version 2.4.0
+	- correctly handle the case where we can't find the start of a traceback
+  - handle tracebacks that are swalled with the message 'Collected exception:'
+
 Version 2.3.0
 	- ignore log lines like this: `KeyError: 'Process worker 13'`
 
