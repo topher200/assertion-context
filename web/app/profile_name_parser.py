@@ -67,20 +67,29 @@ def parse(traceback: Traceback) -> Traceback:
         # Apr 01 07:12:16 i-kdsfj-h manager.debug:  01/Apr/2018:07:12:16.992 30740/MainThread                              : ERROR    wordstream.services: Unexpected HTTP Exception
         # Apr 01 07:12:16 i-kdsfj-h manager.debug:  Traceback (most recent call last):
 
-        # we can use the error line to the process PID
-        pid_match = re.search('\s(\d+)/MainThread', precursor_lines[index])
-        if not pid_match: return None
-        pid = pid_match.groups()[0]
+        # Jun 20 13:04:33 i-kdfjk-r aws1.engine.server.debug:  20/Jun/2018:13:04:33.039 30025/WS#topher-topher@wordstream.com: ERROR    engine.application_services.ads.AService: Failed to get ad for profile 1234. Error:
+        # Jun 20 13:04:33 i-kdfjk-r aws1.engine.server.debug:  Traceback (most recent call last):
 
-        # look backwards for the previous line with that same PID
-        index2 = None
-        for index2 in range(index - 1, -1, -1):
-            if pid in precursor_lines[index2]:
-                break
-        if index2 is None: return None
-
-        # grab the profile name and user name
+        # are the profile/user name on the ERROR line? grab it if it's there
         match = re.search('/(?:WS|PV)#(\S+)-(\S*@\S+)\s*:', precursor_lines[index2])
+
+        if not match:
+            # the names aren't on the ERROR line, we need to look backwords. we can use the ERROR
+            # line to get the process PID
+            pid_match = re.search('\s(\d+)/MainThread', precursor_lines[index])
+            if not pid_match: return None
+            pid = pid_match.groups()[0]
+
+            # look backwards for the previous line with that same PID
+            index2 = None
+            for index2 in range(index - 1, -1, -1):
+                if pid in precursor_lines[index2]:
+                    break
+            if index2 is None: return None
+
+            # grab the profile name and user name
+            match = re.search('/(?:WS|PV)#(\S+)-(\S*@\S+)\s*:', precursor_lines[index2])
+
         if not match: return None
         profile_name = match.groups()[0]
         username = match.groups()[1]
