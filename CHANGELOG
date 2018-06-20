@@ -1,34 +1,34 @@
 Version 2.4.0
-	- correctly handle the case where we can't find the start of a traceback
+  - correctly handle the case where we can't find the start of a traceback
   - handle tracebacks that are swalled with the message 'Collected exception:'
 
 Version 2.3.0
-	- ignore log lines like this: `KeyError: 'Process worker 13'`
+  - ignore log lines like this: `KeyError: 'Process worker 13'`
 
 Version 2.2.0
-	- long jira titles are no longer used
+  - long jira titles are no longer used
 
 Version 2.1.0
-	- new jira comment formatting
-	- added a link to a "Jira formatted list" to index page
+  - new jira comment formatting
+  - added a link to a "Jira formatted list" to index page
 
 Version 2.0.0
-	- add profile name parser
+  - add profile name parser
 
 Version 1.4.0
-	- add opentracing to elasticsearch calls
+  - add opentracing to elasticsearch calls
 
 Version 1.3.0
-	- add opentracing instrumentation lib. traces...
-	-- top level requests
-	-- redis requests
+  - add opentracing instrumentation lib. traces...
+  -- top level requests
+  -- redis requests
 
 Version 1.2.0
-	- jaeger tracing is now version 3.9.0 (finally built for python 3!)
+  - jaeger tracing is now version 3.9.0 (finally built for python 3!)
 
 Version 1.1.0
-	- reduced logging output to avoid log recursion in papertrail
-	- add http:// redirect
+  - reduced logging output to avoid log recursion in papertrail
+  - add http:// redirect
 
 Version 1.0.0
-	- Add Jaeger tracing
+  - Add Jaeger tracing
