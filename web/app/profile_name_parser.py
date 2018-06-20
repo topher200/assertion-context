@@ -71,7 +71,7 @@ def parse(traceback: Traceback) -> Traceback:
         # Jun 20 13:04:33 i-kdfjk-r aws1.engine.server.debug:  Traceback (most recent call last):
 
         # are the profile/user name on the ERROR line? grab it if it's there
-        match = re.search('/(?:WS|PV)#(\S+)-(\S*@\S+)\s*:', precursor_lines[index2])
+        match = re.search('/(?:WS|PV)#(\S+)-(\S*@\S+)\s*:', precursor_lines[index])
 
         if not match:
             # the names aren't on the ERROR line, we need to look backwords. we can use the ERROR
