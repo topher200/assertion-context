@@ -55,7 +55,7 @@ def render_main_page(ES, tracer, days_ago, filter_text):
     with tracer.start_span('get matching jira issues', child_of=root_span) as span:
         with span_in_context(span):
             for tb in tb_meta:
-                text_minus_last_line = tb.traceback.traceback_text.rstrip().split('\n')[:-1]
+                text_minus_last_line = ''.join(tb.traceback.traceback_text.rstrip().split('\n')[:-1])
                 tb.jira_issues = jira_issue_db.get_matching_jira_issues(
                     ES, tracer, text_minus_last_line, es_util.EXACT_MATCH
                 )
