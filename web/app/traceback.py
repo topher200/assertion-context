@@ -73,6 +73,10 @@ class Traceback(object):
         return self._traceback_text
 
     @property
+    def traceback_text_minus_last_line(self):
+        return ''.join(self.traceback_text.rstrip().split('\n')[:-1])
+
+    @property
     def traceback_plus_context_text(self):
         # not guaranteed to exist
         if self._traceback_plus_context_text is None:
