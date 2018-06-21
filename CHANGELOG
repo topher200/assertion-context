@@ -1,3 +1,7 @@
+Version 2.6.0
+  - when making matches, we now ignore the final "AssertionError" line
+    - this line can contain extra, superfluous information
+
 Version 2.5.0
   - handle engine debug corner case
 
