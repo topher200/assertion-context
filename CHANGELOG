@@ -1,3 +1,6 @@
+Version 2.7.0
+  - don't provide a link to profile ids
+
 Version 2.6.0
   - when making matches, we now ignore the final "AssertionError" line
     - this line can contain extra, superfluous information
