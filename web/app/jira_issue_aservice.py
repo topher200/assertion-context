@@ -124,7 +124,7 @@ def create_jira_hits_list(tracebacks):
     hits_list = []
     for t in tracebacks:
         # if it's the first time seeing this profile or username, include links to them
-        if t.profile_name not in seen_profile_names:
+        if t.profile_name and t.profile_name not in seen_profile_names:
             include_profile_link = True
             if t.profile_name.isdigit():
                 # it's not a profile name, it's a profile id. don't include a link
@@ -132,7 +132,7 @@ def create_jira_hits_list(tracebacks):
             seen_profile_names.add(t.profile_name)
         else:
             include_profile_link = False
-        if t.username not in seen_usernames:
+        if t.username and t.username not in seen_usernames:
             include_username_link = True
             seen_usernames.add(t.username)
         else:
