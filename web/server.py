@@ -251,10 +251,8 @@ def create_jira_ticket():
     traceback_text = json_request['traceback_text']
 
     # find a list of tracebacks that use that text
-
-    traceback_text_minus_last_line = ''.join(traceback_text.rstrip().split('\n')[:-1])
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, traceback_text_minus_last_line, es_util.EXACT_MATCH, 50
+        ES, tracer, traceback_text, es_util.EXACT_MATCH, 50
     )
 
     # create a description using the list of tracebacks
@@ -299,9 +297,8 @@ def jira_comment():
     issue = jira_issue_aservice.get_issue(issue_key)
 
     # find a list of tracebacks that use the given traceback text
-    traceback_text_minus_last_line = ''.join(traceback_text.rstrip().split('\n')[:-1])
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, traceback_text_minus_last_line, es_util.EXACT_MATCH, 10000
+        ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
     )
 
     # filter out any tracebacks that are after the latest one already on that ticket
@@ -352,7 +349,7 @@ def jira_formatted_list(traceback_origin_id):
 
     # find a list of tracebacks that use the given traceback text
     tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, tb.traceback_text_minus_last_line, es_util.EXACT_MATCH, 10000
+        ES, tracer, tb.traceback_text, es_util.EXACT_MATCH, 10000
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
 

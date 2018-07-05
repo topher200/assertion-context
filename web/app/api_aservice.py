@@ -56,11 +56,11 @@ def render_main_page(ES, tracer, days_ago, filter_text):
         with span_in_context(span):
             for tb in tb_meta:
                 tb.jira_issues = jira_issue_db.get_matching_jira_issues(
-                    ES, tracer, tb.traceback.traceback_text_minus_last_line, es_util.EXACT_MATCH
+                    ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH
                 )
                 matching_jira_keys = set(jira_issue.key for jira_issue in tb.jira_issues)
                 similar_jira_issues = jira_issue_db.get_matching_jira_issues(
-                    ES, tracer, tb.traceback.traceback_text_minus_last_line, es_util.SIMILAR_MATCH
+                    ES, tracer, tb.traceback.traceback_text, es_util.SIMILAR_MATCH
                 )
                 tb.similar_jira_issues = [similar_jira_issue for similar_jira_issue in similar_jira_issues
                                         if similar_jira_issue.key not in matching_jira_keys]
@@ -86,7 +86,7 @@ def render_main_page(ES, tracer, days_ago, filter_text):
         with span_in_context(span):
             for tb in tb_meta:
                 tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
-                    ES, tracer, tb.traceback.traceback_text_minus_last_line, es_util.EXACT_MATCH, 100
+                    ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
                 )
 
     with tracer.start_span('render page', child_of=root_span) as span:
