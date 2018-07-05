@@ -1,3 +1,6 @@
+Version 2.8.0
+  - revert changes from 2.6.0. we once again use the last line for matching
+
 Version 2.7.0
   - don't provide a link to profile ids
 
