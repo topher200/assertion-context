@@ -1,6 +1,6 @@
 Version 3.0.0
   - post new Tracebacks to slack
-  - introduce namedlist for 'TracebackPlusMetadata' object
+  - introduce simple class for 'TracebackPlusMetadata' object
   - version bump celery to 4.2.0
 
 Version 2.8.0

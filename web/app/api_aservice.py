@@ -3,7 +3,6 @@
 import datetime
 import logging
 
-from namedlist import namedlist
 import flask
 import pytz
 
@@ -20,14 +19,20 @@ from app import (
 logger = logging.getLogger()
 
 
-TracebackPlusMetadata = namedlist(
-    'TracebackPlusMetadata',
-    (
+class TracebackPlusMetadata():
+    """
+        A lightweight class to hold a Traceback plus some metadata.
+
+        We made a class (instead of a namedtuple) so that we can build incrementally.
+    """
+    def __init__(self, traceback):
+        self.traceback = traceback
+
+    __slots__ = [
         'traceback',
         'jira_issues',
         'similar_jira_issues',
-    )
-)
+    ]
 
 
 def get_tracebacks_for_day(
