@@ -120,7 +120,6 @@ def render_main_page(ES, tracer, days_ago:int, filter_text:str):
     """
     tracer = tracer or opentracing.tracer
     root_span = get_current_span()
-    assert False
 
     # our papertrail logs are saved in Eastern Time
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
