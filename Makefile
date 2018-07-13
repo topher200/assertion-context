@@ -1,9 +1,11 @@
 .PHONY: deploy-k8s
 deploy-k8s: push-to-docker deploy-current-version
 
+VERSION := $(shell cat web/version)
 .PHONY: bump-web-patch-version
-bump-version:
-	bumpversion --current-version $(cat web/VERSION) patch web/VERSION
+bump-web-patch-version:
+	bumpversion --current-version $(VERSION) patch web/VERSION
+	git commit -m 'version bump' -o web/version
 
 .PHONY: install
 install:
