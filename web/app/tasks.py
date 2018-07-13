@@ -1,4 +1,8 @@
+import datetime
 import logging
+
+import pytz
+import redis
 
 from elasticsearch import Elasticsearch
 import celery
@@ -6,14 +10,19 @@ import certifi
 import requests
 
 from app import (
+    api_aservice,
     config_util,
-    jira_issue_db,
     jira_issue_aservice,
-    traceback_database,
+    jira_issue_db,
     logging_util,
-    tasks_util,
-    s3,
     realtime_updater,
+    s3,
+    tasks_util,
+    traceback_database,
+    tracing,
+)
+from .services import (
+    slack_poster,
 )
 from app.ddl import api_call_db
 
@@ -24,6 +33,10 @@ app = celery.Celery('tasks', broker='redis://'+REDIS_ADDRESS)
 
 # set up database
 ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
+REDIS = redis.StrictRedis(host=REDIS_ADDRESS)
+
+# add tracing
+tracer = tracing.initialize_tracer()
 
 logger = logging.getLogger()
 
@@ -110,6 +123,36 @@ def hydrate_cache():
     requests.put('http://nginx/api/hydrate_cache')
 
 
+@app.task
+def post_unticketed_tracebacks_to_slack():
+    """
+        Post any unticketed tracebacks to slack.
+
+        Only posts if we've never posted about that specific Traceback before.
+    """
+    # our papertrail logs are saved in Eastern Time
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+
+    # get today's tracebacks
+    tracebacks = api_aservice.get_tracebacks_for_day(ES, None, today, 'No Ticket')
+
+    for tb_to_post in (
+            tb for tb in tracebacks
+            if tb.origin_papertrail_id
+            not in REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb.origin_papertrail_id)
+    ):
+        slack_poster.post_traceback(tb_to_post)
+        # TODO: this set will grow to infinity
+        REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_to_post.origin_papertrail_id)
+        break
+
+
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
+
+
+__SEEN_TRACEBACKS_KEY = 'seen_tracebacks'
+"""
+    redis key to store our set of tracebacks we've seen
+"""
