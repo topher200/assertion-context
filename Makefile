@@ -7,6 +7,9 @@ bump-web-patch-version:
 	bumpversion --current-version $(VERSION) patch web/VERSION
 	git commit -m 'version bump' -o web/VERSION
 
+.PHONY: bump-and-deploy
+bump-and-deploy: bump-web-patch-version deploy-k8s
+
 .PHONY: install
 install:
 	pip install -r requirements.txt
