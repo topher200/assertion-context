@@ -2,8 +2,8 @@
 
 import datetime
 import logging
-import types
 
+from namedlist import namedlist
 import flask
 import pytz
 
@@ -18,6 +18,16 @@ from app import (
 )
 
 logger = logging.getLogger()
+
+
+TracebackPlusMetadata = namedlist(
+    'TracebackPlusMetadata',
+    (
+        'traceback',
+        'jira_issues',
+        'similar_jira_issues',
+    )
+)
 
 
 def render_main_page(ES, tracer, days_ago, filter_text):
@@ -44,10 +54,10 @@ def render_main_page(ES, tracer, days_ago, filter_text):
                         hidden_tracebacks.add(tb.origin_papertrail_id)
                 logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
 
-    # filter out tracebacks the user has hidden. we use a SimpleNamespace to store each traceback +
-    # some metadata we'll use when rendering the html page
+    # filter out tracebacks the user has hidden. we use a namedlist to store each traceback + some
+    # metadata we'll use when rendering the html page
     tb_meta = [
-        types.SimpleNamespace(traceback=t) for t in tracebacks
+        TracebackPlusMetadata(traceback=t) for t in tracebacks
         if t.origin_papertrail_id not in hidden_tracebacks
     ]
 
