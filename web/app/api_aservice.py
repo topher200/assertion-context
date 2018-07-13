@@ -32,6 +32,7 @@ class TracebackPlusMetadata():
         'traceback',
         'jira_issues',
         'similar_jira_issues',
+        'similar_tracebacks',
     ]
 
 
