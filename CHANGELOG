@@ -1,3 +1,7 @@
+Version 3.0.0
+  - post new Tracebacks to slack
+  - introduce namedlist for 'TracebackPlusMetadata' object
+
 Version 2.8.0
   - revert changes from 2.6.0. we once again use the last line for matching
 
