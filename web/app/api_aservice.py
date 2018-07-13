@@ -30,12 +30,15 @@ TracebackPlusMetadata = namedlist(
 )
 
 
-def render_main_page(ES, tracer, days_ago, filter_text):
-    root_span = get_current_span()
+def get_tracebacks_for_day(
+        ES, tracer, date_to_analyze:datetime.date, filter_text:str
+) -> TracebackPlusMetadata:
+    """
+        Retrieves the Tracebacks for the given date_to_analyze date.
 
-    # our papertrail logs are saved in Eastern Time
-    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
-    date_to_analyze = today - datetime.timedelta(days=days_ago)
+        If provided, only returns Tracebacks which match filter_text.
+    """
+    root_span = get_current_span()
 
     # get all tracebacks
     with tracer.start_span('get all tracebacks', child_of=root_span) as span:
@@ -98,6 +101,21 @@ def render_main_page(ES, tracer, days_ago, filter_text):
                 tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
                     ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
                 )
+
+    return tb_meta
+
+
+def render_main_page(ES, tracer, days_ago:int, filter_text:str):
+    """
+        Renders our index page with all the Trackbacks for the specified day and filter.
+    """
+    root_span = get_current_span()
+
+    # our papertrail logs are saved in Eastern Time
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+    date_to_analyze = today - datetime.timedelta(days=days_ago)
+
+    tb_meta = get_tracebacks_for_day(ES, tracer, date_to_analyze, filter_text)
 
     with tracer.start_span('render page', child_of=root_span) as span:
         with span_in_context(span):
