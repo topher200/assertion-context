@@ -50,6 +50,7 @@ def get_tracebacks_for_day(
     with tracer.start_span('get all tracebacks', child_of=root_span) as span:
         with span_in_context(span):
             tracebacks = traceback_database.get_tracebacks(ES, tracer, date_to_analyze, date_to_analyze)
+    logger.debug('found %s tracebacks', len(tracebacks))
 
     # create a set of tracebacks that match all the traceback texts the user has hidden
     with tracer.start_span('determine hidden tracebacks', child_of=root_span) as span:
