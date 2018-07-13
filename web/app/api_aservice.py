@@ -4,6 +4,7 @@ import datetime
 import logging
 
 import flask
+import opentracing
 import pytz
 
 from opentracing_instrumentation.request_context import get_current_span, span_in_context
@@ -44,6 +45,7 @@ def get_tracebacks_for_day(
 
         If provided, only returns Tracebacks which match filter_text.
     """
+    tracer = tracer or opentracing.tracer
     root_span = get_current_span()
 
     # get all tracebacks
@@ -116,6 +118,7 @@ def render_main_page(ES, tracer, days_ago:int, filter_text:str):
     """
         Renders our index page with all the Trackbacks for the specified day and filter.
     """
+    tracer = tracer or opentracing.tracer
     root_span = get_current_span()
 
     # our papertrail logs are saved in Eastern Time
