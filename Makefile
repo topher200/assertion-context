@@ -1,6 +1,10 @@
 .PHONY: deploy-k8s
 deploy-k8s: push-to-docker deploy-current-version
 
+.PHONY: bump-web-patch-version
+bump-version:
+	bumpversion --current-version $(cat web/VERSION) patch web/VERSION
+
 .PHONY: install
 install:
 	pip install -r requirements.txt
