@@ -4,7 +4,7 @@ Flask-KVSession==0.6.2
 Gunicorn==19.6
 boto3==1.4.0
 cachetools==2.0.1
-celery[redis]==4.0.2
+celery[redis]==4.2.0
 certifi
 dogpile.cache==0.6.2
 elasticsearch>=6.0.0,<7.0.0
