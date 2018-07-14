@@ -43,7 +43,8 @@ PROFILE_NAME_SLACK_TEMPLATE = "<{product_url}/admin/profile/{profile_name}|{prof
     - product_url, with no trailing slash
 """
 
-USERNAME_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
+USERNAME_JIRA_TEMPLATE = "[{username}|{product_url}/admin/user/{username}]"
+USERNAME_SLACK_TEMPLATE = "<{product_url}/admin/user/{username}|{username}>"
 """
     A template for the username, with a link to that user in the product.
 
@@ -85,7 +86,7 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
     user_str = None
     if t.username:
         if include_user_link:
-            user_str = USERNAME_TEMPLATE.format(
+            user_str = USERNAME_JIRA_TEMPLATE.format(
                 username=t.username,
                 product_url=PRODUCT_URL
             )
@@ -133,7 +134,7 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
     user_str = None
     if t.username:
         if include_user_link:
-            user_str = USERNAME_TEMPLATE.format(
+            user_str = USERNAME_SLACK_TEMPLATE.format(
                 username=t.username,
                 product_url=PRODUCT_URL
             )
