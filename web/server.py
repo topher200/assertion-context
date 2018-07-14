@@ -22,17 +22,20 @@ from simplekv.decorator import PrefixDecorator
 
 from opentracing_instrumentation.request_context import span_in_context
 
-from app import api_aservice
-from app import es_util
-from app import healthz
-from app import jira_issue_aservice
-from app import jira_issue_db
-from app import logging_util
-from app import realtime_updater
-from app import tasks
-from app import text_keys
-from app import traceback_database
-from app import tracing
+from .app import (
+    api_aservice,
+    es_util,
+    healthz,
+    jira_issue_aservice,
+    jira_issue_db,
+    logging_util,
+    realtime_updater,
+    tasks,
+    text_keys,
+    traceback_database,
+    traceback_formatter,
+    tracing,
+)
 
 
 # create app
@@ -357,7 +360,11 @@ def jira_formatted_list(traceback_origin_id):
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
 
-    return jira_issue_aservice.create_jira_hits_list(tracebacks), 200, {'Content-Type': 'text/plain'}
+    return (
+        traceback_formatter.create_hits_list(tracebacks, traceback_formatter.jira_formatted_string),
+        200,
+        {'Content-Type': 'text/plain'}
+    )
 
 
 @app.route("/api/update_jira_db", methods=['PUT'])
