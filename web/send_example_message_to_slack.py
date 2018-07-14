@@ -27,4 +27,6 @@ tb_meta = random.choice(tracebacks_with_metadata)
 traceback = tb_meta.traceback
 similar_tracebacks = tb_meta.similar_tracebacks
 
-slack_poster.post_traceback(traceback, similar_tracebacks)
+response = slack_poster.post_traceback(traceback, similar_tracebacks)
+print(response)
+print(response.text)

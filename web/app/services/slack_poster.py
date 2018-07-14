@@ -58,3 +58,5 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
             'Request to slack returned an error %s, the response is:\n%s',
             response.status_code, response.text
         )
+
+    return response
