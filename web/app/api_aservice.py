@@ -38,12 +38,14 @@ class TracebackPlusMetadata():
 
 
 def get_tracebacks_for_day(
-        ES, tracer, date_to_analyze:datetime.date, filter_text:str
+        ES, tracer, date_to_analyze:datetime.date, filter_text:str, hidden_traceback_ids:set,
 ) -> TracebackPlusMetadata:
     """
         Retrieves the Tracebacks for the given date_to_analyze date.
 
         If provided, only returns Tracebacks which match filter_text.
+
+        Only returns Tracebacks whose ids aren't in hidden_traceback_ids.
     """
     tracer = tracer or opentracing.tracer
     root_span = get_current_span()
@@ -54,23 +56,11 @@ def get_tracebacks_for_day(
             tracebacks = traceback_database.get_tracebacks(ES, tracer, date_to_analyze, date_to_analyze)
     logger.debug('found %s tracebacks', len(tracebacks))
 
-    # create a set of tracebacks that match all the traceback texts the user has hidden
-    with tracer.start_span('determine hidden tracebacks', child_of=root_span) as span:
-        with span_in_context(span):
-            hidden_tracebacks = set()
-            if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
-                for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
-                    for tb in traceback_database.get_matching_tracebacks(
-                            ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
-                    ):
-                        hidden_tracebacks.add(tb.origin_papertrail_id)
-                logger.info('found %s traceback ids we need to hide', len(hidden_tracebacks))
-
     # filter out tracebacks the user has hidden. we use a namedlist to store each traceback + some
     # metadata we'll use when rendering the html page
     tb_meta = [
         TracebackPlusMetadata(traceback=t) for t in tracebacks
-        if t.origin_papertrail_id not in hidden_tracebacks
+        if t.origin_papertrail_id not in hidden_traceback_ids
     ]
 
     # get a list of matching jira issues
@@ -125,7 +115,19 @@ def render_main_page(ES, tracer, days_ago:int, filter_text:str):
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     date_to_analyze = today - datetime.timedelta(days=days_ago)
 
-    tb_meta = get_tracebacks_for_day(ES, tracer, date_to_analyze, filter_text)
+    # create a set of tracebacks that match all the traceback texts the user has hidden
+    with tracer.start_span('determine hidden tracebacks', child_of=root_span) as span:
+        with span_in_context(span):
+            hidden_traceback_ids = set()
+            if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
+                for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
+                    for tb in traceback_database.get_matching_tracebacks(
+                            ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
+                    ):
+                        hidden_traceback_ids.add(tb.origin_papertrail_id)
+                logger.info('found %s traceback ids we need to hide', len(hidden_traceback_ids))
+
+    tb_meta = get_tracebacks_for_day(ES, tracer, date_to_analyze, filter_text, hidden_traceback_ids)
 
     with tracer.start_span('render page', child_of=root_span) as span:
         with span_in_context(span):

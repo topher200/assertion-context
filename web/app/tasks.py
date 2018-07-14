@@ -134,7 +134,7 @@ def post_unticketed_tracebacks_to_slack():
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
 
     # get today's tracebacks
-    tracebacks = api_aservice.get_tracebacks_for_day(ES, None, today, 'No Ticket')
+    tracebacks = api_aservice.get_tracebacks_for_day(ES, None, today, 'No Ticket', set())
 
     for tb_to_post in (
             tb for tb in tracebacks
