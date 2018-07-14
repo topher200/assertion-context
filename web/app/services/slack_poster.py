@@ -17,36 +17,41 @@ logger = logging.getLogger()
 
 MESSAGE_TEMPLATE = """
 ```
-{traceback_text}```
-{hits}
-"""
+{traceback_text}```"""
 
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback]):
-    message = MESSAGE_TEMPLATE.format(
-        traceback_text=traceback.traceback_plus_context_text,
-        hits=traceback_formatter.create_hits_list(
-            similar_tracebacks,
-            traceback_formatter.slack_formatted_string,
-            max_number_hits=10
-        ),
+    traceback_text = MESSAGE_TEMPLATE.format(traceback_text=traceback.traceback_plus_context_text)
+    hits = traceback_formatter.create_hits_list(
+        similar_tracebacks,
+        traceback_formatter.slack_formatted_string,
+        max_number_hits=50
     )
+
     slack_data = {
-        'text': message,
-        'attachments': [
+        "text": traceback_text,
+        "attachments": [
             {
-                'callback_id': traceback.origin_papertrail_id,
-                'actions': [
-                    {
-                        'name': 'create_ticket',
-                        'text': 'Create Ticket',
-                        'type': 'button',
-                        'value': 'default',
-                    },
-                ]
+                "text": hits
             },
+            {
+                "callback_id": "%s" % traceback.origin_papertrail_id,
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "fallback": "Create Jira Ticket",
+                "actions": [
+                    {
+                        "name": "create_ticket",
+                        "text": "Create Jira Ticket",
+                        "type": "button",
+                        "value": "default"
+                    }
+                ]
+            }
         ]
     }
+
+    logger.error(json.dumps(slack_data))
 
     response = requests.post(
         WEBHOOK_URL,
