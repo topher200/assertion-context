@@ -369,7 +369,7 @@ def jira_formatted_list(traceback_origin_id):
 
 @app.route("/slack-callback", methods=['POST'])
 def slack_callback():
-    data = urllib.parse_qs(app.current_request.raw_body)
+    data = urllib.parse.parse_qs(app.current_request.raw_body)
     if data is None:
         return 'empty data', 400
 
