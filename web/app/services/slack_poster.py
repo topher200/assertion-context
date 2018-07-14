@@ -31,7 +31,22 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
             max_number_hits=10
         ),
     )
-    slack_data = {'text': message}
+    slack_data = {
+        'text': message,
+        'attachments': [
+            {
+                'callback_id': traceback.origin_papertrail_id,
+                'actions': [
+                    {
+                        'name': 'create_ticket',
+                        'text': 'Create Ticket',
+                        'type': 'button',
+                        'value': 'default',
+                    },
+                ]
+            },
+        ]
+    }
 
     response = requests.post(
         WEBHOOK_URL,
