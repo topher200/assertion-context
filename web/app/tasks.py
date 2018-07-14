@@ -21,10 +21,10 @@ from app import (
     traceback_database,
     tracing,
 )
+from app.ddl import api_call_db
 from .services import (
     slack_poster,
 )
-from app.ddl import api_call_db
 
 REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
 ES_ADDRESS = config_util.get('ES_ADDRESS')
