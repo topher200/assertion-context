@@ -141,8 +141,7 @@ def post_unticketed_tracebacks_to_slack():
     # for each traceback, post it if we've never posted it before
     for tb_to_post in (
             tb_meta.traceback for tb_meta in tracebacks_with_metadata
-            if tb_meta.traceback.origin_papertrail_id
-            not in REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
+            if not REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
     ):
         slack_poster.post_traceback(tb_to_post)
         # TODO: this set will grow to infinity
