@@ -5,6 +5,7 @@
 """
 import datetime
 import logging
+import json
 import os
 import traceback
 import urllib
@@ -373,10 +374,9 @@ def slack_callback():
     if data is None:
         return 'empty data', 400
 
-    logger.warning('raw data: %s', data)
     parsed_data = urllib.parse.parse_qs(data)
-
-    logger.warning('slack callback: %s', parsed_data)
+    payload = json.loads(parsed_data['payload'])
+    logger.warning('slack callback: %s', payload)
     return 'ok'
 
 
