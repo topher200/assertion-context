@@ -210,7 +210,7 @@ def realtime_update():
 
     # this isn't exactly the best time to post to slack (since it won't include anything from this
     # realtime_update call), but it's as good a time as any
-    # tasks.post_unticketed_tracebacks_to_slack.delay()
+    tasks.post_unticketed_tracebacks_to_slack.delay()
     return 'job queued', 202
 
 
