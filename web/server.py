@@ -64,7 +64,7 @@ logger = logging.getLogger()
 logging_util.setup_logging()
 
 # add tracing
-tracer = tracing.initialize_tracer()
+tracing.initialize_tracer()
 
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
@@ -94,7 +94,7 @@ def index():
     span = flask.g.tracer_root_span
     with span_in_context(span):
         span.set_tag('filter', filter_text)
-        return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text)
+        return api_aservice.render_main_page(ES, opentracing.tracer, days_ago_int, filter_text)
 
 
 @app.route("/api/parse_s3", methods=['POST'])
@@ -207,6 +207,10 @@ def realtime_update():
         end_time = json_request['end_time']
 
     realtime_updater.enqueue(end_time)
+
+    # this isn't exactly the best time to post to slack (since it won't include anything from this
+    # realtime_update call), but it's as good a time as any
+    tasks.post_unticketed_tracebacks_to_slack.delay()
     return 'job queued', 202
 
 
@@ -252,7 +256,7 @@ def create_jira_ticket():
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, traceback_text, es_util.EXACT_MATCH, 50
+        ES, opentracing.tracer, traceback_text, es_util.EXACT_MATCH, 50
     )
 
     # create a description using the list of tracebacks
@@ -298,7 +302,7 @@ def jira_comment():
 
     # find a list of tracebacks that use the given traceback text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
+        ES, opentracing.tracer, traceback_text, es_util.EXACT_MATCH, 10000
     )
 
     # filter out any tracebacks that are after the latest one already on that ticket
@@ -349,7 +353,7 @@ def jira_formatted_list(traceback_origin_id):
 
     # find a list of tracebacks that use the given traceback text
     tracebacks = traceback_database.get_matching_tracebacks(
-        ES, tracer, tb.traceback_text, es_util.EXACT_MATCH, 10000
+        ES, opentracing.tracer, tb.traceback_text, es_util.EXACT_MATCH, 10000
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
 
@@ -408,7 +412,7 @@ def hydrate_cache():
     """
         Invalidate all the dogpile function caches
     """
-    _ = api_aservice.render_main_page(ES, tracer, days_ago=0, filter_text=FILTERS[0])
+    _ = api_aservice.render_main_page(ES, opentracing.tracer, days_ago=0, filter_text=FILTERS[0])
     return 'success'
 
 
@@ -461,6 +465,7 @@ def start_request():
     for k, v in flask.request.headers:
         headers[k.lower()] = v
     try:
+        tracer = opentracing.tracer
         span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
         span = tracer.start_span(operation_name='server', child_of=span_ctx)
     except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:

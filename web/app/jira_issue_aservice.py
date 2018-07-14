@@ -99,7 +99,7 @@ def create_description(similar_tracebacks):
 
     return DESCRIPTION_TEMPLATE % (
         master_traceback.traceback_plus_context_text.rstrip(),
-        create_jira_hits_list(tracebacks)
+        traceback_formatter.create_hits_list(tracebacks, traceback_formatter.jira_formatted_string)
     )
 
 
@@ -110,53 +110,9 @@ def create_comment_with_hits_list(tracebacks):
         Sorts them so that the latest one is first
     """
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
-    return COMMENT_TEMPLATE % (create_jira_hits_list(tracebacks))
-
-
-def create_jira_hits_list(tracebacks):
-    """
-        Creates a well formatted list of strings, given a list of tracebacks
-
-        Jira has a limit of 32767 characters per comment. We will try to keep it under 25000.
-    """
-    seen_profile_names = set()
-    seen_usernames = set()
-    hits_list = []
-    for t in tracebacks:
-        # if it's the first time seeing this profile or username, include links to them
-        if t.profile_name and t.profile_name not in seen_profile_names:
-            include_profile_link = True
-            if t.profile_name.isdigit():
-                # it's not a profile name, it's a profile id. don't include a link
-                include_profile_link = False
-            seen_profile_names.add(t.profile_name)
-        else:
-            include_profile_link = False
-        if t.username and t.username not in seen_usernames:
-            include_username_link = True
-            seen_usernames.add(t.username)
-        else:
-            include_username_link = False
-
-        # don't include links to admin users
-        if t.username and t.username.startswith('@'):
-            include_username_link = False
-
-        hits_list.append(traceback_formatter.jira_formatted_string(t, include_profile_link, include_username_link))
-
-    # keep trying fewer and fewer comments until we fit
-    index = len(hits_list)
-    for index in range(index, 0, -1):
-        comment_string = '\n'.join(hits_list[:index])
-        if len(comment_string) < 25000:
-            break
-
-    logger.info(
-        'for %s tracebacks, built %s hits and took the first %s for a %s char comment',
-        len(tracebacks), len(hits_list), index, len(comment_string)
+    return COMMENT_TEMPLATE % (
+        traceback_formatter.create_hits_list(tracebacks, traceback_formatter.jira_formatted_string)
     )
-
-    return comment_string
 
 
 def create_comment(issue, comment_string):

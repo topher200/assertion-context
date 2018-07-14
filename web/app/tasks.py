@@ -1,4 +1,8 @@
+import datetime
 import logging
+
+import pytz
+import redis
 
 from elasticsearch import Elasticsearch
 import celery
@@ -6,16 +10,21 @@ import certifi
 import requests
 
 from app import (
+    api_aservice,
     config_util,
-    jira_issue_db,
     jira_issue_aservice,
-    traceback_database,
+    jira_issue_db,
     logging_util,
-    tasks_util,
-    s3,
     realtime_updater,
+    s3,
+    tasks_util,
+    traceback_database,
+    tracing,
 )
 from app.ddl import api_call_db
+from .services import (
+    slack_poster,
+)
 
 REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
 ES_ADDRESS = config_util.get('ES_ADDRESS')
@@ -24,6 +33,10 @@ app = celery.Celery('tasks', broker='redis://'+REDIS_ADDRESS)
 
 # set up database
 ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
+REDIS = redis.StrictRedis(host=REDIS_ADDRESS)
+
+# add tracing
+tracer = tracing.initialize_tracer()
 
 logger = logging.getLogger()
 
@@ -110,6 +123,38 @@ def hydrate_cache():
     requests.put('http://nginx/api/hydrate_cache')
 
 
+@app.task
+def post_unticketed_tracebacks_to_slack():
+    """
+        Post any unticketed tracebacks to slack.
+
+        Only posts if we've never posted about that specific Traceback before.
+    """
+    # our papertrail logs are saved in Eastern Time
+    today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
+
+    # get today's tracebacks
+    tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
+        ES, None, today, 'No Ticket', set()
+    )
+    tracebacks_with_metadata.reverse() # post in order by time, with latest coming last
+
+    # for each traceback, post it if we've never posted it before
+    for tb_meta in (
+            tb_meta for tb_meta in tracebacks_with_metadata
+            if not REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
+    ):
+        slack_poster.post_traceback(tb_meta.traceback, tb_meta.similar_tracebacks)
+        # TODO: this set will grow to infinity
+        REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
+
+
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
+
+
+__SEEN_TRACEBACKS_KEY = 'seen_tracebacks'
+"""
+    redis key to store our set of tracebacks we've seen
+"""
