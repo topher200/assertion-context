@@ -9,7 +9,7 @@ import pytz
 
 from opentracing_instrumentation.request_context import get_current_span, span_in_context
 
-from app import (
+from . import (
     es_util,
     jira_issue_db,
     tasks,

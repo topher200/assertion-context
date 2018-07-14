@@ -11,9 +11,11 @@ import elasticsearch
 
 from opentracing_instrumentation.request_context import get_current_span
 
-from app import es_util
-from app import redis_util
-from app import retry
+from . import (
+    es_util,
+    redis_util,
+    retry,
+)
 from .jira_issue import JiraIssue, generate_from_source
 
 
