@@ -367,6 +367,16 @@ def jira_formatted_list(traceback_origin_id):
     )
 
 
+@app.route("/slack-callback", methods=['POST'])
+def slack_callback():
+    json_request = flask.request.get_json()
+    if json_request is None:
+        return 'invalid json', 400
+
+    logger.warning('slack callback: %s', json_request)
+    return 'ok'
+
+
 @app.route("/api/update_jira_db", methods=['PUT'])
 def update_jira_db():
     """
