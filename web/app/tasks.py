@@ -137,6 +137,7 @@ def post_unticketed_tracebacks_to_slack():
     tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
         ES, None, today, 'No Ticket', set()
     )
+    tracebacks_with_metadata.reverse() # post in order by time, with latest coming last
 
     # for each traceback, post it if we've never posted it before
     for tb_to_post in (
