@@ -4,7 +4,7 @@ deploy-k8s: push-to-docker deploy-current-version
 VERSION := $(shell cat web/version)
 .PHONY: bump-web-patch-version
 bump-web-patch-version:
-	bumpversion --current-version $(VERSION) patch web/VERSION
+	bumpversion --allow-dirty --current-version $(VERSION) patch web/VERSION
 	git commit -m 'version bump' -o web/VERSION
 
 .PHONY: bump-and-deploy
