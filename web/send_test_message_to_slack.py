@@ -1,4 +1,5 @@
 import datetime
+import random
 
 from elasticsearch import Elasticsearch
 import certifi
@@ -22,7 +23,8 @@ yesterday = today - datetime.timedelta(days=1)
 tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
     ES, None, today, None, set()
 )
-traceback = tracebacks_with_metadata[0].traceback
-similar_tracebacks = tracebacks_with_metadata[0].similar_tracebacks
+tb_meta = random.choice(tracebacks_with_metadata)
+traceback = tb_meta.traceback
+similar_tracebacks = tb_meta.similar_tracebacks
 
 slack_poster.post_traceback(traceback, similar_tracebacks)
