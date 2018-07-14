@@ -134,12 +134,15 @@ def post_unticketed_tracebacks_to_slack():
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
 
     # get today's tracebacks
-    tracebacks = api_aservice.get_tracebacks_for_day(ES, None, today, 'No Ticket', set())
+    tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
+        ES, None, today, 'No Ticket', set()
+    )
 
+    # for each traceback, post it if we've never posted it before
     for tb_to_post in (
-            tb for tb in tracebacks
-            if tb.origin_papertrail_id
-            not in REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb.origin_papertrail_id)
+            tb_meta.traceback for tb_meta in tracebacks_with_metadata
+            if tb_meta.traceback.origin_papertrail_id
+            not in REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
     ):
         slack_poster.post_traceback(tb_to_post)
         # TODO: this set will grow to infinity
