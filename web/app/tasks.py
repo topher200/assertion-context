@@ -147,7 +147,6 @@ def post_unticketed_tracebacks_to_slack():
         slack_poster.post_traceback(tb_meta.traceback, tb_meta.similar_tracebacks)
         # TODO: this set will grow to infinity
         REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
-        break
 
 
 @celery.signals.setup_logging.connect
