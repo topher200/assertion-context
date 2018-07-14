@@ -373,7 +373,10 @@ def slack_callback():
     if data is None:
         return 'empty data', 400
 
-    logger.warning('slack callback: %s', data)
+    logger.warning('raw data: %s', parsed_data)
+    parsed_data = urllib.parse.parse_qs(data)
+
+    logger.warning('slack callback: %s', parsed_data)
     return 'ok'
 
 
