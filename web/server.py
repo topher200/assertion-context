@@ -375,7 +375,7 @@ def slack_callback():
         return 'empty data', 400
 
     parsed_data = urllib.parse.parse_qs(data)
-    payload = json.loads(parsed_data['payload'])
+    payload = json.loads(parsed_data[b'payload'][0])
     logger.warning('slack callback: %s', payload)
     return 'ok'
 
