@@ -369,11 +369,11 @@ def jira_formatted_list(traceback_origin_id):
 
 @app.route("/slack-callback", methods=['POST'])
 def slack_callback():
-    json_request = flask.request.get_json(force=True)
-    if json_request is None:
-        return 'invalid json', 400
+    data = flask.request.get_data()
+    if data is None:
+        return 'empty data', 400
 
-    logger.warning('slack callback: %s', json_request)
+    logger.warning('slack callback: %s', data)
     return 'ok'
 
 
