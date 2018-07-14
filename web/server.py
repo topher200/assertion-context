@@ -22,7 +22,7 @@ from simplekv.decorator import PrefixDecorator
 
 from opentracing_instrumentation.request_context import span_in_context
 
-from .app import (
+from app import (
     api_aservice,
     es_util,
     healthz,
