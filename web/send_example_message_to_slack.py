@@ -22,7 +22,7 @@ today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
 yesterday = today - datetime.timedelta(days=1)
 print('getting tracebacks')
 tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
-    ES, None, today, None, set()
+    ES, None, today, 'No Ticket', set()
 )
 tb_meta = random.choice(tracebacks_with_metadata)
 traceback = tb_meta.traceback
