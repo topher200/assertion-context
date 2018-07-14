@@ -140,13 +140,13 @@ def post_unticketed_tracebacks_to_slack():
     tracebacks_with_metadata.reverse() # post in order by time, with latest coming last
 
     # for each traceback, post it if we've never posted it before
-    for tb_to_post in (
-            tb_meta.traceback for tb_meta in tracebacks_with_metadata
+    for tb_meta in (
+            tb_meta for tb_meta in tracebacks_with_metadata
             if not REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
     ):
-        slack_poster.post_traceback(tb_to_post)
+        slack_poster.post_traceback(tb_meta.traceback, tb_meta.similar_tracebacks)
         # TODO: this set will grow to infinity
-        REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_to_post.origin_papertrail_id)
+        REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
         break
 
 

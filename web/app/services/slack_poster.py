@@ -1,19 +1,37 @@
+from typing import List
 import logging
 import json
 
 import requests
 
 
-from .. import config_util
+from .. import (
+    config_util,
+    traceback_formatter,
+)
 from ..traceback import Traceback
 
 WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
 
 logger = logging.getLogger()
 
+MESSAGE_TEMPLATE = """
+```
+{traceback_text}```
+{hits}
+"""
 
-def post_traceback(traceback:Traceback):
-    slack_data = {'text': traceback.traceback_plus_context_text}
+
+def post_traceback(traceback, similar_tracebacks:List[Traceback]):
+    message = MESSAGE_TEMPLATE.format(
+        traceback_text=traceback.traceback_plus_context_text,
+        hits=traceback_formatter.create_hits_list(
+            similar_tracebacks,
+            traceback_formatter.slack_formatted_string,
+            max_number_hits=10
+        ),
+    )
+    slack_data = {'text': message}
 
     response = requests.post(
         WEBHOOK_URL,
