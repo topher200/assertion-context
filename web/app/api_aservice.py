@@ -11,6 +11,7 @@ from opentracing_instrumentation.request_context import get_current_span, span_i
 
 from . import (
     es_util,
+    jira_issue_aservice,
     jira_issue_db,
     tasks,
     text_keys,
@@ -158,3 +159,26 @@ def parse_s3_for_date(date_, bucket, key_prefix):
         key = '/'.join((key_prefix, filename_string))
         logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
         tasks.parse_log_file.delay(bucket, key)
+
+
+def create_ticket(ES, origin_papertrail_id:int) -> str:
+    """
+        Creates a jira issue for the given traceback id
+    """
+    traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+
+    # find a list of tracebacks that use that text
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
+    )
+
+    # create a description using the list of tracebacks
+    description = jira_issue_aservice.create_description(similar_tracebacks)
+
+    # create a title using the traceback text
+    title = jira_issue_aservice.create_title(traceback.traceback_text)
+
+    # make API call to jira
+    ticket_id = jira_issue_aservice.create_jira_issue(title, description)
+
+    return ticket_id

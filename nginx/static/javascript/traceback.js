@@ -31,7 +31,7 @@ function restore_all(){
 function create_jira_ticket(traceback_button){
     traceback_button.disabled = true;  // disable button during processing
     var payload = {
-        traceback_text: traceback_button.value
+        origin_papertrail_id: traceback_button.value
     };
     $.ajax({
         type: "POST",
