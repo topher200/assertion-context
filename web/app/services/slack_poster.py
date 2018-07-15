@@ -32,6 +32,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
         "text": traceback_text,
         "attachments": [
             {
+                "color": "#DB4F4F",
                 "text": hits
             },
             {
