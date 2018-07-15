@@ -36,7 +36,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
             },
             {
                 "callback_id": "%s" % traceback.origin_papertrail_id,
-                "color": "#3AA3E3",
+                "color": "#046EAA",
                 "attachment_type": "default",
                 "fallback": "Create Jira Ticket",
                 "actions": [
