@@ -52,7 +52,18 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
         ]
     }
 
-    logger.error(json.dumps(slack_data))
+    return __send_message_to_slack(slack_data)
+
+
+def post_newly_created_ticket(ticket_id:str):
+    slack_data = {
+        'text': 'Created %s' % ticket_id
+    }
+
+    __send_message_to_slack(slack_data)
+
+def __send_message_to_slack(slack_data:dict):
+    logger.debug('sending message to slack: %s', json.dumps(slack_data))
 
     response = requests.post(
         WEBHOOK_URL,

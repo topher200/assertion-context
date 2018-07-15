@@ -181,4 +181,7 @@ def create_ticket(ES, origin_papertrail_id:int) -> str:
     # make API call to jira
     ticket_id = jira_issue_aservice.create_jira_issue(title, description)
 
+    # tell slack that we made a new ticket (async)
+    tasks.tell_slack_about_new_jira_ticket.delay(ticket_id)
+
     return ticket_id

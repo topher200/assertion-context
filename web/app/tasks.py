@@ -149,6 +149,11 @@ def post_unticketed_tracebacks_to_slack():
         REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
 
 
+@app.task
+def tell_slack_about_new_jira_ticket(ticket_id:str):
+    slack_poster.post_newly_created_ticket(ticket_id)
+
+
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
