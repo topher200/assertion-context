@@ -19,10 +19,17 @@ MESSAGE_TEMPLATE = """
 ```
 {traceback_text}```"""
 
+NUM_LINES_TO_POST = 5
+"""
+    How many lines of the traceback to post. Do too many and slack splits up the message.
+"""
+
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback]):
-    last_3_lines = "\n".join(traceback.traceback_text.splitlines()[-3:])
-    traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_3_lines)
+    last_N_lines = "\n".join(
+        traceback.traceback_plus_context_text.splitlines()[-NUM_LINES_TO_POST:]
+    )
+    traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_N_lines)
     hits = traceback_formatter.create_hits_list(
         similar_tracebacks,
         traceback_formatter.slack_formatted_string,
