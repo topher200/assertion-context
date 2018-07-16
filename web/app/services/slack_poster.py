@@ -21,7 +21,7 @@ MESSAGE_TEMPLATE = """
 
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback]):
-    last_3_lines = traceback.traceback_text.splitlines()[-3:]
+    last_3_lines = "\n".join(traceback.traceback_text.splitlines()[-3:])
     traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_3_lines)
     hits = traceback_formatter.create_hits_list(
         similar_tracebacks,
