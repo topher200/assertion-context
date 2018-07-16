@@ -21,7 +21,8 @@ MESSAGE_TEMPLATE = """
 
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback]):
-    traceback_text = MESSAGE_TEMPLATE.format(traceback_text=traceback.traceback_plus_context_text)
+    last_3_lines = traceback.traceback_text.splitlines()[-3:]
+    traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_3_lines)
     hits = traceback_formatter.create_hits_list(
         similar_tracebacks,
         traceback_formatter.slack_formatted_string,
