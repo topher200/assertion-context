@@ -365,7 +365,7 @@ def slack_callback():
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
     action = payload['actions'][0]['name']
-    if action == 'create_button':
+    if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
         api_aservice.create_ticket(ES, origin_papertrail_id)
     else:
