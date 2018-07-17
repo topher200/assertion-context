@@ -12,6 +12,7 @@ from .. import (
 from ..traceback import Traceback
 
 WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
+SLACK_REAL_USER_TOKEN = config_util.get('SLACK_REAL_USER_TOKEN')
 
 logger = logging.getLogger()
 
@@ -69,20 +70,6 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
     return __send_message_to_slack(slack_data)
 
 
-def post_newly_created_ticket(ticket_id:str):
-    slack_data = {
-        'text': 'Created %s' % ticket_id
-    }
-    __send_message_to_slack(slack_data)
-
-
-def post_message_to_slack(message:str):
-    slack_data = {
-        'text': message,
-    }
-    __send_message_to_slack(slack_data)
-
-
 def __send_message_to_slack(slack_data:dict):
     logger.debug('sending message to slack: %s', json.dumps(slack_data))
 
@@ -98,3 +85,30 @@ def __send_message_to_slack(slack_data:dict):
         )
 
     return response
+
+
+def post_message_to_slack_as_real_user(message:str):
+    """
+        Normal messages are posted as a bot user.
+
+        To interact with other bots, it's sometimes helpful to post as a true user. This method
+        does so.
+    """
+    assert SLACK_REAL_USER_TOKEN
+
+    url = 'https://slack.com/api/chat.postMessage'
+    params = {
+        'token': SLACK_REAL_USER_TOKEN,
+        'channel': 'tracebacks',
+        'as_user': True,
+        'text': message,
+    }
+    response = requests.post(
+        url,
+        params=params,
+    )
+    if response.status_code != 200:
+        logger.error(
+            'Request to slack returned an error %s, the response is:\n%s',
+            response.status_code, response.text
+        )
