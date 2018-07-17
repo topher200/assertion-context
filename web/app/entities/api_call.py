@@ -1,7 +1,7 @@
 import datetime
 
 
-class ApiCall(object):
+class ApiCall():
     """
         ApiCall is a single RPC-style call to Engine or Manager.
 

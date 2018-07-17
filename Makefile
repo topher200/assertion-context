@@ -18,7 +18,7 @@ install:
 .PHONY: test
 test: install
 	nosetests --py3where web
-	pylint --load-plugins pylint_flask web --reports n
+	pylint web --reports n
 
 .PHONY: fresh-deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
