@@ -37,6 +37,9 @@ from app import (
     traceback_formatter,
     tracing,
 )
+from .services import (
+    slack_poster,
+)
 
 
 # create app
@@ -258,7 +261,7 @@ def create_jira_ticket():
         return 'invalid json', 400
     origin_papertrail_id = json_request['origin_papertrail_id']
 
-    ticket_key = api_aservice.create_ticket(ES, origin_papertrail_id)
+    ticket_key = api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=False)
 
     # send toast message to user with the JIRA url
     url = jira_issue_aservice.get_link_to_issue(ticket_key)
@@ -367,7 +370,10 @@ def slack_callback():
     action = payload['actions'][0]['name']
     if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
-        api_aservice.create_ticket(ES, origin_papertrail_id)
+        try:
+            api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=True)
+        except api_aservice.IssueAlreadyExistsError as e:
+            slack_poster.post_message_to_slack(str(e))
     else:
         logger.warning('unexpected slack callback action: %s', action)
         logger.debug('slack payload: %s', payload)

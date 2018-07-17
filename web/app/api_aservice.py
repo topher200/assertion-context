@@ -21,6 +21,11 @@ from . import (
 logger = logging.getLogger()
 
 
+class IssueAlreadyExistsError(Exception):
+    """
+        Raised if we attempt to create a duplicate issue for a traceback.
+    """
+
 class TracebackPlusMetadata():
     """
         A lightweight class to hold a Traceback plus some metadata.
@@ -161,11 +166,18 @@ def parse_s3_for_date(date_, bucket, key_prefix):
         tasks.parse_log_file.delay(bucket, key)
 
 
-def create_ticket(ES, origin_papertrail_id:int) -> str:
+def create_ticket(ES, origin_papertrail_id:int, reject_if_ticket_exists:bool) -> str:
     """
         Creates a jira issue for the given traceback id
     """
     traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+
+    if reject_if_ticket_exists:
+        jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, None, traceback.traceback_text, es_util.EXACT_MATCH
+        )
+        if jira_issues:
+            raise IssueAlreadyExistsError("Issue already exists as %s" % jira_issues[0].key)
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
