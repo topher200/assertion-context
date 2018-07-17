@@ -70,6 +70,13 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
     return __send_message_to_slack(slack_data)
 
 
+def post_message_to_slack(message:str):
+    slack_data = {
+        'text': message,
+    }
+    __send_message_to_slack(slack_data)
+
+
 def __send_message_to_slack(slack_data:dict):
     logger.debug('sending message to slack: %s', json.dumps(slack_data))
 
