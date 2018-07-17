@@ -308,7 +308,7 @@ def jira_comment():
     else:
         # just take the them all
         tracebacks_to_comment = similar_tracebacks
-    if len(tracebacks_to_comment) <= 0:
+    if tracebacks_to_comment:
         logger.info('not saving comment - found %s hits but none were newer than %s',
                     len(similar_tracebacks),
                     latest)
