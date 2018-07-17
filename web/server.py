@@ -37,7 +37,7 @@ from app import (
     traceback_formatter,
     tracing,
 )
-from .app.services import (
+from app.services import (
     slack_poster,
 )
 
