@@ -5,7 +5,7 @@ import sys
 from time import sleep
 
 
-class Retry(object):
+class Retry():
     """
         A retrying decorator/context-manager that traps any of the configured exceptions thrown by
         the decorated function or method.
@@ -18,7 +18,7 @@ class Retry(object):
 
         Usage example (decorator):
         C{
-            class AClass(object):
+            class AClass():
 
                 @Retry()
                 def method_1(self):
@@ -33,7 +33,7 @@ class Retry(object):
 
         Usage example (context-manager):
         C{
-            class AClass(object):
+            class AClass():
 
                 def method_1(self, string_param):
                     ...

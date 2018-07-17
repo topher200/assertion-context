@@ -37,7 +37,7 @@ SERVERS_WE_CARE_ABOUT = frozenset((
 logger = logging.getLogger()
 
 
-class ApiCallParser(object):
+class ApiCallParser():
     @staticmethod
     def parse_stream(file_object):
         """

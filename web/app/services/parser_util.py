@@ -14,7 +14,7 @@ LOG_TIMEZONE = pytz.timezone('America/New_York')
 logger = logging.getLogger()
 
 
-class ParserUtil(object):
+class ParserUtil():
     @staticmethod
     def parse_papertrail_log_line(raw_log_line):
         """

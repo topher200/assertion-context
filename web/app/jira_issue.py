@@ -1,4 +1,4 @@
-class JiraIssue(object):
+class JiraIssue():
     """
         Object representing a JIRA issue.
 

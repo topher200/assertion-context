@@ -2,7 +2,7 @@ import datetime
 import typing
 
 
-class Traceback(object):
+class Traceback():
     """
         L{Traceback} holds the text of many log lines grouped together.
 

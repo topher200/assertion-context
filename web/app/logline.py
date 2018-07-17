@@ -1,4 +1,4 @@
-class LogLine(object):
+class LogLine():
     """
         L{LogLine} holds the data from a single Papertrail log line
 

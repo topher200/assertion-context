@@ -44,7 +44,7 @@ NUM_PREVIOUS_LOG_LINES_TO_SAVE = 100
 logger = logging.getLogger()
 
 
-class Parser(object):
+class Parser():
     @staticmethod
     def parse_stream(file_object):
         """
