@@ -17,5 +17,5 @@ jira==1.0.10
 opentracing_instrumentation==2.4.1
 pytz
 redis==2.10.5
-requests==2.7.0
+requests==2.19.1
 simplejson==3.10.0
