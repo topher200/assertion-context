@@ -10,6 +10,7 @@ import dogpile.cache
 import elasticsearch
 
 from opentracing_instrumentation.request_context import get_current_span
+import opentracing
 
 from . import (
     es_util,
@@ -112,6 +113,8 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     """
     assert isinstance(traceback_text, str), (type(traceback_text), traceback_text)
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
+
+    tracer = tracer or opentracing.tracer
 
     body = es_util.generate_text_match_payload(
         traceback_text, ["description_filtered", "comments_filtered"], match_level
