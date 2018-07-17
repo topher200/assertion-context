@@ -4,3 +4,6 @@ elasticsearch>=6.0.0,<7.0.0
 nose==1.3.7
 pylint==2.0.0
 requests==2.18.4
+# we're explicitly versioning urllib3 to force a correct version for
+# requests/elasticsearch. try removing this later
+urllib3==1.22
