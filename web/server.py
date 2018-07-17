@@ -5,6 +5,7 @@
 """
 import datetime
 import logging
+import json
 import os
 import traceback
 import urllib
@@ -35,6 +36,9 @@ from app import (
     traceback_database,
     traceback_formatter,
     tracing,
+)
+from app.services import (
+    slack_poster,
 )
 
 
@@ -245,35 +249,23 @@ def create_jira_ticket():
         Create a jira ticket with tracebacks that share the given traceback text
 
         Takes a json payload with these fields:
-        - traceback_text: text of the traceback for which to create an issue
+        - origin_papertrail_id: id of the traceback for which to create an issue
 
         The frontend is expecting this API to return a human readable string in the event of
         success (200 response code)
     """
-    # get the traceback text
+    # get traceback id
     json_request = flask.request.get_json()
     if json_request is None or 'traceback_text' not in json_request:
         logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
-    traceback_text = json_request['traceback_text']
+    origin_papertrail_id = json_request['origin_papertrail_id']
 
-    # find a list of tracebacks that use that text
-    similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, opentracing.tracer, traceback_text, es_util.EXACT_MATCH, 50
-    )
-
-    # create a description using the list of tracebacks
-    description = jira_issue_aservice.create_description(similar_tracebacks)
-
-    # create a title using the traceback text
-    title = jira_issue_aservice.create_title(traceback_text)
-
-    # make API call to jira
-    ticket = jira_issue_aservice.create_jira_issue(title, description)
+    ticket_key = api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=False)
 
     # send toast message to user with the JIRA url
-    url = jira_issue_aservice.get_link_to_issue(ticket.key)
-    return 'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket.key)
+    url = jira_issue_aservice.get_link_to_issue(ticket_key)
+    return 'Created ticket <a href="%s" class="alert-link">%s</a>' % (url, ticket_key)
 
 
 @app.route("/jira_comment", methods=['POST'])
@@ -365,6 +357,28 @@ def jira_formatted_list(traceback_origin_id):
         200,
         {'Content-Type': 'text/plain'}
     )
+
+
+@app.route("/slack-callback", methods=['POST'])
+def slack_callback():
+    data = flask.request.get_data()
+    if data is None:
+        return 'empty data', 400
+
+    parsed_data = urllib.parse.parse_qs(data)
+    payload = json.loads(parsed_data[b'payload'][0])
+    action = payload['actions'][0]['name']
+    if action == 'create_ticket':
+        origin_papertrail_id = payload['callback_id']
+        try:
+            api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=True)
+        except api_aservice.IssueAlreadyExistsError as e:
+            # we must post the message as a real user so Jirabot picks it up
+            slack_poster.post_message_to_slack_as_real_user(str(e))
+    else:
+        logger.warning('unexpected slack callback action: %s', action)
+        logger.debug('slack payload: %s', payload)
+    return 'ok'
 
 
 @app.route("/api/update_jira_db", methods=['PUT'])

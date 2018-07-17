@@ -11,6 +11,7 @@ from opentracing_instrumentation.request_context import get_current_span, span_i
 
 from . import (
     es_util,
+    jira_issue_aservice,
     jira_issue_db,
     tasks,
     text_keys,
@@ -19,6 +20,11 @@ from . import (
 
 logger = logging.getLogger()
 
+
+class IssueAlreadyExistsError(Exception):
+    """
+        Raised if we attempt to create a duplicate issue for a traceback.
+    """
 
 class TracebackPlusMetadata():
     """
@@ -158,3 +164,38 @@ def parse_s3_for_date(date_, bucket, key_prefix):
         key = '/'.join((key_prefix, filename_string))
         logger.info("adding to s3 parse queue. bucket: '%s', key: '%s'", bucket, key)
         tasks.parse_log_file.delay(bucket, key)
+
+
+def create_ticket(ES, origin_papertrail_id:int, reject_if_ticket_exists:bool) -> str:
+    """
+        Creates a jira issue for the given traceback id
+    """
+    traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+
+    if reject_if_ticket_exists:
+        jira_issues = jira_issue_db.get_matching_jira_issues(
+            ES, None, traceback.traceback_text, es_util.EXACT_MATCH
+        )
+        if jira_issues:
+            key = jira_issues[0].key
+            logger.info('Not creating Jira issue - already found %s', key)
+            raise IssueAlreadyExistsError("Issue already exists as %s" % key)
+
+    # find a list of tracebacks that use that text
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
+    )
+
+    # create a description using the list of tracebacks
+    description = jira_issue_aservice.create_description(similar_tracebacks)
+
+    # create a title using the traceback text
+    title = jira_issue_aservice.create_title(traceback.traceback_text)
+
+    # make API call to jira
+    ticket_id = jira_issue_aservice.create_jira_issue(title, description)
+
+    # tell slack that we made a new ticket (async)
+    tasks.tell_slack_about_new_jira_ticket.delay(ticket_id)
+
+    return ticket_id

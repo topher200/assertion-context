@@ -123,7 +123,7 @@ def create_comment(issue, comment_string):
     logger.info('added comment to issue: %s', issue.key)
 
 
-def create_jira_issue(title, description):
+def create_jira_issue(title, description) -> str:
     """
         Creates a issue in jira given the title/description text
 
@@ -131,7 +131,7 @@ def create_jira_issue(title, description):
 
         Returns the newly created issue
 
-        @rtype: jira.resources.Issue
+        @return: the key of the newly created issue
     """
     fields = {
         'project': {'key': JIRA_PROJECT_KEY},
@@ -142,7 +142,7 @@ def create_jira_issue(title, description):
     }
     issue = JIRA_CLIENT.create_issue(fields=fields)
     logger.info('created jira issue: %s', issue.key)
-    return issue
+    return issue.key
 
 
 def get_issue(key):

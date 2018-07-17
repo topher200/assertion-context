@@ -149,6 +149,12 @@ def post_unticketed_tracebacks_to_slack():
         REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
 
 
+@app.task
+def tell_slack_about_new_jira_ticket(ticket_id:str):
+    # we must post this message as a real user so that Jirabot picks up on it
+    slack_poster.post_message_to_slack_as_real_user('Created %s' % ticket_id)
+
+
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
