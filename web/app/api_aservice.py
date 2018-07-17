@@ -177,7 +177,9 @@ def create_ticket(ES, origin_papertrail_id:int, reject_if_ticket_exists:bool) ->
             ES, None, traceback.traceback_text, es_util.EXACT_MATCH
         )
         if jira_issues:
-            raise IssueAlreadyExistsError("Issue already exists as %s" % jira_issues[0].key)
+            key = jira_issues[0].key
+            logger.info('Not creating Jira issue - already found %s', key)
+            raise IssueAlreadyExistsError("Issue already exists as %s" % key)
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
