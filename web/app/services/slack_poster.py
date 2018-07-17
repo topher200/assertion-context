@@ -40,14 +40,11 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
         "text": traceback_text,
         "attachments": [
             {
-                "text": hits,
-                "short": True,
+                "text": MESSAGE_TEMPLATE.format(traceback_text=traceback.traceback_plus_context_text),
             },
             {
-                "text": MESSAGE_TEMPLATE.format(
-                    traceback_text=traceback.traceback_plus_context_text
-                ),
-
+                "text": hits,
+                "short": True,
             },
             {
                 "callback_id": "%s" % traceback.origin_papertrail_id,
