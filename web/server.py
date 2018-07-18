@@ -388,6 +388,8 @@ def slack_callback():
         except api_aservice.IssueAlreadyExistsError as e:
             # we must post the message as a real user so Jirabot picks it up
             slack_poster.post_message_to_slack_as_real_user(str(e))
+    elif action == 'add_to_existing_ticket':
+        logger.info('received request to add to existing ticket. %s', payload)
     else:
         logger.error('unexpected slack callback action: %s', action)
         logger.warning('slack payload: %s', payload)
