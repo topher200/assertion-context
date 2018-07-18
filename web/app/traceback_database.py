@@ -5,7 +5,6 @@
 """
 import logging
 
-import dogpile.cache
 import elasticsearch
 
 from opentracing_instrumentation.request_context import get_current_span
@@ -18,12 +17,12 @@ from .traceback import Traceback, generate_traceback_from_source
 logger = logging.getLogger()
 
 
-DOGPILE_REGION = redis_util.make_dogpile_region(
-    lambda key: (
-        "dogpile:traceback:%s" %
-        dogpile.cache.util.sha1_mangle_key(key.encode('utf-8'))
-    )
-)
+DOGPILE_REGION_PREFIX = 'dogpile:traceback'
+DOGPILE_REGION = redis_util.make_dogpile_region(DOGPILE_REGION_PREFIX)
+def invalidate_cache():
+    redis_util.force_redis_cache_invalidation(DOGPILE_REGION_PREFIX)
+
+
 
 INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'
@@ -48,10 +47,6 @@ def save_traceback(es, traceback):
     )
     invalidate_cache()
     return res
-
-
-def invalidate_cache():
-    DOGPILE_REGION.invalidate()
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))

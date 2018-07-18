@@ -6,7 +6,6 @@
 
 import logging
 
-import dogpile.cache
 import elasticsearch
 
 from opentracing_instrumentation.request_context import get_current_span
@@ -20,12 +19,10 @@ from . import (
 from .jira_issue import JiraIssue, generate_from_source
 
 
-DOGPILE_REGION = redis_util.make_dogpile_region(
-    lambda key: (
-        "dogpile:jira-issue:%s" %
-        dogpile.cache.util.sha1_mangle_key(key.encode('utf-8'))
-    )
-)
+DOGPILE_REGION_PREFIX = 'dogpile:jira-issue'
+DOGPILE_REGION = redis_util.make_dogpile_region(DOGPILE_REGION_PREFIX)
+def invalidate_cache():
+    redis_util.force_redis_cache_invalidation(DOGPILE_REGION_PREFIX)
 
 INDEX = 'jira-issue-index'
 DOC_TYPE = 'jira-issue'
@@ -78,10 +75,6 @@ def remove_jira_issue(es, issue_key):
         return # it's cool if we don't find a matching issue
     else:
         invalidate_cache()
-
-
-def invalidate_cache():
-    DOGPILE_REGION.invalidate()
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
