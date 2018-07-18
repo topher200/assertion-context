@@ -364,10 +364,10 @@ def slack_callback():
     data = flask.request.get_data()
     if data is None:
         return 'empty data', 400
-    logger.error('slack callback data: %s', data)
 
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
+    logger.info('slack callback data: %s', payload)
     action = payload['actions'][0]['name']
     if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
