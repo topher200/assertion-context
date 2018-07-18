@@ -23,7 +23,6 @@ def invalidate_cache():
     redis_util.force_redis_cache_invalidation(DOGPILE_REGION_PREFIX)
 
 
-
 INDEX = 'traceback-index'
 DOC_TYPE = 'traceback'
 

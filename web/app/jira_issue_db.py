@@ -24,6 +24,7 @@ DOGPILE_REGION = redis_util.make_dogpile_region(DOGPILE_REGION_PREFIX)
 def invalidate_cache():
     redis_util.force_redis_cache_invalidation(DOGPILE_REGION_PREFIX)
 
+
 INDEX = 'jira-issue-index'
 DOC_TYPE = 'jira-issue'
 
