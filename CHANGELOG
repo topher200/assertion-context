@@ -1,5 +1,6 @@
 Version 3.3.z
   - perform dogpile cache invalidation by deleting keys from redis
+  - clear out Slack attachments using 'response_url'
 
 Version 3.2.z
   - add mypy checking
