@@ -57,9 +57,26 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                 "actions": [
                     {
                         "name": "create_ticket",
-                        "text": "Create Jira Ticket",
-                        "type": "button",
-                        "value": "default"
+                        "text": "Create a Jira ticket...",
+                        "type": "select",
+                        "options": [
+                            {
+                                "text": "Unassigned",
+                                "value": "UNASSIGNED"
+                            },
+                            {
+                                "text": "Adwords (assign to Al)",
+                                "value": "ADWORDS"
+                            },
+                            {
+                                "text": "Bing (assign to Peter)",
+                                "value": "BING"
+                            },
+                            {
+                                "text": "Social (assign to Jay)",
+                                "value": "SOCIAL"
+                            },
+                        ]
                     }
                 ],
                 "short": True,

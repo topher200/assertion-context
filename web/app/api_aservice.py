@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+import typing
 
 import flask
 import opentracing
@@ -166,7 +167,9 @@ def parse_s3_for_date(date_, bucket, key_prefix):
         tasks.parse_log_file.delay(bucket, key)
 
 
-def create_ticket(ES, origin_papertrail_id:int, reject_if_ticket_exists:bool) -> str:
+def create_ticket(
+        ES, origin_papertrail_id:int, assign_to:typing.Optional[str], reject_if_ticket_exists:bool
+) -> str:
     """
         Creates a jira issue for the given traceback id
     """
@@ -192,8 +195,13 @@ def create_ticket(ES, origin_papertrail_id:int, reject_if_ticket_exists:bool) ->
     # create a title using the traceback text
     title = jira_issue_aservice.create_title(traceback.traceback_text)
 
+    if assign_to:
+        assign_to_team = jira_issue_aservice.AssignToTeam(assign_to)
+    else:
+        assign_to_team = None
+
     # make API call to jira
-    ticket_id = jira_issue_aservice.create_jira_issue(title, description)
+    ticket_id = jira_issue_aservice.create_jira_issue(title, description, assign_to_team)
 
     # tell slack that we made a new ticket (async)
     tasks.tell_slack_about_new_jira_ticket.delay(ticket_id)

@@ -10,11 +10,16 @@ from . import (
 )
 from .jira_issue import JiraIssue
 
+logger = logging.getLogger()
 
 JIRA_SERVER=config_util.get('JIRA_SERVER')
 JIRA_BASIC_AUTH_USERNAME=config_util.get('JIRA_BASIC_AUTH_USERNAME')
 JIRA_BASIC_AUTH_PASSWORD=config_util.get('JIRA_BASIC_AUTH_PASSWORD')
 JIRA_PROJECT_KEY=config_util.get('JIRA_PROJECT_KEY')
+
+JIRA_ASSIGNEE_ADWORDS = config_util.get('JIRA_ASSIGNEE_ADWORDS')
+JIRA_ASSIGNEE_BING = config_util.get('JIRA_ASSIGNEE_BING')
+JIRA_ASSIGNEE_SOCIAL = config_util.get('JIRA_ASSIGNEE_SOCIAL')
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -55,6 +60,29 @@ COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
 """
 
 logger = logging.getLogger()
+
+
+class UnknownTeamNameError(Exception):
+    pass
+class AssignToTeam():
+    """
+        AssignToTeam holds which team to assign a ticket to
+    """
+    def __init__(self, team_name):
+        if team_name not in (
+            'UNASSIGNED',
+            'ADWORDS',
+            'BING',
+            'SOCIAL',
+        ):
+            raise UnknownTeamNameError(team_name)
+        self.team_name = team_name
+
+    def __repr__(self):
+        return 'Assign to %s' % self.team_name
+
+    def __eq__(self, other):
+        return self.team_name == other.team_name
 
 
 def create_title(traceback_text):
@@ -123,7 +151,7 @@ def create_comment(issue, comment_string):
     logger.info('added comment to issue: %s', issue.key)
 
 
-def create_jira_issue(title, description) -> str:
+def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str:
     """
         Creates a issue in jira given the title/description text
 
@@ -138,10 +166,32 @@ def create_jira_issue(title, description) -> str:
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
+        'priority': {'name': 'Critical'},
         'labels': ['tracebacks'],
     }
+
+    if assign_to == AssignToTeam('UNASSIGNED'):
+        assignee = None
+        component = None
+    elif assign_to == AssignToTeam('ADWORDS'):
+        assignee = JIRA_ASSIGNEE_ADWORDS
+        component = 'Manage PPC'
+    elif assign_to == AssignToTeam('BING'):
+        assignee = JIRA_ASSIGNEE_BING
+        component = 'Manage PPC'
+    elif assign_to == AssignToTeam('SOCIAL'):
+        assignee = JIRA_ASSIGNEE_SOCIAL
+        component = 'Social'
+        # epic links are set strangely. this value will not carry over to different Jiras
+        # see https://community.atlassian.com/t5/Answers-Developer-Questions/Link-to-Epic-in-rest-api-issue-resource/qaq-p/562851
+        fields['customfield_10008'] = 'PPC-13290'
+    if assignee:
+        fields['assignee'] = {'name': assignee}
+        fields['components'] = [{'name': component}]
+
     issue = JIRA_CLIENT.create_issue(fields=fields)
-    logger.info('created jira issue: %s', issue.key)
+    fields.pop('description') # too long to print. THIS IS DESTRUCTIVE!
+    logger.info('created jira issue %s for %s with fields %s', issue.key, assign_to, fields)
     return issue.key
 
 

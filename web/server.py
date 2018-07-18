@@ -261,7 +261,9 @@ def create_jira_ticket():
         return 'invalid json', 400
     origin_papertrail_id = json_request['origin_papertrail_id']
 
-    ticket_key = api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=False)
+    ticket_key = api_aservice.create_ticket(
+        ES, origin_papertrail_id, None, reject_if_ticket_exists=False
+    )
 
     # send toast message to user with the JIRA url
     url = jira_issue_aservice.get_link_to_issue(ticket_key)
@@ -367,16 +369,21 @@ def slack_callback():
 
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
+    logger.info('slack callback data: %s', payload)
     action = payload['actions'][0]['name']
     if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
+        assign_to = payload['actions'][0]['selected_options'][0]['value']
         try:
-            api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=True)
+            api_aservice.create_ticket(
+                ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+            )
 
             # send the message back, without the "Create a Ticket" message
             original_message = payload['original_message']
-            updated_message = original_message['attachments'].pop()
-            return updated_message
+            original_message['attachments'][-1]['actions'] = []
+            logger.info('sending back Slack message: %s', original_message)
+            return flask.jsonify(original_message)
         except api_aservice.IssueAlreadyExistsError as e:
             # we must post the message as a real user so Jirabot picks it up
             slack_poster.post_message_to_slack_as_real_user(str(e))
