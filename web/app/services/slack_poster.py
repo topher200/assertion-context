@@ -65,15 +65,15 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                                 "value": "unassigned"
                             },
                             {
-                                "text": "Adwords (assigned to Al)",
+                                "text": "Adwords (assign to Al)",
                                 "value": "adwords"
                             },
                             {
-                                "text": "Bing (assigned to Peter)",
+                                "text": "Bing (assign to Peter)",
                                 "value": "bing"
                             },
                             {
-                                "text": "Social (assigned to Jay)",
+                                "text": "Social (assign to Jay)",
                                 "value": "social"
                             },
                         ]
