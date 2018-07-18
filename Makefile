@@ -1,7 +1,7 @@
 .PHONY: deploy-k8s
 deploy-k8s: push-to-docker deploy-current-version
 
-VERSION := $(shell cat web/version)
+VERSION := $(shell cat web/VERSION)
 .PHONY: bump-web-patch-version
 bump-web-patch-version:
 	bumpversion --allow-dirty --current-version $(VERSION) patch web/VERSION
