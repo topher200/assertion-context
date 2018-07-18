@@ -26,7 +26,18 @@ NUM_LINES_TO_POST = 5
 """
 
 
-def post_traceback(traceback, similar_tracebacks:List[Traceback]):
+def __generate_slack_data_to_post_traceback(
+        traceback:Traceback, similar_tracebacks:List[Traceback]
+) -> dict:
+    """
+        Generates the JSON package to post to slack to create a "Tracebacks" slack message.
+
+        Includes...
+        - the last few lines of the Traceback text
+        - the entire traceback text, behind a 'read more' link
+        - a list of hits
+    """
+
     last_N_lines = "\n".join(
         traceback.traceback_plus_context_text.splitlines()[-NUM_LINES_TO_POST:]
     )
@@ -49,23 +60,38 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                 "text": hits,
                 "short": True,
             },
-            {
-                "callback_id": "%s" % traceback.origin_papertrail_id,
-                "color": "#007ABD",
-                "attachment_type": "default",
-                "fallback": "Create Jira Ticket",
-                "actions": [
-                    {
-                        "name": "create_ticket",
-                        "text": "Create Jira Ticket",
-                        "type": "button",
-                        "value": "default"
-                    }
-                ],
-                "short": True,
-            }
         ]
     }
+
+    return slack_data
+
+
+def post_traceback(traceback, similar_tracebacks:List[Traceback]):
+    """
+        Posts a traceback to slack.
+
+        Includes...
+        - everything from L{__generate_slack_data_to_post_traceback}
+        - PLUS a button to create a ticket for the traceback
+    """
+    slack_data = __generate_slack_data_to_post_traceback(traceback, similar_tracebacks)
+    slack_data['attachments'].append(
+        {
+            "callback_id": "%s" % traceback.origin_papertrail_id,
+            "color": "#007ABD",
+            "attachment_type": "default",
+            "fallback": "Create Jira Ticket",
+            "actions": [
+                {
+                    "name": "create_ticket",
+                    "text": "Create Jira Ticket",
+                    "type": "button",
+                    "value": "default"
+                }
+            ],
+            "short": True,
+        }
+    )
 
     return __send_message_to_slack(slack_data)
 
