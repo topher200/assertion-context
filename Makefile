@@ -18,6 +18,7 @@ install:
 .PHONY: test
 test: install
 	nosetests --py3where web
+	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
 
 .PHONY: fresh-deploy-to-kubernetes
