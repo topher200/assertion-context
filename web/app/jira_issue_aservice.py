@@ -1,6 +1,10 @@
 # pylint: disable=line-too-long
 import logging
 import re
+from typing import (
+    Iterator,
+    Optional,
+)
 
 import jira
 
@@ -258,12 +262,9 @@ def get_link_to_issue(issue_key):
     return '%s/browse/%s' % (server, issue_key)
 
 
-def jira_api_object_to_JiraIssue(jira_object):
+def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
     """
         Convert a jira issue object from the jira API to our home-grown JiraIssue class
-
-        @type jira_object: jira.resources.Issue
-        @rtype: JiraIssue
     """
     assert isinstance(jira_object, jira.resources.Issue), (type(jira_object), jira_object)
 
@@ -287,16 +288,13 @@ def jira_api_object_to_JiraIssue(jira_object):
     )
 
 
-def get_all_referenced_ids(issue):
+def get_all_referenced_ids(issue:JiraIssue) -> Iterator[int]:
     """
         Look through the comments and description and find all papertrail ids that are referenced
 
-        @type issue: JiraIssue
         @return: yields individual ids as ints
         @rtype: generator
     """
-    assert isinstance(issue, JiraIssue), (type(issue), issue)
-
     pattern = '(?:focus|centered_on_id)=(\d{18})'
     for match in re.findall(pattern, issue.description):
         yield int(match)
@@ -304,11 +302,10 @@ def get_all_referenced_ids(issue):
         yield int(match)
 
 
-def find_latest_referenced_id(issue):
+def find_latest_referenced_id(issue:JiraIssue) -> Optional[int]:
     """
         Look through the comments and description find the latest papertrail id someone referenced
 
-        @type issue: JiraIssue
         @return: a single papertrail id or None if no ids are found
         @rtype: int or None
     """
@@ -317,7 +314,7 @@ def find_latest_referenced_id(issue):
     return max(get_all_referenced_ids(issue), default=None)
 
 
-def __strip_papertrail_metadata(text):
+def __strip_papertrail_metadata(text:str) -> str:
     """
         Given a block of text, filters out papertrail metadata
 
