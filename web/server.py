@@ -373,6 +373,7 @@ def slack_callback():
     action = payload['actions'][0]['name']
     if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
+        assign_to = payload['actions'][0]['selected_options'][0]['value']
         try:
             api_aservice.create_ticket(
                 ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
