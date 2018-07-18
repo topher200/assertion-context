@@ -261,7 +261,9 @@ def create_jira_ticket():
         return 'invalid json', 400
     origin_papertrail_id = json_request['origin_papertrail_id']
 
-    ticket_key = api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=False)
+    ticket_key = api_aservice.create_ticket(
+        ES, origin_papertrail_id, None, reject_if_ticket_exists=False
+    )
 
     # send toast message to user with the JIRA url
     url = jira_issue_aservice.get_link_to_issue(ticket_key)
