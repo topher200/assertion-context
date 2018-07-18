@@ -372,6 +372,11 @@ def slack_callback():
         origin_papertrail_id = payload['callback_id']
         try:
             api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=True)
+
+            # send the message back, without the "Create a Ticket" message
+            original_message = payload['original_message']
+            updated_message = original_message['attachments'].pop()
+            return updated_message
         except api_aservice.IssueAlreadyExistsError as e:
             # we must post the message as a real user so Jirabot picks it up
             slack_poster.post_message_to_slack_as_real_user(str(e))
