@@ -77,7 +77,20 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                                 "value": "SOCIAL"
                             },
                         ]
-                    }
+                    },
+                    {
+                        "name": "add_to_existing_ticket",
+                        "text": "Add to existing ticket",
+                        "type": "select",
+                        "data_source": "external",
+                        "min_query_length": "4",
+                        "options": [
+                            {
+                                "text": "PPC-12345", # dummy option to start
+                                "value": "PPC-12345"
+                            }
+                        ]
+                    },
                 ],
                 "short": True,
             }
