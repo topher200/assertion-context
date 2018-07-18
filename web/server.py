@@ -383,7 +383,7 @@ def slack_callback():
             original_message = payload['original_message']
             response_url = payload['response_url']
             original_message['attachments'].pop() # destructive!
-            logger.info('sending back Slack message without attachment: %s', original_message)
+            logger.info('sending back Slack message without attachment')
             slack_poster.send_updated_message(response_url, original_message)
         except api_aservice.IssueAlreadyExistsError as e:
             # we must post the message as a real user so Jirabot picks it up
