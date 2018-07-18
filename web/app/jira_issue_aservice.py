@@ -194,8 +194,6 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         fields['components'] = [{'name': component}]
 
     issue = JIRA_CLIENT.create_issue(fields=fields)
-    fields.pop('description') # too long to print. THIS IS DESTRUCTIVE!
-    logger.info('created jira issue %s for %s with fields %s', issue.key, assign_to, fields)
     return issue.key
 
 
