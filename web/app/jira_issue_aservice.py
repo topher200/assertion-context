@@ -17,6 +17,10 @@ JIRA_BASIC_AUTH_USERNAME=config_util.get('JIRA_BASIC_AUTH_USERNAME')
 JIRA_BASIC_AUTH_PASSWORD=config_util.get('JIRA_BASIC_AUTH_PASSWORD')
 JIRA_PROJECT_KEY=config_util.get('JIRA_PROJECT_KEY')
 
+JIRA_ASSIGNEE_ADWORDS = config_util.get('JIRA_ASSIGNEE_ADWORDS')
+JIRA_ASSIGNEE_BING = config_util.get('JIRA_ASSIGNEE_BING')
+JIRA_ASSIGNEE_SOCIAL = config_util.get('JIRA_ASSIGNEE_SOCIAL')
+
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
 {noformat}
@@ -154,16 +158,33 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
 
         @return: the key of the newly created issue
     """
-    logger.warning('assign to: %s', assign_to)
     fields = {
         'project': {'key': JIRA_PROJECT_KEY},
         'summary': title,
         'description': description,
         'issuetype': {'name': 'Bug'},
+        'priority': {'name': 'Critical'},
         'labels': ['tracebacks'],
     }
+
+    if assign_to == AssignToTeam('UNASSIGNED'):
+        assignee = None
+        component = None
+    elif assign_to == AssignToTeam('ADWORDS'):
+        assignee = JIRA_ASSIGNEE_ADWORDS
+        component = 'Manage PPC'
+    elif assign_to == AssignToTeam('BING'):
+        assignee = JIRA_ASSIGNEE_BING
+        component = 'Manage PPC'
+    elif assign_to == AssignToTeam('SOCIAL'):
+        assignee = JIRA_ASSIGNEE_SOCIAL
+        component = 'Social'
+    if assignee:
+        fields['assignee']: {'name': assignee}
+        fields['components']: [{'name': component}]
+
     issue = JIRA_CLIENT.create_issue(fields=fields)
-    logger.info('created jira issue: %s', issue.key)
+    logger.info('created jira issue %s for %s', issue.key, assign_to)
     return issue.key
 
 
