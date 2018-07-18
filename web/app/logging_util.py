@@ -9,6 +9,10 @@ DEBUG_LOGGING = config_util.get('DEBUG_LOGGING')
 
 
 def setup_logging():
+    # clear any existing handlers
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
     formatter = logging.Formatter(
         (
             "[%(asctime)s] | %(levelname)s | pid%(process)d | "
