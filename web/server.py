@@ -389,8 +389,8 @@ def slack_callback():
             # we must post the message as a real user so Jirabot picks it up
             slack_poster.post_message_to_slack_as_real_user(str(e))
     else:
-        logger.warning('unexpected slack callback action: %s', action)
-        logger.debug('slack payload: %s', payload)
+        logger.error('unexpected slack callback action: %s', action)
+        logger.warning('slack payload: %s', payload)
     return 'ok'
 
 
