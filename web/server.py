@@ -372,7 +372,9 @@ def slack_callback():
     if action == 'create_ticket':
         origin_papertrail_id = payload['callback_id']
         try:
-            api_aservice.create_ticket(ES, origin_papertrail_id, reject_if_ticket_exists=True)
+            api_aservice.create_ticket(
+                ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+            )
 
             # send the message back, without the "Create a Ticket" message
             original_message = payload['original_message']

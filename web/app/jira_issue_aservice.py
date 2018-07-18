@@ -10,6 +10,7 @@ from . import (
 )
 from .jira_issue import JiraIssue
 
+logger = logging.getLogger()
 
 JIRA_SERVER=config_util.get('JIRA_SERVER')
 JIRA_BASIC_AUTH_USERNAME=config_util.get('JIRA_BASIC_AUTH_USERNAME')
@@ -55,6 +56,25 @@ COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
 """
 
 logger = logging.getLogger()
+
+
+class UnknownTeamNameError(Exception):
+    pass
+class AssignToTeam():
+    """
+        AssignToTeam holds which team to assign a ticket to
+    """
+    def __init__(self, team_name):
+        if team_name not in (
+            'ADWORDS',
+            'BING',
+            'SOCIAL',
+        ):
+            raise UnknownTeamNameError(team_name)
+        self.team_name = team_name
+
+    def __repr__(self):
+        return 'Assign to %s' % self.team_name
 
 
 def create_title(traceback_text):
@@ -123,7 +143,7 @@ def create_comment(issue, comment_string):
     logger.info('added comment to issue: %s', issue.key)
 
 
-def create_jira_issue(title, description) -> str:
+def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str:
     """
         Creates a issue in jira given the title/description text
 
@@ -133,6 +153,7 @@ def create_jira_issue(title, description) -> str:
 
         @return: the key of the newly created issue
     """
+    logger.warning('assign to: %s', assign_to)
     fields = {
         'project': {'key': JIRA_PROJECT_KEY},
         'summary': title,
