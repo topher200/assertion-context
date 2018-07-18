@@ -370,29 +370,34 @@ def slack_callback():
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
     logger.info('slack callback data: %s', payload)
-    action = payload['actions'][0]['name']
-    if action == 'create_ticket':
-        origin_papertrail_id = payload['callback_id']
-        assign_to = payload['actions'][0]['selected_options'][0]['value']
-        try:
-            api_aservice.create_ticket(
-                ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
-            )
+    if 'actions' in payload:
+        # it's a request to do an action
+        action = payload['actions'][0]['name']
+        if action == 'create_ticket':
+            origin_papertrail_id = payload['callback_id']
+            assign_to = payload['actions'][0]['selected_options'][0]['value']
+            try:
+                api_aservice.create_ticket(
+                    ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+                )
 
-            # send the message back, without the "Create a Ticket" message
-            original_message = payload['original_message']
-            response_url = payload['response_url']
-            original_message['attachments'].pop() # destructive!
-            logger.info('sending back Slack message without attachment')
-            slack_poster.send_updated_message(response_url, original_message)
-        except api_aservice.IssueAlreadyExistsError as e:
-            # we must post the message as a real user so Jirabot picks it up
-            slack_poster.post_message_to_slack_as_real_user(str(e))
-    elif action == 'add_to_existing_ticket':
-        logger.info('received request to add to existing ticket. %s', payload)
+                # send the message back, without the "Create a Ticket" message
+                original_message = payload['original_message']
+                response_url = payload['response_url']
+                original_message['attachments'].pop() # destructive!
+                logger.info('sending back Slack message without attachment')
+                slack_poster.send_updated_message(response_url, original_message)
+            except api_aservice.IssueAlreadyExistsError as e:
+                # we must post the message as a real user so Jirabot picks it up
+                slack_poster.post_message_to_slack_as_real_user(str(e))
+        elif action == 'add_to_existing_ticket':
+            logger.info('received request to add to existing ticket. %s', payload)
+        else:
+            logger.error('unexpected slack callback action: %s', action)
+            logger.warning('slack payload: %s', payload)
     else:
-        logger.error('unexpected slack callback action: %s', action)
-        logger.warning('slack payload: %s', payload)
+        # it's a request to get more info in a dropdown
+        pass
     return 'ok'
 
 

@@ -197,6 +197,22 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
     return issue.key
 
 
+def get_issues_match_key_prefix(key_prefix:str) -> List[JiraIssue]:
+    """
+        Get a list jira issues given the start to a key.
+
+        Returns None if we can't find the given issue. This can happen if a user deletes an issue
+        in Jira
+
+        @rtype: JiraIssue or None
+    """
+    try:
+        return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+    except jira.exceptions.JIRAError as e:
+        logger.warning('failure accessing issue %s. is it deleted?\n%s', key, e)
+        return None
+
+
 def get_issue(key:str) -> Optional[JiraIssue]:
     """
         Get a jira issue given its key
