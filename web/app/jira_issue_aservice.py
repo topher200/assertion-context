@@ -197,7 +197,7 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
     return issue.key
 
 
-def get_issue(key):
+def get_issue(key:str) -> JiraIssue:
     """
         Get a jira issue given its key
 
@@ -213,7 +213,7 @@ def get_issue(key):
         return None
 
 
-def get_all_issues():
+def get_all_issues() -> Iterator[jira.resources.Issue]:
     """
         Get a jira issues.
 
@@ -222,10 +222,6 @@ def get_all_issues():
         Returns issues in the jira API object form, not our home-grown JiraIssue form.
 
         Only grabs the 'id' field of the jira issues, since that's all we're currently using
-
-        @rtype: generator
-
-        @postcondition: all(isinstance(r, jira.resources.Issue) for r in return)
     """
     # there seems to be a bug in the jira library where it only grabs the first 50 results (even if
     # maxResults evaluates to False, as instructed to do by the docs). we'll handle the pagination
@@ -248,7 +244,7 @@ def get_all_issues():
             break
 
 
-def get_link_to_issue(issue_key):
+def get_link_to_issue(issue_key:str) -> str:
     """
         Takes a jira issue key and returns a URL to that issue
 
@@ -291,7 +287,6 @@ def get_all_referenced_ids(issue:JiraIssue) -> Iterator[int]:
         Look through the comments and description and find all papertrail ids that are referenced
 
         @return: yields individual ids as ints
-        @rtype: generator
     """
     pattern = '(?:focus|centered_on_id)=(\d{18})'
     for match in re.findall(pattern, issue.description):
