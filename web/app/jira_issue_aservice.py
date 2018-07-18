@@ -66,6 +66,7 @@ class AssignToTeam():
     """
     def __init__(self, team_name):
         if team_name not in (
+            'UNASSIGNED',
             'ADWORDS',
             'BING',
             'SOCIAL',
