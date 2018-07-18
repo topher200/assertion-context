@@ -1,3 +1,6 @@
+Version 3.3.z
+  - perform dogpile cache invalidation by deleting keys from redis
+
 Version 3.2.z
   - add mypy checking
 
