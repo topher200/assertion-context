@@ -35,6 +35,9 @@ class TracebackPlusMetadata():
     """
     def __init__(self, traceback):
         self.traceback = traceback
+        self.jira_issues = None
+        self.similar_jira_issues = None
+        self.similar_tracebacks = None
 
     __slots__ = [
         'traceback',
@@ -46,7 +49,7 @@ class TracebackPlusMetadata():
 
 def get_tracebacks_for_day(
         ES, tracer, date_to_analyze:datetime.date, filter_text:str, hidden_traceback_ids:set,
-) -> TracebackPlusMetadata:
+) -> typing.List[TracebackPlusMetadata]:
     """
         Retrieves the Tracebacks for the given date_to_analyze date.
 
@@ -198,7 +201,7 @@ def create_ticket(
     if assign_to:
         assign_to_team = jira_issue_aservice.AssignToTeam(assign_to)
     else:
-        assign_to_team = None
+        assign_to_team = jira_issue_aservice.AssignToTeam('UNASSIGNED')
 
     # make API call to jira
     ticket_id = jira_issue_aservice.create_jira_issue(title, description, assign_to_team)

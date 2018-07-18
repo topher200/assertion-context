@@ -10,7 +10,7 @@ from .traceback import Traceback
 logger = logging.getLogger()
 
 
-def parse(traceback: Traceback) -> Traceback:
+def parse(traceback: Traceback) -> typing.Optional[Traceback]:
     """
         Parses the profile name from the Traceback's log lines.
 
@@ -19,6 +19,7 @@ def parse(traceback: Traceback) -> Traceback:
     """
     log_lines = traceback.raw_full_text.splitlines()
     precursor_lines = __strip_traceback_text(log_lines)
+    if precursor_lines is None: return None
 
     # look backwards until we find the first ERROR line
     index = __find_first_error_line(precursor_lines)
@@ -102,7 +103,9 @@ def parse(traceback: Traceback) -> Traceback:
     ):
         # automation has weird names. let's fix it manually
         try:
-            profile_name, username = re.match('(\S*)-(zauto\S+?)$', profile_name + '-' + username).groups()[:2]
+            profile_name, username = re.match(  # type: ignore # let it die and be caught
+                '(\S*)-(zauto\S+?)$', profile_name + '-' + username
+            ).groups()[:2]
         except Exception:
             print('unable to handle zauto. %s, %s' % (profile_name, username))
 

@@ -191,13 +191,13 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         fields['customfield_10008'] = 'PPC-13290'
     if assignee:
         fields['assignee'] = {'name': assignee}
-        fields['components'] = [{'name': component}]
+        fields['components'] = [{'name': component}] # type: ignore # jira API is weird
 
     issue = JIRA_CLIENT.create_issue(fields=fields)
     return issue.key
 
 
-def get_issue(key:str) -> JiraIssue:
+def get_issue(key:str) -> Optional[JiraIssue]:
     """
         Get a jira issue given its key
 
@@ -300,11 +300,10 @@ def find_latest_referenced_id(issue:JiraIssue) -> Optional[int]:
         Look through the comments and description find the latest papertrail id someone referenced
 
         @return: a single papertrail id or None if no ids are found
-        @rtype: int or None
     """
     assert isinstance(issue, JiraIssue), (type(issue), issue)
 
-    return max(get_all_referenced_ids(issue), default=None)
+    return max(get_all_referenced_ids(issue), default=None) # type: ignore # not sure why mypy barfs
 
 
 def __strip_papertrail_metadata(text:str) -> str:

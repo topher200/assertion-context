@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Callable, Set
 import logging
 
 from .traceback import Traceback
@@ -152,7 +152,7 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
     return ' - %s' % combined_str
 
 
-def create_hits_list(tracebacks, formatter:callable, max_number_hits:Optional[int]=None):
+def create_hits_list(tracebacks, formatter:Callable, max_number_hits:Optional[int]=None):
     """
         Creates a well formatted list of strings, given a list of tracebacks
 
@@ -160,8 +160,8 @@ def create_hits_list(tracebacks, formatter:callable, max_number_hits:Optional[in
 
         @param formatter: one of (slack_formatted_string, jira_formatted_string)
     """
-    seen_profile_names = set()
-    seen_usernames = set()
+    seen_profile_names: Set[str] = set()
+    seen_usernames: Set[str] = set()
     hits_list = []
     for t in tracebacks:
         # if it's the first time seeing this profile or username, include links to them

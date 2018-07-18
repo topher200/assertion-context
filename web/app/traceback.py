@@ -109,19 +109,19 @@ class Traceback():
         return self._program_name
 
     @property
-    def profile_name(self):
+    def profile_name(self) -> typing.Optional[str]:
         return self._profile_name
 
     @profile_name.setter
-    def profile_name(self, name: str) -> typing.Optional[str]:
+    def profile_name(self, name: str):
         self._profile_name = name
 
     @property
-    def username(self):
+    def username(self) -> typing.Optional[str]:
         return self._username
 
     @username.setter
-    def username(self, name: str) -> typing.Optional[str]:
+    def username(self, name: str):
         self._username = name
 
     def document(self):
