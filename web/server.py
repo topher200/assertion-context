@@ -381,7 +381,7 @@ def slack_callback():
 
             # send the message back, without the "Create a Ticket" message
             original_message = payload['original_message']
-            original_message['attachments'][-1]['actions'] = []
+            original_message['attachments'].pop()
             logger.info('sending back Slack message: %s', original_message)
             return flask.jsonify(original_message)
         except api_aservice.IssueAlreadyExistsError as e:
