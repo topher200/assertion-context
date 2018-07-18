@@ -52,6 +52,9 @@ class EnvironmentVarConfig(metaclass=MetaFlaskEnv):
 
 app.config.from_object(EnvironmentVarConfig)
 
+logging_util.setup_logging()
+logger = logging.getLogger()
+
 # add bootstrap
 Bootstrap(app)
 
@@ -66,9 +69,6 @@ KVSessionExtension(prefixed_store, app)
 
 # config
 DEBUG_TIMING = True
-
-logger = logging.getLogger()
-logging_util.setup_logging()
 
 # add tracing
 tracing.initialize_tracer()
