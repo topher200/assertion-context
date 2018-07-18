@@ -1,4 +1,7 @@
-Version 3.0.0
+Version 3.1.z
+  - include a dropdown in Slack to select where to send the new ticket
+
+Version 3.0.z
   - post new Tracebacks to slack
   - introduce simple class for 'TracebackPlusMetadata' object
   - version bump celery to 4.2.0
