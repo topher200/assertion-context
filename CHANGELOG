@@ -5,6 +5,7 @@ Version 3.0.z
   - post new Tracebacks to slack
   - introduce simple class for 'TracebackPlusMetadata' object
   - version bump celery to 4.2.0
+  - lots of other version bumps (requests, pylint, etc)
 
 Version 2.8.0
   - revert changes from 2.6.0. we once again use the last line for matching
