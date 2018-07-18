@@ -190,7 +190,7 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         fields['components']: [{'name': component}]
 
     issue = JIRA_CLIENT.create_issue(fields=fields)
-    logger.info('created jira issue %s for %s', issue.key, assign_to)
+    logger.info('created jira issue %s for %s with fields %s', issue.key, assign_to, fields)
     return issue.key
 
 
