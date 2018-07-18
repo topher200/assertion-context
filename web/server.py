@@ -376,8 +376,8 @@ def slack_callback():
 
             # send the message back, without the "Create a Ticket" message
             original_message = payload['original_message']
-            updated_message = original_message['attachments'].pop()
-            return flask.jsonify(updated_message)
+            original_message['attachments'].pop()
+            return flask.jsonify(original_message)
         except api_aservice.IssueAlreadyExistsError as e:
             # we must post the message as a real user so Jirabot picks it up
             slack_poster.post_message_to_slack_as_real_user(str(e))
