@@ -81,6 +81,9 @@ class AssignToTeam():
     def __repr__(self):
         return 'Assign to %s' % self.team_name
 
+    def __eq__(self, other):
+        return self.team_name == other.team_name
+
 
 def create_title(traceback_text):
     """
