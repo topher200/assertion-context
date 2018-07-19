@@ -139,16 +139,23 @@ def post_unticketed_tracebacks_to_slack():
     )
     tracebacks_with_metadata.reverse() # post in order by time, with latest coming last
 
-    # for each traceback, post it if we've never posted it before
+    # for each traceback, post it if we haven't seen it already today
     for tb_meta in (
             tb_meta for tb_meta in tracebacks_with_metadata
-            if not REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
+            if not REDIS.get(
+                    __SEEN_TRACEBACKS_KEY.format(
+                        traceback_id=tb_meta.traceback.origin_papertrail_id
+                    )
+            )
     ):
         slack_poster.post_traceback(
             tb_meta.traceback, tb_meta.similar_tracebacks, tb_meta.jira_issues
         )
-        # TODO: this set will grow to infinity
-        REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
+        REDIS.setex(
+            __SEEN_TRACEBACKS_KEY.format(tb_meta.traceback.origin_papertrail_id),
+            __TWO_DAYS_IN_SECONDS,
+            "true"
+        )
 
 
 @app.task
@@ -168,7 +175,16 @@ def setup_logging(*_, **__):
     logging_util.setup_logging()
 
 
-__SEEN_TRACEBACKS_KEY = 'seen_tracebacks'
+__SEEN_TRACEBACKS_KEY = 'seen_tracebacks:{traceback_id}'
 """
     redis key to store our set of tracebacks we've seen
+
+    requires the "date" of the traceback so that we can set a ttl on the set (and ensure that it gets
+    garbage collected).
+"""
+
+
+__TWO_DAYS_IN_SECONDS = 60 * 60 * 24 * 2
+"""
+    Two days, in seconds
 """
