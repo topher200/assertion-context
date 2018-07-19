@@ -403,6 +403,9 @@ def slack_callback():
             options = {
                 "options": list(jira_issue_aservice.search_matching_jira_tickets(ES, search_phrase))
             }
+
+            logger.warning('our response to slack: %s', flask.jsonify(options))
+
             return flask.jsonify(options)
         else:
             logger.error('unexpected slack callback action: %s', action)
