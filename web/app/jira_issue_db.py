@@ -134,13 +134,15 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
 
 def search_jira_issues(es, search_phrase, max_count):
     """
-        Searches our jira issue database for issues that match the given L{search_phrase}
+        Searches our jira issue database for issues that match the given L{search_phrase}.
+
+        Only searches the "key" and "summary" fields for a match.
     """
     body = {
         "query": {
             "simple_query_string": {
                 "query": search_phrase,
-                "fields": ["*"]
+                "fields": ["key", "summary"]
             }
         }
     }
