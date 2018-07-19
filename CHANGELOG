@@ -1,5 +1,6 @@
 Version 4.1.z
   - include jira ticket with Slack postings
+  - support Slack commenting on existing tickets
 
 Version 4.0.z
   - save jira issue 'created and updated' datetime to ES
