@@ -395,9 +395,20 @@ def slack_callback():
         else:
             logger.error('unexpected slack callback action: %s', action)
             logger.warning('slack payload: %s', payload)
+    elif 'name' in payload:
+        # it's a request to get more info for a dropdown menu
+        action = payload['name']
+        if action == 'add_to_existing_ticket':
+            search_phrase = payload['value']
+            options = {
+                "options": list(api_aservice.search_matching_jira_tickets(ES, search_phrase))
+            }
+            return flask.jsonify(options)
+        else:
+            logger.error('unexpected slack callback action: %s', action)
+            logger.warning('slack payload: %s', payload)
     else:
-        # it's a request to get more info in a dropdown
-        pass
+        logger.error('unexpected slack callback json: %s', payload)
     return 'ok'
 
 

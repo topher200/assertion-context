@@ -5,6 +5,9 @@
 """
 
 import logging
+from typing import (
+    List,
+)
 
 import elasticsearch
 
@@ -126,6 +129,32 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
         except elasticsearch.exceptions.NotFoundError:
             logger.warning('jira index not found. has it been created?')
             return []
+    res = []
+    for raw_jira_issue in raw_es_response['hits']['hits']:
+        res.append(generate_from_source(raw_jira_issue['_source']))
+    return res
+
+
+@DOGPILE_REGION.cache_on_arguments()
+@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
+def search_jira_issues(es, search_phrase:str, max_count:int) -> List[JiraIssue]:
+    """
+        Searches our jira issue database for issues that match the given L{search_phrase}
+    """
+    body = {
+        "query": {
+            "simple_query_string": {
+                "query": search_phrase,
+                "fields": ["*"]
+            }
+        }
+    }
+    raw_es_response = es.search(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        body=body,
+        size=max_count
+    )
     res = []
     for raw_jira_issue in raw_es_response['hits']['hits']:
         res.append(generate_from_source(raw_jira_issue['_source']))

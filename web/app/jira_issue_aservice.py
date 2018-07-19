@@ -10,6 +10,7 @@ import jira
 
 from . import (
     config_util,
+    jira_issue_db,
     traceback_formatter,
 )
 from .jira_issue import JiraIssue
@@ -197,22 +198,6 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
     return issue.key
 
 
-def get_issues_match_key_prefix(key_prefix:str) -> List[JiraIssue]:
-    """
-        Get a list jira issues given the start to a key.
-
-        Returns None if we can't find the given issue. This can happen if a user deletes an issue
-        in Jira
-
-        @rtype: JiraIssue or None
-    """
-    try:
-        return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
-    except jira.exceptions.JIRAError as e:
-        logger.warning('failure accessing issue %s. is it deleted?\n%s', key, e)
-        return None
-
-
 def get_issue(key:str) -> Optional[JiraIssue]:
     """
         Get a jira issue given its key
@@ -258,6 +243,21 @@ def get_all_issues() -> Iterator[jira.resources.Issue]:
             start_at += BATCH_SIZE
         else:
             break
+
+
+def search_matching_jira_tickets(ES, search_phrase:str) -> Iterator[dict]:
+    """
+        Get the top Jira issues that match the given search phrase.
+
+        Yields dicts, with each dict a text/value pair that refers to a Jira issue:
+        - text: the display summary of the jira issue, in this form: "KEY: SUMMARY"
+        - value: the key of the jira issue
+    """
+    for issue in jira_issue_db.search_jira_issues(ES, search_phrase, max_count=10):
+        yield {
+            "text": "%s: %s" % (issue.key, issue.summary),
+            "value": issue.key,
+        }
 
 
 def get_link_to_issue(issue_key:str) -> str:
