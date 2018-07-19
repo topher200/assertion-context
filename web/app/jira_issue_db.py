@@ -5,9 +5,6 @@
 """
 
 import logging
-from typing import (
-    List,
-)
 
 import elasticsearch
 
