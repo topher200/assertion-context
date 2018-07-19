@@ -397,7 +397,7 @@ def slack_callback():
             selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
             origin_papertrail_id = payload['callback_id']
             selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
-            api_aservice.create_comment_for_new_traceback_on_existing_ticket(
+            api_aservice.create_comment_on_existing_ticket(
                 ES, selected_ticket_key, origin_papertrail_id
             )
 
