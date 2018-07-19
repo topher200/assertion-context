@@ -136,13 +136,13 @@ def search_jira_issues(es, search_phrase, max_count):
     """
         Searches our jira issue database for issues that match the given L{search_phrase}.
 
-        Only searches the "key" and "summary" fields for a match.
+        Prioritizes the "key" and "summary" fields for a match.
     """
     body = {
         "query": {
             "simple_query_string": {
                 "query": search_phrase,
-                "fields": ["key", "summary"]
+                "fields": ["key^10", "summary^5", "*"]
             }
         }
     }
