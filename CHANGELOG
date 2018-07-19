@@ -1,5 +1,6 @@
 Version 4.0.z
-  - save jira issue created and updated datetime to ES
+  - save jira issue 'created and updated' datetime to ES
+  - have a Filter for "tracebacks with tickets which haven't been updated recently"
 
 Version 3.4.z
   - add ability to create a comment on a ticket, using a Slack search option
