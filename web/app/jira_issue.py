@@ -1,3 +1,6 @@
+import datetime
+
+
 class JiraIssue():
     """
         Object representing a JIRA issue.
@@ -13,6 +16,8 @@ class JiraIssue():
           filtered out
         - the type of the issue (bug, story, etc)
         - the current status of the issue
+        - the created datetime of the issue
+        - the last updated datetime of the issue
     """
     def __init__(
             self,
@@ -25,6 +30,8 @@ class JiraIssue():
             comments_filtered,
             issue_type,
             status,
+            created,
+            updated,
     ):
         self._key = key
         self._url = url
@@ -35,6 +42,8 @@ class JiraIssue():
         self._comments_filtered = comments_filtered
         self._issue_type = issue_type
         self._status = status
+        self._created = created
+        self._updated = updated
 
     def __repr__(self):
         return str(self.document())
@@ -75,7 +84,15 @@ class JiraIssue():
     def status(self):
         return self._status
 
-    def document(self):
+    @property
+    def created(self) -> datetime.datetime:
+        return self._created
+
+    @property
+    def updated(self) -> datetime.datetime:
+        return self._updated
+
+    def document(self) -> dict:
         """
             Returns the document form of this object for ElasticSearch.
 
@@ -91,14 +108,26 @@ class JiraIssue():
             "comments_filtered": self._comments_filtered,
             "issue_type": self._issue_type,
             "status": self._status,
+            "created": self._created,
+            "updated": self._updated,
         }
 
 
-def generate_from_source(source):
+def generate_from_source(source:dict) -> JiraIssue:
     """
         L{source} is a dictionary (from ElasticSearch) containing the fields of this object
     """
-    assert isinstance(source, dict), (type(source), source)
+
+    created = datetime.datetime.strptime(
+        source["created"],
+        '%Y-%m-%dT%H:%M:%S.%f%z'
+
+    )
+    updated = datetime.datetime.strptime(
+        source["created"],
+        '%Y-%m-%dT%H:%M:%S.%f%z'
+
+    )
 
     return JiraIssue(
         source["key"],
@@ -110,4 +139,6 @@ def generate_from_source(source):
         source["comments_filtered"],
         source["issue_type"],
         source["status"],
+        created,
+        updated,
     )

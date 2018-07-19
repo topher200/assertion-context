@@ -21,6 +21,8 @@ from . import (
 
 logger = logging.getLogger()
 
+TWO_WEEKS_AGO = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=14)
+
 
 class IssueAlreadyExistsError(Exception):
     """
@@ -92,6 +94,13 @@ def get_tracebacks_for_day(
         tb_meta = [tb for tb in tb_meta if tb.jira_issues]
     elif filter_text == 'No Ticket':
         tb_meta = [tb for tb in tb_meta if not tb.jira_issues]
+    elif filter_text == 'No Recent Ticket':
+        tb_meta = [
+            tb for tb in tb_meta if not [
+                issue for issue in tb.jira_issues
+                if issue.updated > TWO_WEEKS_AGO
+            ]
+        ]
     elif filter_text == 'Has Open Ticket':
         tb_meta = [
             tb for tb in tb_meta if

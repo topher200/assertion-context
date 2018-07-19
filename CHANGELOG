@@ -1,3 +1,6 @@
+Version 4.0.z
+  - save jira issue created and updated datetime to ES
+
 Version 3.4.z
   - add ability to create a comment on a ticket, using a Slack search option
   - fixed lambda response, now clearing out Slack attachments using return values
