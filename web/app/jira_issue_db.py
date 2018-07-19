@@ -89,7 +89,7 @@ def refresh(es):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_matching_jira_issues(es, tracer, traceback_text:str, match_level) -> List[JiraIssue]:
+def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     """
         Queries the database for any jira issues that include the traceback_text
 
@@ -98,7 +98,11 @@ def get_matching_jira_issues(es, tracer, traceback_text:str, match_level) -> Lis
 
         Returns a list (instead of a generator) so we can be cached
 
+        @type traceback_text: str
+        @rtype: list
+
         @precondition: match_level in es_util.ALL_MATCH_LEVELS
+        @postcondition: all(isinstance(v, JiraIssue) for v in return)
     """
     assert isinstance(traceback_text, str), (type(traceback_text), traceback_text)
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
