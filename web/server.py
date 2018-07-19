@@ -76,7 +76,7 @@ tracing.initialize_tracer()
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
-FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket']
+FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket', 'No Recent Ticket']
 
 
 @app.route("/", methods=['GET'])
