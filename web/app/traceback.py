@@ -65,15 +65,15 @@ class Traceback():
         self._profile_name = profile_name
         self._username = username
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.document())
 
     @property
-    def traceback_text(self):
+    def traceback_text(self) -> str:
         return self._traceback_text
 
     @property
-    def traceback_plus_context_text(self):
+    def traceback_plus_context_text(self) -> str:
         # not guaranteed to exist
         if self._traceback_plus_context_text is None:
             return self.traceback_text
@@ -81,7 +81,7 @@ class Traceback():
         return self._traceback_plus_context_text
 
     @property
-    def raw_traceback_text(self):
+    def raw_traceback_text(self) -> str:
         # not guaranteed to exist
         if self._raw_full_text is None:
             return self.traceback_text
@@ -89,23 +89,23 @@ class Traceback():
         return self._raw_full_text
 
     @property
-    def raw_full_text(self):
+    def raw_full_text(self) -> str:
         return self._raw_full_text
 
     @property
-    def origin_papertrail_id(self):
+    def origin_papertrail_id(self) -> str:
         return self._origin_papertrail_id
 
     @property
-    def origin_timestamp(self):
+    def origin_timestamp(self) -> datetime.datetime:
         return self._origin_timestamp
 
     @property
-    def instance_id(self):
+    def instance_id(self) -> str:
         return self._instance_id
 
     @property
-    def program_name(self):
+    def program_name(self) -> str:
         return self._program_name
 
     @property
@@ -124,7 +124,7 @@ class Traceback():
     def username(self, name: str):
         self._username = name
 
-    def document(self):
+    def document(self) -> dict:
         """
             Returns the document form of this logline for ElasticSearch.
 
@@ -144,12 +144,10 @@ class Traceback():
         }
 
 
-def generate_traceback_from_source(source):
+def generate_traceback_from_source(source:dict) -> Traceback:
     """
         L{source} is a dictionary (from ElasticSearch) containing the fields of a L{Traceback}
     """
-    assert isinstance(source, dict), (type(source), source)
-
     # We get the datetime as a string, we need to parse it out
     try:
         timestamp = datetime.datetime.strptime(
