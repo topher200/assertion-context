@@ -126,6 +126,6 @@ def generate_from_source(source):
         source["comments_filtered"],
         source["issue_type"],
         source["status"],
-        source["created"],
-        source["updated"],
+        source.get("created", None), # not guaranteed to exist
+        source.get("updated", None), # not guaranteed to exist
     )
