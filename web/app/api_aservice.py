@@ -95,12 +95,16 @@ def get_tracebacks_for_day(
     elif filter_text == 'No Ticket':
         tb_meta = [tb for tb in tb_meta if not tb.jira_issues]
     elif filter_text == 'No Recent Ticket':
-        tb_meta = [
-            tb for tb in tb_meta if not [
-                issue for issue in tb.jira_issues
-                if issue.updated > TWO_WEEKS_AGO
-            ]
-        ]
+        tb_meta_without_recent_ticket = []
+        for tb in tb_meta:
+            has_recent_issues = False
+            for issue in tb.jira_issues:
+                if issue.updated > TWO_WEEKS_AGO:
+                    has_recent_issues = True
+                    break
+            if not has_recent_issues:
+                tb_meta_without_recent_ticket.append(tb)
+        tb_meta = tb_meta_without_recent_ticket
     elif filter_text == 'Has Open Ticket':
         tb_meta = [
             tb for tb in tb_meta if

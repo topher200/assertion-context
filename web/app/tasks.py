@@ -148,13 +148,13 @@ def post_unticketed_tracebacks_to_slack():
                     )
             )
     ):
-        slack_poster.post_traceback(
-            tb_meta.traceback, tb_meta.similar_tracebacks, tb_meta.jira_issues
-        )
         REDIS.setex(
             __SEEN_TRACEBACKS_KEY.format(traceback_id=tb_meta.traceback.origin_papertrail_id),
             __TWO_DAYS_IN_SECONDS,
             "true"
+        )
+        slack_poster.post_traceback(
+            tb_meta.traceback, tb_meta.similar_tracebacks, tb_meta.jira_issues
         )
 
 
