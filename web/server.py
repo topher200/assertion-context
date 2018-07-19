@@ -391,7 +391,22 @@ def slack_callback():
                 # we must post the message as a real user so Jirabot picks it up
                 slack_poster.post_message_to_slack_as_real_user(str(e))
         elif action == 'add_to_existing_ticket':
-            logger.info('received request to add to existing ticket. %s', payload)
+            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
+            origin_papertrail_id = payload['callback_id']
+            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
+            api_aservice.create_comment_for_new_traceback_on_existing_ticket(
+                ES, selected_ticket_key, origin_papertrail_id
+            )
+
+            # replace the slack message's CTA with a "done!" message
+            original_message = payload['original_message']
+            original_message['attachments'].pop() # destructive!
+            original_message['attachments'].append(
+                {
+                    "text": "%s updated!" % selected_ticket_key
+                }
+            )
+            return flask.jsonify(original_message)
         else:
             logger.error('unexpected slack callback action: %s', action)
             logger.warning('slack payload: %s', payload)
