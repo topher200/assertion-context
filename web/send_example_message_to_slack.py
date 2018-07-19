@@ -22,13 +22,14 @@ today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
 yesterday = today - datetime.timedelta(days=1)
 print('getting tracebacks')
 tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
-    ES, None, today, 'No Ticket', set()
+    ES, None, today, 'Has Ticket', set()
 )
 tb_meta = random.choice(tracebacks_with_metadata)
 traceback = tb_meta.traceback
 similar_tracebacks = tb_meta.similar_tracebacks
+jira_issues = tb_meta.jira_issues
 
 print('posting to slack')
-response = slack_poster.post_traceback(traceback, similar_tracebacks)
+response = slack_poster.post_traceback(traceback, similar_tracebacks, jira_issues)
 print('posted. response: %s' % response)
 print(response.text)

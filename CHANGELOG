@@ -1,3 +1,6 @@
+Version 4.1.z
+  - include jira ticket with Slack postings
+
 Version 4.0.z
   - save jira issue 'created and updated' datetime to ES
   - have a Filter for "tracebacks with tickets which haven't been updated recently"

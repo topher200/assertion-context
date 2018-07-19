@@ -7,8 +7,10 @@ import requests
 
 from .. import (
     config_util,
+    jira_issue_aservice,
     traceback_formatter,
 )
+from ..jira_issue import JiraIssue
 from ..traceback import Traceback
 
 WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
@@ -20,13 +22,26 @@ MESSAGE_TEMPLATE = """
 ```
 {traceback_text}```"""
 
+JIRA_ISSUE_TEMPLATE = """
+- <{issue_link}|{issue_key}>, {issue_status}: {issue_summary}
+"""
+"""
+    a template for rendering a single jira issue in slack
+
+    requires:
+    - issue_link: a url link to this issue
+    - issue_key: the key for this issue
+    - issue_status: the current status for this issue
+    - issue_summary: the summary for this issue
+"""
+
 NUM_LINES_TO_POST = 5
 """
     How many lines of the traceback to post. Do too many and slack splits up the message.
 """
 
 
-def post_traceback(traceback, similar_tracebacks:List[Traceback]):
+def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:List[JiraIssue]):
     last_N_lines = "\n".join(
         traceback.traceback_plus_context_text.splitlines()[-NUM_LINES_TO_POST:]
     )
@@ -35,6 +50,14 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
         similar_tracebacks,
         traceback_formatter.slack_formatted_string,
         max_number_hits=50
+    )
+    jira_issue_text = '\n'.join(
+        JIRA_ISSUE_TEMPLATE.format(
+            issue_link=jira_issue_aservice.get_link_to_issue(issue.key),
+            issue_key=issue.key,
+            issue_status=issue.status.upper(),
+            issue_summary=issue.summary,
+        ) for issue in jira_issues
     )
 
     slack_data = {
@@ -47,6 +70,10 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
             },
             {
                 "text": hits,
+                "short": True,
+            },
+            {
+                "text": jira_issue_text,
                 "short": True,
             },
             {

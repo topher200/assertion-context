@@ -135,7 +135,7 @@ def post_unticketed_tracebacks_to_slack():
 
     # get today's tracebacks
     tracebacks_with_metadata = api_aservice.get_tracebacks_for_day(
-        ES, None, today, 'No Ticket', set()
+        ES, None, today, 'No Recent Ticket', set()
     )
     tracebacks_with_metadata.reverse() # post in order by time, with latest coming last
 
@@ -144,7 +144,9 @@ def post_unticketed_tracebacks_to_slack():
             tb_meta for tb_meta in tracebacks_with_metadata
             if not REDIS.sismember(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
     ):
-        slack_poster.post_traceback(tb_meta.traceback, tb_meta.similar_tracebacks)
+        slack_poster.post_traceback(
+            tb_meta.traceback, tb_meta.similar_tracebacks, tb_meta.jira_issues
+        )
         # TODO: this set will grow to infinity
         REDIS.sadd(__SEEN_TRACEBACKS_KEY, tb_meta.traceback.origin_papertrail_id)
 
