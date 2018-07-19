@@ -98,7 +98,7 @@ def get_tracebacks_for_day(
         tb_meta = [
             tb for tb in tb_meta if not [
                 issue for issue in tb.jira_issues
-                if issue.updated < TWO_WEEKS_AGO
+                if issue.updated > TWO_WEEKS_AGO
             ]
         ]
     elif filter_text == 'Has Open Ticket':
