@@ -132,8 +132,6 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     return res
 
 
-@DOGPILE_REGION.cache_on_arguments()
-@retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def search_jira_issues(es, search_phrase, max_count):
     """
         Searches our jira issue database for issues that match the given L{search_phrase}
