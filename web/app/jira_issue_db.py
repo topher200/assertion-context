@@ -4,6 +4,9 @@
     For all functions, `es` must be an instance of Elasticsearch
 """
 
+from typing import (
+    List,
+)
 import logging
 
 import elasticsearch
@@ -32,7 +35,7 @@ logger = logging.getLogger()
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def save_jira_issue(es, jira_issue):
+def save_jira_issue(es, jira_issue:JiraIssue):
     """
         Saves a jira issue to ES
 
@@ -55,17 +58,13 @@ def save_jira_issue(es, jira_issue):
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def remove_jira_issue(es, issue_key):
+def remove_jira_issue(es, issue_key:str):
     """
         Removes the issue with the specified key from the database
 
         Deletes the record by key. This works because we set the ES doc's key to be the jira issue
         key (so there will be at most one issue with a given key)
-
-        @type issue_key: str
     """
-    assert isinstance(issue_key, str), (type(issue_key), issue_key)
-
     try:
         es.delete(
             index=INDEX,
@@ -90,7 +89,7 @@ def refresh(es):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_matching_jira_issues(es, tracer, traceback_text, match_level):
+def get_matching_jira_issues(es, tracer, traceback_text:str, match_level) -> List[JiraIssue]:
     """
         Queries the database for any jira issues that include the traceback_text
 
@@ -99,11 +98,7 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
 
         Returns a list (instead of a generator) so we can be cached
 
-        @type traceback_text: str
-        @rtype: list
-
         @precondition: match_level in es_util.ALL_MATCH_LEVELS
-        @postcondition: all(isinstance(v, JiraIssue) for v in return)
     """
     assert isinstance(traceback_text, str), (type(traceback_text), traceback_text)
     assert match_level in es_util.ALL_MATCH_LEVELS, (match_level, es_util.ALL_MATCH_LEVELS)
@@ -132,7 +127,7 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     return res
 
 
-def search_jira_issues(es, search_phrase, max_count):
+def search_jira_issues(es, search_phrase:str, max_count:int) -> List[JiraIssue]:
     """
         Searches our jira issue database for issues that match the given L{search_phrase}.
 
@@ -160,7 +155,7 @@ def search_jira_issues(es, search_phrase, max_count):
 
 
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_num_jira_issues(es):
+def get_num_jira_issues(es) -> int:
     """
         Returns the total number of jira issues found in the database
     """
