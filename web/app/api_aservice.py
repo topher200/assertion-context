@@ -21,7 +21,7 @@ from . import (
 
 logger = logging.getLogger()
 
-TWO_WEEKS_AGO = datetime.datetime.now() - datetime.timedelta(days=14)
+TWO_WEEKS_AGO = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=14)
 
 
 class IssueAlreadyExistsError(Exception):
