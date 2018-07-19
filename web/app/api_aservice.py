@@ -102,7 +102,7 @@ def get_tracebacks_for_day(
                 if issue.updated > TWO_WEEKS_AGO:
                     has_recent_issues = True
                     break
-            logger.info('traceback: %s: %s, has_recent_issues: %s', tb.origin_papertrail_id, tb.origin_timestamp, has_recent_issues)
+            logger.info('traceback: %s: %s, has_recent_issues: %s', tb.traceback.origin_papertrail_id, tb.traceback.origin_timestamp, has_recent_issues)
             if not has_recent_issues:
                 tb_meta_without_recent_ticket.append(tb)
         tb_meta = tb_meta_without_recent_ticket
