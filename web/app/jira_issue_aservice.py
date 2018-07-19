@@ -295,8 +295,8 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
         comments_filtered,
         jira_object.fields.issuetype.name,
         jira_object.fields.status.name,
+        jira_object.fields.created,
         jira_object.fields.updated,
-        jira_object.fields.created
     )
 
 
