@@ -369,7 +369,6 @@ def slack_callback():
 
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
-    logger.info('slack callback data: %s', payload)
     if 'actions' in payload:
         # it's a request to do an action
         action = payload['actions'][0]['name']
