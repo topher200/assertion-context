@@ -141,7 +141,7 @@ def search_jira_issues(es, search_phrase:str, max_count:int) -> List[JiraIssue]:
         "query": {
             "multi_match": {
                 "query": search_phrase,
-                "fields": ["key^10", "summary^5", "*"],
+                "fields": ["key^10", "summary^5", "description", "comments"],
                 "type": "phrase_prefix",
             }
         }
