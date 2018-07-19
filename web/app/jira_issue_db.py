@@ -140,10 +140,10 @@ def search_jira_issues(es, search_phrase, max_count):
     """
     body = {
         "query": {
-            "simple_query_string": {
+            "multi_match": {
                 "query": search_phrase,
-                "fields": ["key^10", "summary^5"],
-                "analyze_wildcard": True,
+                "fields": ["key^10", "summary^5", "*"],
+                "type": "phrase_prefix",
             }
         }
     }
