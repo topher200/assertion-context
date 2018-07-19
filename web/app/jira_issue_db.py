@@ -142,7 +142,7 @@ def search_jira_issues(es, search_phrase, max_count):
         "query": {
             "simple_query_string": {
                 "query": search_phrase,
-                "fields": ["key^10", "summary^5", "*"],
+                "fields": ["key^10", "summary^5"],
                 "analyze_wildcard": True,
             }
         }
