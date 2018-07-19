@@ -83,7 +83,6 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                         "text": "Add to existing ticket",
                         "type": "select",
                         "data_source": "external",
-                        "min_query_length": "4",
                         "options": [
                             {
                                 "text": "PPC-12345", # dummy option to start
