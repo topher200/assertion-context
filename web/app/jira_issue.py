@@ -124,7 +124,7 @@ def generate_from_source(source:dict) -> JiraIssue:
 
     )
     updated = datetime.datetime.strptime(
-        source["created"],
+        source["updated"],
         '%Y-%m-%dT%H:%M:%S.%f%z'
 
     )
