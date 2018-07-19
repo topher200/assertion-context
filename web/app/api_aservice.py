@@ -104,7 +104,14 @@ def get_tracebacks_for_day(
                     break
             if tb.traceback.origin_papertrail_id == '956637974106402832':
                 logger.info('traceback: %s: %s, has_recent_issues: %s', tb.traceback.origin_papertrail_id, tb.traceback.origin_timestamp, has_recent_issues)
-                logger.info('tb: %s', tb)
+                logger.info('tb: %s', tb.jira_issues)
+                logger.info('issues: %s', tb.jira_issues)
+                for issue in tb.jira_issues:
+                    logger.info('issue: %s. updated: %s', issue, issue.updated)
+                    logger.info('issue: %s', issue)
+                    if issue.updated > TWO_WEEKS_AGO:
+                        has_recent_issues = True
+                        break
             if not has_recent_issues:
                 tb_meta_without_recent_ticket.append(tb)
         tb_meta = tb_meta_without_recent_ticket
