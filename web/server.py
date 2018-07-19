@@ -401,7 +401,7 @@ def slack_callback():
         if action == 'add_to_existing_ticket':
             search_phrase = payload['value']
             options = {
-                "options": list(api_aservice.search_matching_jira_tickets(ES, search_phrase))
+                "options": list(jira_issue_aservice.search_matching_jira_tickets(ES, search_phrase))
             }
             return flask.jsonify(options)
         else:
