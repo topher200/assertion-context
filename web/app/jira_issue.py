@@ -1,3 +1,6 @@
+import datetime
+
+
 class JiraIssue():
     """
         Object representing a JIRA issue.
@@ -82,14 +85,14 @@ class JiraIssue():
         return self._status
 
     @property
-    def created(self):
+    def created(self) -> datetime.datetime:
         return self._created
 
     @property
-    def updated(self):
+    def updated(self) -> datetime.datetime:
         return self._updated
 
-    def document(self):
+    def document(self) -> dict:
         """
             Returns the document form of this object for ElasticSearch.
 
@@ -110,11 +113,21 @@ class JiraIssue():
         }
 
 
-def generate_from_source(source):
+def generate_from_source(source:dict) -> JiraIssue:
     """
         L{source} is a dictionary (from ElasticSearch) containing the fields of this object
     """
-    assert isinstance(source, dict), (type(source), source)
+
+    created = datetime.datetime.strptime(
+        source["created"],
+        '%Y-%m-%dT%H:%M:%S.%f%z'
+
+    )
+    updated = datetime.datetime.strptime(
+        source["created"],
+        '%Y-%m-%dT%H:%M:%S.%f%z'
+
+    )
 
     return JiraIssue(
         source["key"],
@@ -126,6 +139,6 @@ def generate_from_source(source):
         source["comments_filtered"],
         source["issue_type"],
         source["status"],
-        source["created"],
-        source["updated"],
+        created,
+        updated,
     )
