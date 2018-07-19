@@ -132,6 +132,33 @@ def get_matching_jira_issues(es, tracer, traceback_text, match_level):
     return res
 
 
+def search_jira_issues(es, search_phrase, max_count):
+    """
+        Searches our jira issue database for issues that match the given L{search_phrase}.
+
+        Prioritizes the "key" and "summary" fields for a match.
+    """
+    body = {
+        "query": {
+            "multi_match": {
+                "query": search_phrase,
+                "fields": ["key^10", "summary^5", "*"],
+                "type": "phrase_prefix",
+            }
+        }
+    }
+    raw_es_response = es.search(
+        index=INDEX,
+        doc_type=DOC_TYPE,
+        body=body,
+        size=max_count
+    )
+    res = []
+    for raw_jira_issue in raw_es_response['hits']['hits']:
+        res.append(generate_from_source(raw_jira_issue['_source']))
+    return res
+
+
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
 def get_num_jira_issues(es):
     """

@@ -1,3 +1,7 @@
+Version 3.4.z
+  - add ability to create a comment on a ticket, using a Slack search option
+  - fixed lambda response, now clearing out Slack attachments using return values
+
 Version 3.3.z
   - perform dogpile cache invalidation by deleting keys from redis
   - clear out Slack attachments using 'response_url'

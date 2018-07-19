@@ -12,12 +12,12 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 
 .PHONY: install
 install:
-	pip install -r requirements.txt
-	pip install -r web/requirements.txt
+	pip install -r requirements.txt --quiet
+	pip install -r web/requirements.txt --quiet
 
 .PHONY: test
 test: install
-	nosetests --py3where web
+	nosetests --py3where web --quiet
 	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
 

@@ -370,27 +370,63 @@ def slack_callback():
     parsed_data = urllib.parse.parse_qs(data)
     payload = json.loads(parsed_data[b'payload'][0])
     logger.info('slack callback data: %s', payload)
-    action = payload['actions'][0]['name']
-    if action == 'create_ticket':
-        origin_papertrail_id = payload['callback_id']
-        assign_to = payload['actions'][0]['selected_options'][0]['value']
-        try:
-            api_aservice.create_ticket(
-                ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+    if 'actions' in payload:
+        # it's a request to do an action
+        action = payload['actions'][0]['name']
+        if action == 'create_ticket':
+            origin_papertrail_id = payload['callback_id']
+            assign_to = payload['actions'][0]['selected_options'][0]['value']
+            try:
+                new_ticket_id = api_aservice.create_ticket(
+                    ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+                )
+
+                # replace the slack message's CTA with a "done!" message
+                original_message = payload['original_message']
+                original_message['attachments'].pop() # destructive!
+                original_message['attachments'].append(
+                    {
+                        "text": "%s created!" % new_ticket_id
+                    }
+                )
+                return flask.jsonify(original_message)
+            except api_aservice.IssueAlreadyExistsError as e:
+                # we must post the message as a real user so Jirabot picks it up
+                slack_poster.post_message_to_slack_as_real_user(str(e))
+        elif action == 'add_to_existing_ticket':
+            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
+            origin_papertrail_id = payload['callback_id']
+            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
+            api_aservice.create_comment_for_new_traceback_on_existing_ticket(
+                ES, selected_ticket_key, origin_papertrail_id
             )
 
-            # send the message back, without the "Create a Ticket" message
+            # replace the slack message's CTA with a "done!" message
             original_message = payload['original_message']
-            response_url = payload['response_url']
             original_message['attachments'].pop() # destructive!
-            logger.info('sending back Slack message without attachment')
-            slack_poster.send_updated_message(response_url, original_message)
-        except api_aservice.IssueAlreadyExistsError as e:
-            # we must post the message as a real user so Jirabot picks it up
-            slack_poster.post_message_to_slack_as_real_user(str(e))
+            original_message['attachments'].append(
+                {
+                    "text": "%s updated!" % selected_ticket_key
+                }
+            )
+            return flask.jsonify(original_message)
+        else:
+            logger.error('unexpected slack callback action: %s', action)
+            logger.warning('slack payload: %s', payload)
+    elif 'name' in payload:
+        # it's a request to get more info for a dropdown menu
+        action = payload['name']
+        if action == 'add_to_existing_ticket':
+            search_phrase = payload['value']
+            options = {
+                "options": list(jira_issue_aservice.search_matching_jira_tickets(ES, search_phrase))
+            }
+            return flask.Response(json.dumps(options), mimetype='application/json')
+        else:
+            logger.error('unexpected slack callback action: %s', action)
+            logger.warning('slack payload: %s', payload)
     else:
-        logger.error('unexpected slack callback action: %s', action)
-        logger.warning('slack payload: %s', payload)
+        logger.error('unexpected slack callback json: %s', payload)
     return 'ok'
 
 

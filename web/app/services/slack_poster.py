@@ -77,7 +77,19 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
                                 "value": "SOCIAL"
                             },
                         ]
-                    }
+                    },
+                    {
+                        "name": "add_to_existing_ticket",
+                        "text": "Add to existing ticket",
+                        "type": "select",
+                        "data_source": "external",
+                        "options": [
+                            {
+                                "text": "PPC-12345", # dummy option to start
+                                "value": "PPC-12345"
+                            }
+                        ]
+                    },
                 ],
                 "short": True,
             }
@@ -85,19 +97,6 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
     }
 
     return __send_message_to_slack(slack_data)
-
-
-def send_updated_message(response_url:str, new_message:dict):
-    response = requests.post(
-        response_url,
-        data=json.dumps(new_message),
-        headers={'Content-Type': 'application/json'}
-    )
-    if response.status_code != 200:
-        logger.error(
-            'Request to slack returned an error %s, the response is:\n%s',
-            response.status_code, response.text
-        )
 
 
 def post_message_to_slack(message:str):

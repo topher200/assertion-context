@@ -210,3 +210,28 @@ def create_ticket(
     tasks.tell_slack_about_new_jira_ticket.delay(ticket_id)
 
     return ticket_id
+
+def create_comment_for_new_traceback_on_existing_ticket(
+        ES, existing_jira_issue_key:str, origin_papertrail_id:int
+):
+    """
+        Given an existing Jira ticket id, create a comment on that ticket describing a NEW (but
+        related) traceback that we've encountered, referenced by L{origin_papertrail_id}.
+    """
+    traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+
+    # find a list of tracebacks that use that text
+    similar_tracebacks = traceback_database.get_matching_tracebacks(
+        ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
+    )
+
+    # create a comment description using the list of tracebacks
+    description = jira_issue_aservice.create_description(similar_tracebacks)
+
+    # leave the comment
+    jira_issue = jira_issue_aservice.get_issue(existing_jira_issue_key)
+    assert jira_issue
+    jira_issue_aservice.create_comment(jira_issue, description)
+
+    # tell slack that we updated the ticket (async)
+    tasks.tell_slack_about_updated_jira_ticket.delay(jira_issue.key)
