@@ -253,7 +253,7 @@ def search_matching_jira_tickets(ES, search_phrase:str) -> Iterator[dict]:
         - text: the display summary of the jira issue, in this form: "KEY, STATUS: SUMMARY"
         - value: the key of the jira issue
     """
-    for issue in jira_issue_db.search_jira_issues(ES, search_phrase, max_count=10):
+    for issue in jira_issue_db.search_jira_issues(ES, search_phrase, max_count=30):
         yield {
             "text": "%s, %s: %s" % (issue.key, issue.status, issue.summary),
             "value": issue.key,
