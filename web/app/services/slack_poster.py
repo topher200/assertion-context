@@ -99,10 +99,20 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback]):
     return __send_message_to_slack(slack_data)
 
 
-def send_updated_message(response_url:str, new_message:dict):
+def send_updated_message_without_final_attachment(response_url:str, message:dict):
+    """
+        Sends back the original message, replacing the final attachment with "Completed!".
+    """
+    message['attachments'].pop() # destructive!
+    message['attachments'].append(
+        {
+            "text": "Action completed!"
+        }
+    )
+
     response = requests.post(
         response_url,
-        data=json.dumps(new_message),
+        data=json.dumps(message),
         headers={'Content-Type': 'application/json'}
     )
     if response.status_code != 200:
