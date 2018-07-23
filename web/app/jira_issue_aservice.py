@@ -25,6 +25,7 @@ JIRA_PROJECT_KEY=config_util.get('JIRA_PROJECT_KEY')
 JIRA_ASSIGNEE_ADWORDS = config_util.get('JIRA_ASSIGNEE_ADWORDS')
 JIRA_ASSIGNEE_BING = config_util.get('JIRA_ASSIGNEE_BING')
 JIRA_ASSIGNEE_SOCIAL = config_util.get('JIRA_ASSIGNEE_SOCIAL')
+JIRA_ASSIGNEE_GRADER = config_util.get('JIRA_ASSIGNEE_GRADER')
 
 DESCRIPTION_TEMPLATE = '''Error observed in production.
 
@@ -79,6 +80,7 @@ class AssignToTeam():
             'ADWORDS',
             'BING',
             'SOCIAL',
+            'GRADER',
         ):
             raise UnknownTeamNameError(team_name)
         self.team_name = team_name
@@ -190,6 +192,9 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         # epic links are set strangely. this value will not carry over to different Jiras
         # see https://community.atlassian.com/t5/Answers-Developer-Questions/Link-to-Epic-in-rest-api-issue-resource/qaq-p/562851
         fields['customfield_10008'] = 'PPC-13290'
+    elif assign_to == AssignToTeam('GRADER'):
+        assignee = JIRA_ASSIGNEE_GRADER
+        component = 'Grader'
     if assignee:
         fields['assignee'] = {'name': assignee}
         fields['components'] = [{'name': component}] # type: ignore # jira API is weird

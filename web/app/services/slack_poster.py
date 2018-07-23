@@ -103,6 +103,10 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
                                 "text": "Social (assign to Jay)",
                                 "value": "SOCIAL"
                             },
+                            {
+                                "text": "Grader (assign to Raju)",
+                                "value": "GRADER"
+                            },
                         ]
                     },
                     {
