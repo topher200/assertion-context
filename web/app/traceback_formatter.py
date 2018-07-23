@@ -189,6 +189,7 @@ def create_hits_list(tracebacks, formatter:Callable, max_number_hits:Optional[in
     index = len(hits_list)
     if max_number_hits:
         index = min(index, max_number_hits)
+    comment_string = ''
     for index in range(index, 0, -1):
         comment_string = '\n'.join(hits_list[:index])
         if len(comment_string) < 25000:
