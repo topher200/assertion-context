@@ -238,20 +238,32 @@ def create_comment_on_existing_ticket(
         ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
     )
 
-    matching_jira_issues = jira_issue_db.get_matching_jira_issues(
+    # get the list of jira issues that this traceback matches. if our given issue key comes back in
+    # the set of matching jira issues, it means that the full traceback.text is already on our
+    # ticket and we don't need to post it again
+    existing_issue = None
+    for issue in jira_issue_db.get_matching_jira_issues(
         ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH
-    )
-    # if the traceback is already in the ticket, we don't have to post it again
-    traceback_is_already_in_ticket = (
-        existing_jira_issue_key in (issue.key for issue in matching_jira_issues)
-    )
+    ):
+        if issue.key == existing_jira_issue_key:
+            existing_issue = issue
+            break
 
     # create a comment description using the list of tracebacks
-    if traceback_is_already_in_ticket:
-        # we need only need to post the new hits
-        comment = jira_issue_aservice.create_comment_with_hits_list(similar_tracebacks)
+    comment = ''
+    if existing_issue:
+        # we need only need to post the new hits. filter out any tracebacks that are after the
+        # latest one already on that ticket
+        latest = jira_issue_aservice.find_latest_referenced_id(existing_issue)
+        if latest is not None:
+            tracebacks_to_comment = [tb for tb in similar_tracebacks
+                                    if int(tb.origin_papertrail_id) > latest][:50]
+        else:
+            # just take the them all
+            tracebacks_to_comment = similar_tracebacks
+        comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
     else:
-        # we need a full comment with the traceback description
+        # we need a full comment with the traceback description and all hits
         comment = jira_issue_aservice.create_description(similar_tracebacks)
 
     # leave the comment
