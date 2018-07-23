@@ -1,6 +1,7 @@
 Version 4.1.z
   - include jira ticket with Slack postings
   - support Slack commenting on existing tickets
+  - web comments use the same backend as Slack comments
   - redis 'seen it' set is replaced with many keys, so they can expire
   - add 'Add to Grader' option
 
