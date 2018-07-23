@@ -256,7 +256,7 @@ def create_jira_ticket():
     """
     # get traceback id
     json_request = flask.request.get_json()
-    if json_request is None or 'traceback_text' not in json_request:
+    if json_request is None or 'origin_papertrail_id' not in json_request:
         logger.warning('invalid json detected: %s', json_request)
         return 'invalid json', 400
     origin_papertrail_id = json_request['origin_papertrail_id']
