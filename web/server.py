@@ -276,7 +276,7 @@ def jira_comment():
         Save a comment in jira with the latest hits on this traceback
 
         Takes a json payload with these fields:
-        - traceback_text: the text to find papertrail matches for
+        - origin_papertrail_id: the id of the traceback to find papertrail matches for
         - issue_key: the jira issue key on which to leave the comment
 
         The frontend is expecting this API to return a human readable string in the event of
@@ -287,42 +287,16 @@ def jira_comment():
     if json_request is None:
         logger.warning('no json detected: %s', json_request)
         return 'missing json', 400
-    if 'traceback_text' not in json_request:
+    if 'origin_papertrail_id' not in json_request:
         logger.warning('missing json field detected: %s', json_request)
-        return 'missing traceback_text', 400
+        return 'missing origin_papertrail_id', 400
     if 'issue_key' not in json_request:
         logger.warning('missing json field detected: %s', json_request)
         return 'missing issue_key', 400
-    traceback_text = json_request['traceback_text']
+    origin_papertrail_id = json_request['origin_papertrail_id']
     issue_key = json_request['issue_key']
-    issue = jira_issue_aservice.get_issue(issue_key)
 
-    # find a list of tracebacks that use the given traceback text
-    similar_tracebacks = traceback_database.get_matching_tracebacks(
-        ES, opentracing.tracer, traceback_text, es_util.EXACT_MATCH, 10000
-    )
-
-    # filter out any tracebacks that are after the latest one already on that ticket
-    latest = jira_issue_aservice.find_latest_referenced_id(issue)
-    if latest is not None:
-        tracebacks_to_comment = [tb for tb in similar_tracebacks
-                                 if int(tb.origin_papertrail_id) > latest][:50]
-    else:
-        # just take the them all
-        tracebacks_to_comment = similar_tracebacks
-    if tracebacks_to_comment:
-        logger.info('not saving comment - found %s hits but none were newer than %s',
-                    len(similar_tracebacks),
-                    latest)
-        return 'No comment created on %s. That ticket is already up to date' % issue_key
-    else:
-        logger.info('commenting with %s/%s hits',
-                    len(tracebacks_to_comment),
-                    len(similar_tracebacks))
-
-    # create a comment using the list of tracebacks
-    comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
-    jira_issue_aservice.create_comment(issue, comment)
+    api_aservice.create_comment_on_existing_ticket(ES, issue_key, origin_papertrail_id)
     url = jira_issue_aservice.get_link_to_issue(issue_key)
     return 'Created a comment on <a href="%s" class="alert-link">%s</a>' % (url, issue_key)
 

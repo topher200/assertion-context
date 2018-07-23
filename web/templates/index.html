@@ -5,7 +5,7 @@
     <a title="{{ issue.summary }}" href="{{ issue.url }}" data-toggle="tooltip" data-placement="auto bottom">
         {{ issue.key }}
     </a>
-    <button type="button" class="btn btn-default btn-xs"  onclick="jira_comment(this, '{{ issue.key }}', `{{ tb.traceback.traceback_text }}`)">
+    <button type="button" class="btn btn-default btn-xs"  onclick="jira_comment(this, '{{ issue.key }}', `{{ tb.traceback.origin_papertrail_id }}`)">
         <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Add Comment
     </button>
     {% if issue.status == 'Closed' %}

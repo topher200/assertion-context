@@ -49,10 +49,10 @@ function create_jira_ticket(traceback_button){
     });
 }
 
-function jira_comment(comment_button, issue_key, traceback_text) {
+function jira_comment(comment_button, issue_key, origin_papertrail_id) {
     comment_button.disabled = true;  // disable button during processing
     var payload = {
-        traceback_text: traceback_text,
+        origin_papertrail_id: origin_papertrail_id,
         issue_key: issue_key
     };
     $.ajax({
