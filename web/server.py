@@ -530,7 +530,7 @@ def after_request(response):
     # figure out how long the request took
     try:
         time_diff = time.time() - flask.g.start_time
-        time_diff_str = '%.2fs'
+        time_diff_str = '%.2fs' % time_diff
     except AttributeError:
         logger.warning('unable to log request timing')
         time_diff_str = 'UNKNOWN'
