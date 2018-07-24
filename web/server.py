@@ -517,22 +517,59 @@ def start_request():
     span.set_tag('method', flask.request.method)
     flask.g.tracer_root_span = span
 
+    # record the start time so we can calculate timing info after the request is done
+    flask.g.start_time = time.time()
+
+
 @app.after_request
 def after_request(response):
     """ End tracing and record a log after every request. """
     flask.g.tracer_root_span.finish()
 
+    # figure out how long the request took
+    try:
+        time_diff = time.time() - flask.g.start_time
+        time_diff_str = '%.2fs'
+    except AttributeError:
+        logger.warning('unable to log request timing')
+        time_diff_str = 'UNKNOWN'
+
     # This 'if' avoids the duplication of registry in the log, since that 500 is already logged via
     # @app.errorhandler.
     if response.status_code != 500:
         logger.info(
-            "finished %s '%s' request from %s. %s",
+            "finished %s '%s' request from %s in %s. %s",
             flask.request.method,
             flask.request.full_path,
             flask.request.remote_addr,
-            response.status
+            time_diff_str,
+            response.status,
         )
     return response
+
+
+@app.teardown_request
+def profile_request(_):
+    try:
+        time_diff = time.time() - flask.g.start_time
+    except AttributeError:
+        logger.warning('/%s: unable to log request timing', flask.g.endpoint)
+    else:
+        logger.info('/%s request took %.2fs', flask.g.endpoint, time_diff)
+    timings = []
+    for t in (
+            'time_tracebacks',
+            'time_hidden_tracebacks',
+            'jira_issues_time',
+            'similar_tracebacks_time',
+            'render_time'
+    ):
+        try:
+            timings.append('%s: %.2fs' % (t, flask.g.get(t)))
+        except TypeError:
+            pass  # info not present on this one
+    if timings:
+        logger.info(', '.join(timings))
 
 
 @app.errorhandler(Exception)
