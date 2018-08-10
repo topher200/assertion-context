@@ -256,11 +256,15 @@ def create_comment_on_existing_ticket(
         # latest one already on that ticket
         latest = jira_issue_aservice.find_latest_referenced_id(existing_issue)
         if latest is not None:
-            tracebacks_to_comment = [tb for tb in similar_tracebacks
-                                    if int(tb.origin_papertrail_id) > latest][:50]
+            tracebacks_to_comment = [
+                tb for tb in similar_tracebacks
+                if int(tb.origin_papertrail_id) > latest
+            ]
         else:
             # just take the them all
             tracebacks_to_comment = similar_tracebacks
+        logger.info('found latest papertrail id %s. taking %s tracebacks of %s total found',
+                    latest, len(tracebacks_to_comment), len(similar_tracebacks))
         comment = jira_issue_aservice.create_comment_with_hits_list(tracebacks_to_comment)
     else:
         # we need a full comment with the traceback description and all hits

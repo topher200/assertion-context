@@ -142,11 +142,11 @@ def create_comment_with_hits_list(tracebacks):
     """
         Creates a comment given the list of tracebacks
 
-        Sorts them so that the latest one is first
+        Sorts them so that the latest one is first. Only takes the 50 latest.
     """
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
     return COMMENT_TEMPLATE % (
-        traceback_formatter.create_hits_list(tracebacks, traceback_formatter.jira_formatted_string)
+        traceback_formatter.create_hits_list(tracebacks[:50], traceback_formatter.jira_formatted_string)
     )
 
 
