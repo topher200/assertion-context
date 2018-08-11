@@ -172,6 +172,7 @@ Enable Papertrail's "archive to s3" feature
   - http://help.papertrailapp.com/kb/how-it-works/automatic-s3-archive-export/
 
 ### Lambda
+## s3 Log File -> Application
 Create an SNS topic to trigger a Lambda function whenever a Papertrail log file
 is added to your s3 archive. The Lambda function should call our api
 (/api/parse_s3) with the bucket and key of the log file.
@@ -188,7 +189,7 @@ print('Loading function')
 
 s3 = boto3.client('s3')
 
-API_HOST_URL = 'http://ec2-8-8-8-8.compute-1.amazonaws.com'
+API_HOST_URL = # the URL of your app server
 API_ENDPOINT = '/api/parse_s3'
 API_REQUEST_URL = API_HOST_URL + API_ENDPOINT
 
@@ -210,4 +211,52 @@ def lambda_handler(event, context):
     else:
         print('Parse request received %s. data: "%s"' % (res.status_code, payload))
         raise Exception('parse request failed. payload: %s', payload)
+```
+
+## Jira ticket update -> Application
+Configure a webhook in Jira to send a message every time a Jira ticket is
+updated. Point that webhook at an API gateway. Point the API gateway at a lambda
+function like this:
+```
+import json
+
+import requests
+
+import config
+
+
+print('Loading function')
+
+API_HOST_URL = config.API_HOST_URL
+API_ENDPOINT = config.API_ENDPOINT
+API_REQUEST_URL = API_HOST_URL + API_ENDPOINT
+
+
+def lambda_handler(event, _):
+    print("Received event: " + json.dumps(event))
+
+    key = json.loads(event['body'])['issue']['key']
+    payload = {
+        'issue_key': key
+    }
+    print('making request: %s' % payload)
+    res = requests.put(API_REQUEST_URL, json=payload)
+    if res.status_code == 200:
+        print('Successfully updated "%s"' % key)
+    elif res.status_code == 202:
+        print('Successfully queued "%s"' % key)
+    else:
+        print(
+            'request failed. received response: %s. our payload: "%s"' %
+            (res.status_code, payload)
+        )
+        raise
+    
+    return {'key': key}
+```
+
+Where config.py is
+```
+API_HOST_URL = # the URL of your app server
+API_ENDPOINT = '/api/update_jira_db'
 ```
