@@ -28,10 +28,8 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap      assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
 	helm init --wait
-	helm install stable/redis                --name redis                --set usePassword=false                   --set master.persistence.size=80Gi
 	helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set rbac.clusterAdminRole=true
 	helm install stable/heapster             --name heapster
-	helm install incubator/jaeger            --name jaeger               --set provisionDataStore.cassandra=false  --set provisionDataStore.elasticsearch=true --namespace jaeger-infra --set query.service.type=NodePort --set storage.type=elasticsearch
 	$(MAKE) deploy-current-version
 
 .PHONY: cleanup-kubernetes
