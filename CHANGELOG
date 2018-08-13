@@ -5,6 +5,7 @@ Version 4.1.z
   - redis 'seen it' set is replaced with many keys, so they can expire
   - add 'Add to Grader' option
   - add timing info back into logs
+  - invalidate_cache is now a util
 
 Version 4.0.z
   - save jira issue 'created and updated' datetime to ES
