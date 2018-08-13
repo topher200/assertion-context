@@ -119,7 +119,7 @@ def hydrate_cache():
 
         This will speed up subsequent requests from real humans. No data is sent back.
     """
-    _ = api_aservice.render_main_page(ES, None, days_ago=0, filter_text='Has Ticket', set())
+    _ = api_aservice.render_main_page(ES, None, 0, Has Ticket', set())
 
 
 @app.task
