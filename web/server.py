@@ -99,10 +99,23 @@ def index():
     if filter_text is None:
         filter_text = 'All Tracebacks'
 
+    # create a set of traceback ids that match all the traceback texts the user has hidden
     span = flask.g.tracer_root_span
+    tracer = opentracing.tracer
+    with span_in_context(span):
+        # TODO: do we need to set something to declare what this span block is doing?
+        hidden_traceback_ids = set()
+        if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
+            for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
+                for tb in traceback_database.get_matching_tracebacks(
+                        ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
+                ):
+                    hidden_traceback_ids.add(tb.origin_papertrail_id)
+            logger.info('found %s traceback ids we need to hide', len(hidden_traceback_ids))
+
     with span_in_context(span):
         span.set_tag('filter', filter_text)
-        return api_aservice.render_main_page(ES, opentracing.tracer, days_ago_int, filter_text)
+        return api_aservice.render_main_page(ES, tracer, days_ago_int, filter_text, set())
 
 
 @app.route("/api/parse_s3", methods=['POST'])

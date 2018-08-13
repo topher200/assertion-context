@@ -23,7 +23,7 @@ def add_healthcheck_endpoint(app, ES, REDIS):
     health.add_check(redis_available)
 
     def main_page_renders():
-        res = api_aservice.render_main_page(ES, None, 0, 'No Ticket')
+        res = api_aservice.render_main_page(ES, None, 0, 'No Ticket', set())
         if res:
             return True, 'site ok'
         else:

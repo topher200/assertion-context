@@ -127,7 +127,7 @@ def get_tracebacks_for_day(
     return tb_meta
 
 
-def render_main_page(ES, tracer, days_ago:int, filter_text:str):
+def render_main_page(ES, tracer, days_ago:int, filter_text:str, hidden_traceback_ids:set):
     """
         Renders our index page with all the Trackbacks for the specified day and filter.
     """
@@ -138,18 +138,6 @@ def render_main_page(ES, tracer, days_ago:int, filter_text:str):
     today = datetime.datetime.now(pytz.timezone('US/Eastern')).date()
     date_to_analyze = today - datetime.timedelta(days=days_ago)
 
-    # create a set of tracebacks that match all the traceback texts the user has hidden
-    with tracer.start_span('determine hidden tracebacks', child_of=root_span) as span:
-        with span_in_context(span):
-            hidden_traceback_ids = set()
-            if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
-                for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
-                    for tb in traceback_database.get_matching_tracebacks(
-                            ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
-                    ):
-                        hidden_traceback_ids.add(tb.origin_papertrail_id)
-                logger.info('found %s traceback ids we need to hide', len(hidden_traceback_ids))
-
     tb_meta = get_tracebacks_for_day(ES, tracer, date_to_analyze, filter_text, hidden_traceback_ids)
 
     with tracer.start_span('render page', child_of=root_span) as span:
@@ -157,7 +145,7 @@ def render_main_page(ES, tracer, days_ago:int, filter_text:str):
             render = flask.render_template(
                 'index.html',
                 tb_meta=tb_meta,
-                show_restore_button=__user_has_hidden_tracebacks(),
+                show_restore_button=len(hidden_traceback_ids) > 0,
                 date_to_analyze=date_to_analyze,
                 days_ago=days_ago,
                 filter_text=filter_text
