@@ -5,12 +5,13 @@ metadata:
   labels:
     app: nginx
     tier: frontend
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30517
   selector:
     app: nginx
     tier: frontend
