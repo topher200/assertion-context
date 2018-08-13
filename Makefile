@@ -28,7 +28,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create configmap      assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
 	helm init --wait
-	helm install stable/kubernetes-dashboard --name kubernetes-dashboard --set rbac.clusterAdminRole=true
+	helm install stable/kubernetes-dashboard --name kubernetes-dashboard
 	helm install stable/heapster             --name heapster
 	$(MAKE) deploy-current-version
 
