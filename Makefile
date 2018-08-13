@@ -35,12 +35,12 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 .PHONY: cleanup-kubernetes
 cleanup-kubernetes:
 	helm ls --short | xargs helm delete --purge
-	-helm reset
-	-kubectl delete -f kubernetes-elasticsearch/
-	-kubectl delete -f kubernetes/
-	-kubectl delete configmap assertion-context-env-file
-	-kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
-	-kubectl delete secret papertrail-destination
+	helm reset
+	kubectl delete -f kubernetes-elasticsearch/
+	kubectl delete -f kubernetes/
+	kubectl delete configmap assertion-context-env-file
+	kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
+	kubectl delete secret papertrail-destination
 
 .PHONY: deploy-current-version
 deploy-current-version:
