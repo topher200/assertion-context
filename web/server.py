@@ -451,15 +451,6 @@ def invalidate_cache(cache=None):
     return 'success'
 
 
-@app.route("/api/hydrate_cache", methods=['PUT'])
-def hydrate_cache():
-    """
-        Invalidate all the dogpile function caches
-    """
-    _ = api_aservice.render_main_page(ES, opentracing.tracer, days_ago=0, filter_text=FILTERS[0])
-    return 'success'
-
-
 @app.route("/api/purge_celery_queue", methods=['PUT'])
 def purge_celery_queue():
     num_tasks = REDIS.llen('celery')

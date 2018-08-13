@@ -120,7 +120,7 @@ def hydrate_cache():
 
         This will speed up subsequent requests from real humans. No data is sent back.
     """
-    requests.put('http://nginx/api/hydrate_cache')
+    _ = api_aservice.render_main_page(ES, opentracing.tracer, days_ago=0, filter_text=FILTERS[0])
 
 
 @app.task
