@@ -7,7 +7,6 @@ import redis
 from elasticsearch import Elasticsearch
 import celery
 import certifi
-import requests
 
 from app import (
     api_aservice,
