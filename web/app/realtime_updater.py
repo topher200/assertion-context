@@ -13,9 +13,9 @@ import sys
 sys.path.append(ROOT)
 
 from app import (
+    cache_util,
     json_parser,
     tasks,
-    tasks_util,
     traceback_database,
     time_util,
 )
@@ -58,7 +58,7 @@ def run(ES, start_time, end_time):
 
     if count > 0:
         logger.info('invalidating traceback cache')
-        tasks_util.invalidate_cache('traceback')
+        cache_util.invalidate_cache('traceback')
 
     if api_calls:
         logger.info('saving %s api calls', len(api_calls))

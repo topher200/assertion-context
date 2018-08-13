@@ -26,6 +26,7 @@ from opentracing_instrumentation.request_context import span_in_context
 
 from app import (
     api_aservice,
+    cache_util,
     es_util,
     healthz,
     jira_issue_aservice,
@@ -438,7 +439,7 @@ def update_jira_db():
     if 'issue_key' in json_request:
         # save the given issue to ES
         issue_key = json_request['issue_key']
-        tasks.update_jira_issue.delay(issue_key, invalidate_cache=True)
+        tasks.update_jira_issue.delay(issue_key, do_invalidate_cache=True)
         return 'job queued', 202
     else:
         if json_request['all'] != True:
@@ -452,15 +453,9 @@ def update_jira_db():
 @app.route("/api/invalidate_cache/<cache>", methods=['PUT'])
 def invalidate_cache(cache=None):
     """
-        Invalidate all the dogpile function caches
+        Invalidate all (or a subset of) the dogpile function caches.
     """
-    if cache is None or cache == 'traceback':
-        logger.info('invalidating traceback cache')
-        traceback_database.invalidate_cache()
-    if cache is None or cache == 'jira':
-        logger.info('invalidating jira cache')
-        jira_issue_db.invalidate_cache()
-    tasks.hydrate_cache.apply_async(tuple(), expires=60) # expire after a minute
+    cache_util.invalidate_cache(cache)
     return 'success'
 
 
