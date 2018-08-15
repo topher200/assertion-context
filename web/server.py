@@ -231,8 +231,8 @@ def realtime_update():
     realtime_updater.enqueue(end_time)
 
     # this isn't exactly the best time to post to slack (since it won't include anything from this
-    # realtime_update call), but it's as good a time as any
-    tasks.post_unticketed_tracebacks_to_slack.delay()
+    # realtime_update call), but it's as good a time as any. we expire this after a minute
+    tasks.post_unticketed_tracebacks_to_slack.apply_async(tuple(), expires=60)
     return 'job queued', 202
 
 
