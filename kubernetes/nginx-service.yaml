@@ -7,6 +7,9 @@ metadata:
     tier: frontend
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "10"
+
 spec:
   type: LoadBalancer
   ports:
