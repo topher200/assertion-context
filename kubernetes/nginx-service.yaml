@@ -9,6 +9,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
     service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "10"
+    service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "sg-01799ea6e3270e341"
 
 spec:
   type: LoadBalancer
