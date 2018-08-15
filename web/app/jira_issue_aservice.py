@@ -307,11 +307,21 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
 
 def get_all_referenced_ids(issue:JiraIssue) -> Iterator[int]:
     """
-        Look through the comments and description and find all papertrail ids that are referenced
+        Look through the comments and description and find all papertrail ids that are referenced.
+
+        Note that we might yield the same ID more than once.
 
         @return: yields individual ids as ints
     """
+    # look for the 'old' pattern, which is what you get when you copy/paste from papertrail
     pattern = '(?:focus|centered_on_id)=(\d{18})'
+    for match in re.findall(pattern, issue.description):
+        yield int(match)
+    for match in re.findall(pattern, issue.comments):
+        yield int(match)
+
+    # look for my super fancy new pattern. we could make these be one check, but this is simpler
+    pattern = 'traceback/(\d{18})'
     for match in re.findall(pattern, issue.description):
         yield int(match)
     for match in re.findall(pattern, issue.comments):
