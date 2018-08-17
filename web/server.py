@@ -339,7 +339,7 @@ def jira_formatted_list(traceback_origin_id):
 
     # find a list of tracebacks that use the given traceback text
     tracebacks = traceback_database.get_matching_tracebacks(
-        ES, opentracing.tracer, tb.traceback_text, es_util.EXACT_MATCH, 10000
+        ES, opentracing.tracer, tb.traceback_text, es_util.EXACT_MATCH, 100
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)
 

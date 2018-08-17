@@ -60,7 +60,7 @@ def refresh(es):
 
 @DOGPILE_REGION.cache_on_arguments()
 @retry.Retry(exceptions=(elasticsearch.exceptions.ConnectionTimeout,))
-def get_tracebacks(es, tracer, start_date=None, end_date=None, num_matches=10000):
+def get_tracebacks(es, tracer, start_date=None, end_date=None, num_matches=100):
     """
         Queries the database for L{Traceback} from a given date range.
 
