@@ -54,10 +54,16 @@ COMMENT_TEMPLATE = '''Errors observed in production:
         - a list of instances of this traceback
 """
 
-JIRA_CLIENT = jira.JIRA(
-    server=JIRA_SERVER,
-    basic_auth=(JIRA_BASIC_AUTH_USERNAME, JIRA_BASIC_AUTH_PASSWORD),
-)
+__JIRA_CLIENT_SINGLETON = None
+def GetJiraClient():
+    global __JIRA_CLIENT_SINGLETON
+    if __JIRA_CLIENT_SINGLETON is None:
+        __JIRA_CLIENT_SINGLETON = jira.JIRA(
+            server=JIRA_SERVER,
+            basic_auth=(JIRA_BASIC_AUTH_USERNAME, JIRA_BASIC_AUTH_PASSWORD),
+        )
+    return __JIRA_CLIENT_SINGLETON
+
 JIRA_PROJECT_KEY = JIRA_PROJECT_KEY
 
 COMMENT_SEPARATOR = '\n!!!newcomment!!!\n'
@@ -154,7 +160,7 @@ def create_comment(issue, comment_string):
     """
         Leaves the given comment on the issue
     """
-    JIRA_CLIENT.add_comment(issue.key, comment_string)
+    GetJiraClient().add_comment(issue.key, comment_string)
     logger.info('added comment to issue: %s', issue.key)
 
 
@@ -199,7 +205,7 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         fields['assignee'] = {'name': assignee}
         fields['components'] = [{'name': component}] # type: ignore # jira API is weird
 
-    issue = JIRA_CLIENT.create_issue(fields=fields)
+    issue = GetJiraClient().create_issue(fields=fields)
     return issue.key
 
 
@@ -213,7 +219,7 @@ def get_issue(key:str) -> Optional[JiraIssue]:
         @rtype: JiraIssue or None
     """
     try:
-        return jira_api_object_to_JiraIssue(JIRA_CLIENT.issue(key))
+        return jira_api_object_to_JiraIssue(GetJiraClient().issue(key))
     except jira.exceptions.JIRAError as e:
         logger.warning('failure accessing issue %s. is it deleted?\n%s', key, e)
         return None
@@ -235,7 +241,7 @@ def get_all_issues() -> Iterator[jira.resources.Issue]:
     start_at = 0
     BATCH_SIZE = 50
     while True:
-        new_results = JIRA_CLIENT.search_issues(
+        new_results = GetJiraClient().search_issues(
             'project=%s' % JIRA_PROJECT_KEY,
             startAt=start_at,
             maxResults=BATCH_SIZE,
