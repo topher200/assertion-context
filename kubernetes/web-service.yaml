@@ -7,7 +7,8 @@ metadata:
     tier: frontend
 spec:
   ports:
-  - port: 8000
+  - name: flask-web-server
+    port: 8000
     targetPort: 8000
   selector:
     app: web
