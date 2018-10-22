@@ -34,7 +34,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f prometheus-manifests/
 
-	echo install itsio
+	echo install istio
 	kubectl label namespace default istio-injection=enabled
 
 	echo install helm
@@ -53,6 +53,7 @@ cleanup-kubernetes:
 	kubectl delete configmap assertion-context-env-file
 	kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
 	kubectl delete secret papertrail-destination
+	kubectl delete namespace default
 
 .PHONY: deploy-current-version
 deploy-current-version:

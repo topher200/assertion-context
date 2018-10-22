@@ -1,5 +1,5 @@
 Version 5.0.z
-  - add prometheus and itsio monitoring
+  - add prometheus and istio monitoring
   - new 'requests' version
 
 Version 4.1.z
