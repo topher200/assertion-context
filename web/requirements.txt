@@ -17,5 +17,8 @@ jira==1.0.10
 opentracing_instrumentation==2.4.1
 pytz
 redis==2.10.5
-requests==2.20.0
+requests==2.18.4
 simplejson==3.10.0
+# we're explicitly versioning urllib3 to force a correct version for
+# requests/elasticsearch. try removing this later
+urllib3==1.22
