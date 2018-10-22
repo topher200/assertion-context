@@ -1,3 +1,7 @@
+Version 5.0.z
+  - add prometheus and itsio monitoring
+  - new 'requests' version
+
 Version 4.1.z
   - include jira ticket with Slack postings
   - support Slack commenting on existing tickets
