@@ -27,6 +27,14 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
 	kubectl create configmap      assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
+
+	echo install prometheus, from https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
+	kubectl create -f prometheus-manifests/
+	until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+	kubectl create -f prometheus-manifests/
+
+	echo install helm
 	helm init --wait
 	helm install stable/kubernetes-dashboard --name kubernetes-dashboard
 	helm install stable/heapster             --name heapster
@@ -36,6 +44,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 cleanup-kubernetes:
 	helm ls --short | xargs helm delete --purge
 	helm reset
+	kubectl delete -f prometheus-manifests/
 	kubectl delete -f kubernetes-elasticsearch/
 	kubectl delete -f kubernetes/
 	kubectl delete configmap assertion-context-env-file
