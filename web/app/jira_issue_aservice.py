@@ -55,9 +55,10 @@ COMMENT_TEMPLATE = '''Errors observed in production:
 """
 
 __JIRA_CLIENT_SINGLETON = None
-def GetJiraClient():
+def JiraClient():
     global __JIRA_CLIENT_SINGLETON
     if __JIRA_CLIENT_SINGLETON is None:
+        # can thrown requests.exceptions.SSLError
         __JIRA_CLIENT_SINGLETON = jira.JIRA(
             server=JIRA_SERVER,
             basic_auth=(JIRA_BASIC_AUTH_USERNAME, JIRA_BASIC_AUTH_PASSWORD),
@@ -160,7 +161,7 @@ def create_comment(issue, comment_string):
     """
         Leaves the given comment on the issue
     """
-    GetJiraClient().add_comment(issue.key, comment_string)
+    JiraClient().add_comment(issue.key, comment_string)
     logger.info('added comment to issue: %s', issue.key)
 
 
@@ -205,7 +206,7 @@ def create_jira_issue(title:str, description:str, assign_to:AssignToTeam) -> str
         fields['assignee'] = {'name': assignee}
         fields['components'] = [{'name': component}] # type: ignore # jira API is weird
 
-    issue = GetJiraClient().create_issue(fields=fields)
+    issue = JiraClient().create_issue(fields=fields)
     return issue.key
 
 
@@ -219,7 +220,7 @@ def get_issue(key:str) -> Optional[JiraIssue]:
         @rtype: JiraIssue or None
     """
     try:
-        return jira_api_object_to_JiraIssue(GetJiraClient().issue(key))
+        return jira_api_object_to_JiraIssue(JiraClient().issue(key))
     except jira.exceptions.JIRAError as e:
         logger.warning('failure accessing issue %s. is it deleted?\n%s', key, e)
         return None
@@ -241,7 +242,7 @@ def get_all_issues() -> Iterator[jira.resources.Issue]:
     start_at = 0
     BATCH_SIZE = 50
     while True:
-        new_results = GetJiraClient().search_issues(
+        new_results = JiraClient().search_issues(
             'project=%s' % JIRA_PROJECT_KEY,
             startAt=start_at,
             maxResults=BATCH_SIZE,
