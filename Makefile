@@ -34,13 +34,22 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f prometheus-manifests/
 
-	echo install istio
+	echo add istio sidecar
 	kubectl label namespace default istio-injection=enabled
 
 	echo install helm
 	helm init --wait
 	helm install stable/kubernetes-dashboard --namespace kube-system --name kubernetes-dashboard
 	helm install stable/heapster             --namespace kube-system --name heapster
+
+	echo deploy tiller
+	kubectl apply -f kubernetes-istio/helm-service-account.yaml
+	helm init --service-account tiller
+
+	echo deploy istio
+	helm install kubernetes-istio/istio-1.0.2 --name istio --namespace istio-system --set tracing.enabled=true
+
+	echo deploy app
 	$(MAKE) deploy-current-version
 
 .PHONY: cleanup-kubernetes
