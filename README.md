@@ -260,3 +260,9 @@ Where config.py is
 API_HOST_URL = # the URL of your app server
 API_ENDPOINT = '/api/update_jira_db'
 ```
+
+## Istio
+The istio template was created with this command:
+```
+helm template istio-1.0.2/install/kubernetes/helm/istio --name istio --namespace istio-system --set tracing.enabled=true --set global.proxy.includeIPRanges="109.96.0.1/16" -x templates/sidecar-injector-configmap.yaml > kubernetes-istio/istio.yaml
+```
