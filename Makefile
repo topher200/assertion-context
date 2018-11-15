@@ -39,8 +39,8 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 
 	echo install helm
 	helm init --wait
-	helm install stable/kubernetes-dashboard --name kubernetes-dashboard
-	helm install stable/heapster             --name heapster
+	helm install stable/kubernetes-dashboard --namespace kube-system --name kubernetes-dashboard
+	helm install stable/heapster             --namespace kube-system --name heapster
 	$(MAKE) deploy-current-version
 
 .PHONY: cleanup-kubernetes
