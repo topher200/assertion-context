@@ -1,3 +1,6 @@
+Version 5.1.z
+  - add socket_timeout to StrictRedis for the healthz endpoint
+
 Version 5.0.z
   - add prometheus and istio monitoring
   - new 'requests' version
