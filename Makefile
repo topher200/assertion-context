@@ -41,6 +41,9 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	helm install stable/heapster             --namespace kube-system --name heapster
 	$(MAKE) deploy-current-version
 
+	echo install jaeger
+	helm install incubator/jaeger --name jaeger --namespace jaeger-infra --set query.service.type=NodePort --set elasticsearch.rbac.create=true --set storage.type=elasticsearch --set elasticsearch.data.persistence.enabled=true --set provisionDataStore.elasticsearch=true --set provisionDataStore.cassandra=false
+
 .PHONY: cleanup-kubernetes
 cleanup-kubernetes:
 	helm ls --short | xargs helm delete --purge
