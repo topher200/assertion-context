@@ -1,6 +1,6 @@
 Version 5.1.z
   - add socket_timeout to StrictRedis for the healthz endpoint
-  - migrate to py-healthcheck
+  - upgrade 'healthcheck' version
 
 Version 5.0.z
   - add prometheus and istio monitoring
