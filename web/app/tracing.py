@@ -17,7 +17,8 @@ def initialize_tracer():
                 'reporting_host': JAEGER_REPORTING_HOST,
             }
         },
-        service_name='tracebacks'
+        service_name='tracebacks',
+        validate=True,
     )
 
     return config.initialize_tracer() # also sets opentracing.tracer
