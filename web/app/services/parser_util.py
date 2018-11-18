@@ -57,10 +57,22 @@ class ParserUtil():
         program_name = log_line_pieces[8]
         parsed_log_message = log_line_pieces[9]
 
-        # handle the timestamp, whether it includes a timezone or not
-        timestamp_ignoring_timezone = datetime.datetime.strptime(
-            timestamp_string[:19], '%Y-%m-%dT%H:%M:%S'
-        )
+        # handle the timestamp. there's two sets of differences that may occur:
+        # 1. sometimes there's a "T" in the middle of the timestamp, sometimes it's a space instead
+        # 2. sometimes a timezone will be included, sometimes it will not
+        # we handle all possible cases below.
+
+        # 1. handle things differently if we see the 'T'
+        if 'T' in timestamp_string:
+            timestamp_ignoring_timezone = datetime.datetime.strptime(
+                timestamp_string[:19], '%Y-%m-%dT%H:%M:%S'
+            )
+        else:
+            timestamp_ignoring_timezone = datetime.datetime.strptime(
+                timestamp_string[:19], '%Y-%m-%d %H:%M:%S'
+            )
+
+        # 2. if we have a timezone, apply it
         timezone_string = timestamp_string[19:]
         if timezone_string == '':
             # no timezone string == UTC

@@ -1,4 +1,5 @@
 Version 5.1.z
+  - handle timestamps with missing 'T'
   - add socket_timeout to StrictRedis for the healthz endpoint
   - upgrade 'healthcheck' version
 
