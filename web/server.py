@@ -72,9 +72,6 @@ KVSessionExtension(prefixed_store, app)
 # config
 DEBUG_TIMING = True
 
-# add tracing
-tracing.initialize_tracer()
-
 # add route to /healthz healthchecks
 healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
@@ -488,6 +485,12 @@ def admin():
         num_celery_tasks=num_celery_tasks,
         error=error,
     )
+
+
+@app.before_first_request
+def before_first_request():
+    # add tracing
+    tracing.initialize_tracer()
 
 
 @app.before_request
