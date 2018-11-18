@@ -47,7 +47,8 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	helm init --service-account tiller
 
 	echo deploy istio
-	helm install kubernetes-istio/istio-1.0.2 --name istio --namespace istio-system --set tracing.enabled=true
+	helm install kubernetes-istio/istio-1.0.2 --name istio --namespace istio-system --set tracing.enabled=true --set grafana.enabled=true --set pilot.traceSampling=100.0
+	kubectl apply -f kubernetes-istio
 
 	echo deploy app
 	$(MAKE) deploy-current-version
