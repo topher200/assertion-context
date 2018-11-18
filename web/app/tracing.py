@@ -1,5 +1,6 @@
 from opentracing_instrumentation.client_hooks import install_all_patches
 import jaeger_client
+from jaeger_client.metrics.prometheus import PrometheusMetricsFactory
 
 from . import config_util
 
@@ -19,6 +20,7 @@ def initialize_tracer():
         },
         service_name='tracebacks',
         validate=True,
+        metrics_factory=PrometheusMetricsFactory(namespace='tracebacks'),
     )
 
     return config.initialize_tracer() # also sets opentracing.tracer
