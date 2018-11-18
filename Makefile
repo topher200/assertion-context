@@ -34,9 +34,6 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
 	kubectl create -f prometheus-manifests/
 
-	echo install istio
-	kubectl label namespace default istio-injection=enabled
-
 	echo install helm
 	helm init --wait
 	helm install stable/kubernetes-dashboard --namespace kube-system --name kubernetes-dashboard
