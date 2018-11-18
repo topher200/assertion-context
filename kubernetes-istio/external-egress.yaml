@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-egressgateway
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - vpc-stats-from-logs-6-0-xiffda5pw6howr5u6wxxwkkkby.us-east-1.es.amazonaws.com
+    - tracebacks-aug2018.hyjatr.ng.0001.use1.cache.amazonaws.com
