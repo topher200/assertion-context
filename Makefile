@@ -27,6 +27,7 @@ fresh-deploy-to-k8s: cleanup-kubernetes
 	kubectl create -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'
 	kubectl create configmap      assertion-context-env-file --from-env-file .env
 	kubectl create -f kubernetes/
+	source .env && sed -e s@AWS_SSL_CERT@$AWS_SSL_CERT@ -e s@AWS_EXTRA_SECURITY_GROUP@$AWS_EXTRA_SECURITY_GROUP@ kubernetes/nginx-service.yaml | kubectl apply -f -
 
 	echo install prometheus, from https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus
 	kubectl create -f prometheus-manifests/

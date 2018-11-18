@@ -47,6 +47,10 @@ S3_KEY_PREFIX = <prefix of papertrail logs in s3. example: 'papertrail/logs'>
 AWS_ACCESS_KEY_ID=ASDFKJ87979898798798
 AWS_SECRET_ACCESS_KEY=DFnkjdfkjdkFJDKFJkdsjfDFJKJKDFjkdfjkddkk # to download papertrail archives from s3
 AWS_REGION=us-east-1 # to download papertrail archives from s3
+
+# configuring the nginx AWS load balancer
+AWS_SSL_CERT=arn:aws:acm:us-east-1:00000000000000:certificate/00000000-0000-0000-0000-000000000000
+AWS_EXTRA_SECURITY_GROUP=sg-00000000000000
 ```
  - fill out .env.papertrail with config variables. requires these fields:
 ```

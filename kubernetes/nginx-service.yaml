@@ -6,16 +6,25 @@ metadata:
     app: nginx
     tier: frontend
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: http
     service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
     service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "10"
-    service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "sg-01799ea6e3270e341"
-
+    service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: AWS_EXTRA_SECURITY_GROUP
+    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: AWS_SSL_CERT
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 443,8443
 spec:
   type: LoadBalancer
   ports:
-  - name: nginx-web-app-proxy
+  - name: http-nginx
+    nodePort: 32500
     port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https-nginx
+    nodePort: 32507
+    port: 443
+    protocol: TCP
     targetPort: 80
   selector:
     app: nginx
