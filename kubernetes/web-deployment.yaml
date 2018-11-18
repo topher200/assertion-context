@@ -23,11 +23,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: assertion-context-env-file
-          env:
-            - name: JAEGER_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
           readinessProbe:
             httpGet:
               path: /healthz
