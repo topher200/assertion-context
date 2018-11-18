@@ -12,9 +12,9 @@ flask-bootstrap==3.3.7.1
 flask==0.11.1
 gevent==1.1.2
 healthcheck==1.3.3
-jaeger-client==3.9.0
+jaeger-client==3.12.0
 jira==1.0.10
-opentracing_instrumentation==2.4.1
+opentracing_instrumentation==2.4.3
 pytz
 redis==2.10.5
 requests==2.18.4
