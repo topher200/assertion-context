@@ -34,9 +34,6 @@ app = celery.Celery('tasks', broker='redis://'+REDIS_ADDRESS)
 ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
 REDIS = redis.StrictRedis(host=REDIS_ADDRESS)
 
-# add tracing
-tracer = tracing.initialize_tracer()
-
 logger = logging.getLogger()
 
 
@@ -172,6 +169,9 @@ def tell_slack_about_updated_jira_ticket(ticket_id:str):
 @celery.signals.setup_logging.connect
 def setup_logging(*_, **__):
     logging_util.setup_logging()
+
+    # add tracing
+    tracer = tracing.initialize_tracer()
 
 
 __SEEN_TRACEBACKS_KEY = 'seen_tracebacks:{traceback_id}'
