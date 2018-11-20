@@ -327,6 +327,7 @@ def jira_formatted_list(traceback_origin_id):
         The frontend is expecting this API to return a human readable string in the event of
         success (200 response code)
     """
+    assert False
     try:
         traceback_id = int(traceback_origin_id)
     except ValueError:
