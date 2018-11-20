@@ -53,7 +53,14 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     url = __FULLSTORY_SESSIONS_GET_API.format(
         profile_name=t.profile_name, limit=__FULLSTORY_SESSIONS_LIMIT)
     headers = {'Authorization': 'Basic %s' % __FULLSTORY_AUTH_TOKEN}
-    sessions = requests.get(url, headers=headers).json()
+    try:
+        sessions = None
+        response = requests.get(url, headers=headers)
+        sessions = response.json()
+        assert isinstance(sessions, dict)
+        assert all('CreatedTime' in s for s in sessions), sessions
+    except Exception:
+        assert 'Received response "%s", tried to parse sessions but got "%s"' % (response, sessions)
 
     logger.info('Found %s sessions for %s', len(sessions), t.profile_name)
     # Example of the 'sessions' object from fullstory:
