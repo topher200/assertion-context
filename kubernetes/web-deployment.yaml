@@ -4,6 +4,11 @@ metadata:
   name: web
 spec:
   replicas: 6
+  strategy:
+    rollingUpdate:
+      maxSurge: 10
+      maxUnavailable: 2
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -11,7 +16,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - image: topher200/assertion-context:2.1.27
+        - image: topher200/assertion-context:5.1.9
           name: web
           ports:
             - containerPort: 8000
