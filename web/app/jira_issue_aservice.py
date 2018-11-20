@@ -306,7 +306,7 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
         comments_text,
         comments_filtered,
         jira_object.fields.issuetype.name,
-        jira_object.fields.assignee.displayName,
+        jira_object.fields.assignee.displayName if jira_object.fields.assignee else None,
         jira_object.fields.status.name,
         jira_object.fields.created,
         jira_object.fields.updated,
