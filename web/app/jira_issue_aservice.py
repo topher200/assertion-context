@@ -297,6 +297,8 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
     description_filtered = __strip_papertrail_metadata(description)
     comments_filtered = __strip_papertrail_metadata(comments_text)
 
+    assert False, jira_object
+
     return JiraIssue(
         jira_object.key,
         get_link_to_issue(jira_object.key),
