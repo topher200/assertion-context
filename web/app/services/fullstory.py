@@ -58,6 +58,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
         response = requests.get(url, headers=headers)
         sessions = response.json()
         assert isinstance(sessions, dict), sessions
+        assert all(isinstance(s, dict) for s in sessions), sessions
         assert all('CreatedTime' in s for s in sessions), sessions
     except Exception:
         assert 'Made request %s, received response "%s", tried to parse sessions but got "%s"' % (
