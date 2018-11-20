@@ -21,6 +21,6 @@ RUN gem install papertrail
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./ /code
+COPY . /code
 
 CMD ["python", "server.py"]
