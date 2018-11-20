@@ -16,7 +16,7 @@ def invalidate_cache():
 
 __FULLSTORY_AUTH_TOKEN = config_util.get('FULLSTORY_AUTH_TOKEN')
 
-__EIGHT_HOURS_IN_SECONDS = 60 * 60 * 8
+__ONE_HOUR_IN_SECONDS = 60 * 60
 
 __FULLSTORY_SESSIONS_GET_API = 'https://www.fullstory.com/api/v1/sessions?uid={profile_name}&limit={limit}'
 """
@@ -47,7 +47,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
         Returns None if...
         - t.profile_name is None
         - we can't find a session that happened before the error
-        - the error time and the session start time are more than __EIGHT_HOURS_IN_SECONDS
+        - the error time and the session start time are more than __ONE_HOUR_IN_SECONDS
     """
     if not t.profile_name: return None
 
@@ -68,7 +68,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
         logger.info('No eligible sessions found')
         return None # unable to find a qualified session
 
-    if epoch_timestamp_seconds - most_recent_session['CreatedTime'] > __EIGHT_HOURS_IN_SECONDS:
+    if epoch_timestamp_seconds - most_recent_session['CreatedTime'] > __ONE_HOUR_IN_SECONDS:
         logger.info(
             'The closest session start time (%s) was too far in the past of error time (%s)',
             most_recent_session['CreatedTime'],
