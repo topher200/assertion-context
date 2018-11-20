@@ -2,7 +2,7 @@
 FROM python:3.6
 MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
-RUN echo 'set -o vi' >> /root/.bashrc
+RUN echo 'set -o vi\nalias ll="ls -al"' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1
 
 # set my timezone to eastern, so we send our company's standard time to papertrail
