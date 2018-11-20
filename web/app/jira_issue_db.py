@@ -47,10 +47,6 @@ def save_jira_issue(es, jira_issue:JiraIssue):
     assert isinstance(jira_issue, JiraIssue), (type(jira_issue), jira_issue)
 
     doc = jira_issue.document()
-    if 'assignee' in doc:
-        assert False, 'yay %s' % doc
-    else:
-        assert False, doc
     res = es.index(
         index=INDEX,
         doc_type=DOC_TYPE,
