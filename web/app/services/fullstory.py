@@ -56,6 +56,8 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     try:
         sessions = None
         response = requests.get(url, headers=headers)
+        if 'no such user' in response.text:
+            return None
         sessions = response.json()
         assert isinstance(sessions, list), sessions
         assert all(isinstance(s, dict) for s in sessions), sessions
