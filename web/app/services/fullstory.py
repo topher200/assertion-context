@@ -6,7 +6,13 @@ import requests
 from ..traceback import Traceback
 from .. import (
     config_util,
+    redis_util,
 )
+
+REGION_PREFIX = 'dogpile:fullstory'
+DOGPILE_REGION = redis_util.make_dogpile_region(REGION_PREFIX)
+def invalidate_cache():
+    redis_util.force_redis_cache_invalidation(REGION_PREFIX)
 
 __FULLSTORY_AUTH_TOKEN = config_util.get('FULLSTORY_AUTH_TOKEN')
 
@@ -74,6 +80,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     link_to_session = '%s:%d' % (most_recent_session['FsUrl'], timestamp_in_millis)
     return link_to_session
 
+@DOGPILE_REGION.cache_on_arguments()
 def __get_sessions(profile_name:str) -> list:
     """
         Returns the fullstory sessions for this profile

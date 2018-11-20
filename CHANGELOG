@@ -1,3 +1,6 @@
+Version 5.2.z
+  - add links to fullstory to output
+
 Version 5.1.z
   - handle timestamps with missing 'T'
   - add socket_timeout to StrictRedis for the healthz endpoint
