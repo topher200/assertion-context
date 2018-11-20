@@ -15,6 +15,7 @@ class JiraIssue():
         - string of all the issue's comments, concatinated together, with any papertrail metadata
           filtered out
         - the type of the issue (bug, story, etc)
+        - the name of the assignee of the issue
         - the current status of the issue
         - the created datetime of the issue
         - the last updated datetime of the issue
@@ -29,6 +30,7 @@ class JiraIssue():
             comments,
             comments_filtered,
             issue_type,
+            assignee,
             status,
             created,
             updated,
@@ -41,6 +43,7 @@ class JiraIssue():
         self._comments = comments
         self._comments_filtered = comments_filtered
         self._issue_type = issue_type
+        self._assignee = assignee
         self._status = status
         self._created = created
         self._updated = updated
@@ -81,6 +84,10 @@ class JiraIssue():
         return self._issue_type
 
     @property
+    def assignee(self):
+        return self._assignee
+
+    @property
     def status(self):
         return self._status
 
@@ -107,6 +114,7 @@ class JiraIssue():
             "comments": self._comments,
             "comments_filtered": self._comments_filtered,
             "issue_type": self._issue_type,
+            "assignee": self._assignee,
             "status": self._status,
             "created": self._created,
             "updated": self._updated,
@@ -138,6 +146,7 @@ def generate_from_source(source:dict) -> JiraIssue:
         source["comments"],
         source["comments_filtered"],
         source["issue_type"],
+        source["assignee"],
         source["status"],
         created,
         updated,
