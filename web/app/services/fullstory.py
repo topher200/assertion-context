@@ -81,7 +81,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     return link_to_session
 
 @DOGPILE_REGION.cache_on_arguments()
-def __get_sessions(profile_name:str) -> list:
+def __get_sessions(profile_name):
     """
         Returns the fullstory sessions for this profile
 
@@ -96,6 +96,10 @@ def __get_sessions(profile_name:str) -> list:
                 'UserId': 5721800000000000
             }
         ]
+
+        @type profile_name: str
+        @rtype: list
+        @postcondition: all(isinstance(r, dict) for r in return)
     """
     url = __FULLSTORY_SESSIONS_GET_API.format(
         profile_name=profile_name, limit=__FULLSTORY_SESSIONS_LIMIT)
