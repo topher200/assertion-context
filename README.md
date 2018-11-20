@@ -30,6 +30,9 @@ DEBUG_LOGGING = False  # enables logging to file, very verbose
 # token for Papertrail CLI access. used by realtime-updater
 PAPERTRAIL_API_TOKEN=123456789012345678901234567890ab
 
+# token for FullStory access. used to create links to FullStory
+FULLSTORY_AUTH_TOKEN=123456789012345678901234567890ab
+
 # databases/storage
 ES_ADDRESS = <url to ElasticSearch database>
 REDIS_ADDRESS = <url to Redis database>

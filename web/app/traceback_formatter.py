@@ -6,6 +6,7 @@ from .traceback import Traceback
 from . import (
     config_util,
 )
+from .services import fullstory
 
 logger = logging.getLogger()
 
@@ -31,6 +32,15 @@ PAPERTRAIL_LINK_SLACK_TEMPLATE = "<{kibana_redirect_url}/api/traceback/{papertra
     - timestamp, from TIMESTAMP_TEMPLATE
     - a link to a service that redirects to kibana. example: 'https://kibana-redirect.company.com'
     - the papertrail id document to open. example: '926890000000000000'
+"""
+
+FULLSTORY_LINK_JIRA_TEMPLATE = "[FullStory|{fullstory_link}]"
+FULLSTORY_LINK_SLACK_TEMPLATE = "{fullstory_link}|FullStory"
+"""
+    A template for a link to FullStory.
+
+    Caller must provide:
+    - fullstory_link, a url string that points to the FullStory session
 """
 
 PROFILE_NAME_JIRA_TEMPLATE = "[{profile_name}|{product_url}/admin/profile/{profile_name}]"
@@ -60,6 +70,7 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
 
         We have four parts to our formatted string:
         - a timestamp, with a link to our papertrail/kibana redirect service
+        - a link to fullstory. may not exist
         - a profile name, with a link to the product's profile. may not exist
         - a user name, with a link to the product's user. may not exist
 
@@ -79,7 +90,7 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
         if include_profile_link:
             profile_str = PROFILE_NAME_JIRA_TEMPLATE.format(
                 profile_name=t.profile_name,
-                product_url=PRODUCT_URL
+                product_url=PRODUCT_URL,
             )
         else:
             profile_str = t.profile_name
@@ -88,15 +99,23 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
         if include_user_link:
             user_str = USERNAME_JIRA_TEMPLATE.format(
                 username=t.username,
-                product_url=PRODUCT_URL
+                product_url=PRODUCT_URL,
             )
         else:
             user_str = t.username
+
+    # link to fullstory
+    fullstory_link = fullstory.get_link_to_session_at_traceback_time(t)
+    if fullstory_link:
+        fullstory_str = FULLSTORY_LINK_JIRA_TEMPLATE.format(
+            fullstory_link=fullstory_link,
+        )
 
     # put it all together
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
+            fullstory_str,
             profile_str,
             user_str,
         ) if s is not None
@@ -107,10 +126,11 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
 
 def slack_formatted_string(t: Traceback, include_profile_link: bool, include_user_link: bool) -> str:
     """
-        Given a traceback, returns a well formatting string in Slacks bad formatting
+        Given a traceback, returns a well formatting string in Slack's formatting
 
         We have four parts to our formatted string:
         - a timestamp, with a link to our papertrail/kibana redirect service
+        - a link to fullstory. may not exist
         - a profile name, with a link to the product's profile. may not exist
         - a user name, with a link to the product's user. may not exist
     """
@@ -141,10 +161,18 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
         else:
             user_str = t.username
 
+    # link to fullstory
+    fullstory_link = fullstory.get_link_to_session_at_traceback_time(t)
+    if fullstory_link:
+        fullstory_str = FULLSTORY_LINK_SLACK_TEMPLATE.format(
+            fullstory_link=fullstory_link,
+        )
+
     # put it all together
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
+            fullstory_str,
             profile_str,
             user_str,
         ) if s is not None
