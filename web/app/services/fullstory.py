@@ -70,7 +70,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
 
     if epoch_timestamp_seconds - most_recent_session['CreatedTime'] > __ONE_HOUR_IN_SECONDS:
         logger.info(
-            'The closest session start time (%s) was too far in the past of error time (%s)',
+            'The closest session start time (%s) was too far in the past of traceback time (%s)',
             most_recent_session['CreatedTime'],
             epoch_timestamp_seconds
         )
