@@ -117,9 +117,9 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
-            fullstory_str,
             profile_str,
             user_str,
+            fullstory_str,
         ) if s is not None
     )
     return ' - %s' % combined_str
@@ -176,9 +176,9 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
     combined_str = ', '.join(
         s for s in (
             timestamp_str,
-            fullstory_str,
             profile_str,
             user_str,
+            fullstory_str,
         ) if s is not None
     )
     return ' - %s' % combined_str
