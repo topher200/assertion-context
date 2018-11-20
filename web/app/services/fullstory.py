@@ -60,7 +60,9 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
         assert isinstance(sessions, dict)
         assert all('CreatedTime' in s for s in sessions), sessions
     except Exception:
-        assert 'Received response "%s", tried to parse sessions but got "%s"' % (response, sessions)
+        assert 'Made request %s, received response "%s", tried to parse sessions but got "%s"' % (
+            url, response, sessions
+        )
 
     logger.info('Found %s sessions for %s', len(sessions), t.profile_name)
     # Example of the 'sessions' object from fullstory:
