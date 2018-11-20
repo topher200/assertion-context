@@ -146,7 +146,7 @@ def generate_from_source(source:dict) -> JiraIssue:
         source["comments"],
         source["comments_filtered"],
         source["issue_type"],
-        source["assignee"],
+        source["assignee"] if "assignee" in source else '',
         source["status"],
         created,
         updated,
