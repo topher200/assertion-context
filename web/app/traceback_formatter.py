@@ -167,6 +167,8 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
         fullstory_str = FULLSTORY_LINK_SLACK_TEMPLATE.format(
             fullstory_link=fullstory_link,
         )
+    else:
+        fullstory_str = None
 
     # put it all together
     combined_str = ', '.join(
