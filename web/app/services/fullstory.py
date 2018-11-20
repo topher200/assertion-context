@@ -45,42 +45,10 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     """
     if not t.profile_name: return None
 
-    epoch_timestamp_seconds = t.origin_timestamp.timestamp()
-
-    # TODO: add 'sessions' cache
-
-    # get available fullstory sessions for this profile
-    url = __FULLSTORY_SESSIONS_GET_API.format(
-        profile_name=t.profile_name, limit=__FULLSTORY_SESSIONS_LIMIT)
-    headers = {'Authorization': 'Basic %s' % __FULLSTORY_AUTH_TOKEN}
-    try:
-        sessions = None
-        response = requests.get(url, headers=headers)
-        if 'no such user' in response.text:
-            return None
-        sessions = response.json()
-        assert isinstance(sessions, list), sessions
-        assert all(isinstance(s, dict) for s in sessions), sessions
-        assert all('CreatedTime' in s for s in sessions), sessions
-    except Exception:
-        logging.error(
-            'Made request %s, received response "%s", tried to parse sessions but got "%s"',
-            url, response, sessions
-        )
-        raise
-
-    logger.info('Found %s sessions for %s', len(sessions), t.profile_name)
-    # Example of the 'sessions' object from fullstory:
-    #     [{
-    #         'CreatedTime': 1541780000, # <---- this is seconds since epoch
-    #         'FsUrl': 'https://www.fullstory.com/ui/AZ1TC/session/5721895350000000:5668600000000000',
-    #         'SessionId': 5668600000000000,
-    #         'UserId': 5721800000000000
-    #     }]
-
     # figure out which session was the most recent before our error
+    epoch_timestamp_seconds = t.origin_timestamp.timestamp()
     most_recent_session = {}
-    for session in sessions:
+    for session in __get_sessions(t.profile_name):
         if session['CreatedTime'] < epoch_timestamp_seconds:
             # this session started before our timestamp; it could include our timestamp
             if (
@@ -105,3 +73,41 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
     timestamp_in_millis = epoch_timestamp_seconds * 1000 # fullstory URL timestamps are millis
     link_to_session = '%s:%d' % (most_recent_session['FsUrl'], timestamp_in_millis)
     return link_to_session
+
+def __get_sessions(profile_name:str) -> list:
+    """
+        Returns the fullstory sessions for this profile
+
+        Returns an empty list if the profile name is not found in fullstory.
+
+        Example of the response dict from fullstory:
+        [
+            {
+                'CreatedTime': 1541780000, # <---- this is seconds since epoch
+                'FsUrl': 'https://www.fullstory.com/ui/AZ1TC/session/5721895350000000:5668600000000000',
+                'SessionId': 5668600000000000,
+                'UserId': 5721800000000000
+            }
+        ]
+    """
+    url = __FULLSTORY_SESSIONS_GET_API.format(
+        profile_name=profile_name, limit=__FULLSTORY_SESSIONS_LIMIT)
+    headers = {'Authorization': 'Basic %s' % __FULLSTORY_AUTH_TOKEN}
+    try:
+        sessions = None
+        response = requests.get(url, headers=headers)
+        if 'no such user' in response.text:
+            return []
+        sessions = response.json()
+        assert isinstance(sessions, list), sessions
+        assert all(isinstance(s, dict) for s in sessions), sessions
+        assert all('CreatedTime' in s for s in sessions), sessions
+    except Exception:
+        logging.error(
+            'Made request %s, received response "%s", tried to parse sessions but got "%s"',
+            url, response, sessions
+        )
+        raise
+
+    logger.info('Found %s sessions for %s', len(sessions), profile_name)
+    return sessions
