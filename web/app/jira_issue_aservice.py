@@ -304,7 +304,9 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
         # we should be able to use this instead:
         # assignee = jira_object.fields.assignee.displayName
         assignee = jira_object.raw['fields']['assignee']['displayName']
-    except KeyError:
+    except (TypeError, KeyError):
+        logger.debug('Unable to get assignee from %s. raw object: "%s"',
+                     jira_object.key, jira_object.raw)
         assignee = ''
 
     return JiraIssue(
