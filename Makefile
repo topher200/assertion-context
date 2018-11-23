@@ -46,7 +46,6 @@ cleanup-kubernetes:
 	helm ls --short | xargs helm delete --purge
 	helm reset
 	kubectl delete -f prometheus-manifests/
-	kubectl delete -f kubernetes-elasticsearch/
 	kubectl delete -f kubernetes/
 	kubectl delete configmap assertion-context-env-file
 	kubectl delete -f 'https://help.papertrailapp.com/assets/files/papertrail-logspout-daemonset.yml'

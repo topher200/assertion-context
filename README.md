@@ -63,9 +63,6 @@ papertrail-destination=syslog://logs9.papertrailapp.com:12345
 
 Then to start it all up:
  - `make fresh-deploy-to-k8s`
- - if you don't have an externally hosted elasticsearch, also run 
-   `kubectl create -f kubernetes-elasticsearch` to start elasticsearch in the cluster
-  - in your .env file, set ES_ADDRESS to `elasticsearch.default.svc.cluster.local:9200`
 
 ## Elasticsearch
 
