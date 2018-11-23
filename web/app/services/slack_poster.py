@@ -23,7 +23,7 @@ MESSAGE_TEMPLATE = """
 {traceback_text}```"""
 
 JIRA_ISSUE_TEMPLATE = """
-- <{issue_link}|{issue_key}>, {issue_status}: {issue_summary}
+- <{issue_link}|{issue_key}>, {issue_status}, {issue_assignee}: {issue_summary}
 """
 """
     a template for rendering a single jira issue in slack
@@ -32,6 +32,7 @@ JIRA_ISSUE_TEMPLATE = """
     - issue_link: a url link to this issue
     - issue_key: the key for this issue
     - issue_status: the current status for this issue
+    - issue_assignee: name of who the issue is currently assigned to
     - issue_summary: the summary for this issue
 """
 
@@ -56,6 +57,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
             issue_link=jira_issue_aservice.get_link_to_issue(issue.key),
             issue_key=issue.key,
             issue_status=issue.status.upper(),
+            issue_assignee=issue.assignee,
             issue_summary=issue.summary,
         ) for issue in jira_issues
     )

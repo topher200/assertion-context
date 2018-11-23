@@ -35,7 +35,7 @@ PAPERTRAIL_LINK_SLACK_TEMPLATE = "<{kibana_redirect_url}/api/traceback/{papertra
 """
 
 FULLSTORY_LINK_JIRA_TEMPLATE = "[FullStory|{fullstory_link}]"
-FULLSTORY_LINK_SLACK_TEMPLATE = "{fullstory_link}|FullStory"
+FULLSTORY_LINK_SLACK_TEMPLATE = "<{fullstory_link}|FullStory>"
 """
     A template for a link to FullStory.
 

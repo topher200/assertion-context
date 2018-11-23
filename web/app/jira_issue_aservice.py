@@ -297,6 +297,18 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
     description_filtered = __strip_papertrail_metadata(description)
     comments_filtered = __strip_papertrail_metadata(comments_text)
 
+    # jira's python client library doesn't seem to be populating jira_object.fields.assignee.raw
+    # like it should, so we're unable to use the client library to pull out assignee. we'll hack it
+    # with the raw json
+    try:
+        # we should be able to use this instead:
+        # assignee = jira_object.fields.assignee.displayName
+        assignee = jira_object.raw['fields']['assignee']['displayName']
+    except (TypeError, KeyError):
+        logger.debug('Unable to get assignee from %s. raw object: "%s"',
+                     jira_object.key, jira_object.raw)
+        assignee = ''
+
     return JiraIssue(
         jira_object.key,
         get_link_to_issue(jira_object.key),
@@ -306,6 +318,7 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
         comments_text,
         comments_filtered,
         jira_object.fields.issuetype.name,
+        assignee,
         jira_object.fields.status.name,
         jira_object.fields.created,
         jira_object.fields.updated,
