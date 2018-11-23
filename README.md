@@ -172,6 +172,11 @@ source /usr/local/bin/virtualenvwrapper.sh
 ### Running
 Once python is installed, tests can be run with
   - `make test`
+  
+### Setting up dockerhub
+Use this command to use a username and password to log into docker. This allows 
+you to push built images to  dockerhub:
+- `docker login`
 
 ## S3 and Lambda
 ### Papertrail
