@@ -508,14 +508,15 @@ def start_request():
 
     # start an opentracing span
     headers = {}
+    endpoint = flask.request.endpoint
     for k, v in flask.request.headers:
         headers[k.lower()] = v
     try:
         tracer = opentracing.tracer
         span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
-        span = tracer.start_span(operation_name='server', child_of=span_ctx)
+        span = tracer.start_span(operation_name=endpoint, child_of=span_ctx)
     except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:
-        span = tracer.start_span(operation_name='server', tags={"Extract failed": str(e)})
+        span = tracer.start_span(operation_name=endpoint, tags={"Extract failed": str(e)})
     span.set_tag('path', flask.request.full_path)
     span.set_tag('method', flask.request.method)
     flask.g.tracer_root_span = span
