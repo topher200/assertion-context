@@ -13,7 +13,7 @@ def initialize_tracer():
     config = jaeger_client.Config(
         config = {
             'sampler': {'type': 'const', 'param': 1},
-            'logging': False,
+            'logging': True,
             'local_agent': {
                 'reporting_host': JAEGER_REPORTING_HOST,
             }
