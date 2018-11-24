@@ -66,6 +66,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
     channel = slack_channel.get(traceback)
     slack_data = {
         "text": traceback_text,
+        "channel": channel,
         "attachments": [
             {
                 "text": MESSAGE_TEMPLATE.format(
