@@ -11,7 +11,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - image: topher200/assertion-context:1.0.00
+        - image: topher200/assertion-context:6.0.2
           name: celery
           args:
           - celery
@@ -27,5 +27,17 @@ spec:
             requests:
               cpu: 500m # this really should be 1000m
               memory: 300Mi
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 50
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - web
+                topologyKey: kubernetes.io/hostname
       restartPolicy: Always
 status: {}
