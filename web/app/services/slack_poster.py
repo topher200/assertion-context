@@ -11,6 +11,7 @@ from .. import (
 )
 from ..jira_issue import JiraIssue
 from ..traceback import Traceback
+from ..business_logic import slack_channel
 
 
 WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
@@ -62,6 +63,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
         ) for issue in jira_issues
     )
 
+    channel = slack_channel.get(traceback)
     slack_data = {
         "text": traceback_text,
         "attachments": [
@@ -156,7 +158,7 @@ def __send_message_to_slack(slack_data:dict):
     return response
 
 
-def post_message_to_slack_as_real_user(message:str):
+def post_message_to_slack_as_real_user(channel:str, message:str):
     """
         Normal messages are posted as a bot user.
 
@@ -168,7 +170,7 @@ def post_message_to_slack_as_real_user(message:str):
     url = 'https://slack.com/api/chat.postMessage'
     params = {
         'token': SLACK_REAL_USER_TOKEN,
-        'channel': 'tracebacks',
+        'channel': channel,
         'as_user': True,
         'text': message,
     }

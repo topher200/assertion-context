@@ -18,16 +18,12 @@ from . import (
     text_keys,
     traceback_database,
 )
+from .business_logic import slack_channel
 
 logger = logging.getLogger()
 
 TWO_WEEKS_AGO = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=14)
 
-
-class IssueAlreadyExistsError(Exception):
-    """
-        Raised if we attempt to create a duplicate issue for a traceback.
-    """
 
 class TracebackPlusMetadata():
     """
@@ -185,8 +181,9 @@ def create_ticket(
         )
         if jira_issues:
             key = jira_issues[0].key
+            channel = slack_channel.get(traceback)
             logger.info('Not creating Jira issue - already found %s', key)
-            raise IssueAlreadyExistsError("Issue has already been created as %s" % key)
+            tasks.tell_slack_about_error(channel, "Issue has already been created as %s" % key)
 
     # find a list of tracebacks that use that text
     similar_tracebacks = traceback_database.get_matching_tracebacks(
@@ -208,7 +205,8 @@ def create_ticket(
     ticket_id = jira_issue_aservice.create_jira_issue(title, description, assign_to_team)
 
     # tell slack that we made a new ticket (async)
-    tasks.tell_slack_about_new_jira_ticket.delay(ticket_id)
+    channel = slack_channel.get(traceback)
+    tasks.tell_slack_about_new_jira_ticket.delay(channel, ticket_id)
 
     return ticket_id
 
@@ -264,4 +262,5 @@ def create_comment_on_existing_ticket(
     jira_issue_aservice.create_comment(jira_issue, comment)
 
     # tell slack that we updated the ticket (async)
-    tasks.tell_slack_about_updated_jira_ticket.delay(jira_issue.key)
+    channel = slack_channel.get(traceback)
+    tasks.tell_slack_about_updated_jira_ticket.delay(channel, jira_issue.key)
