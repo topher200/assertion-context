@@ -1,3 +1,6 @@
+Version 5.3.z
+  - add jaeger opentracing implementation
+
 Version 5.2.z
   - add links to fullstory to output
   - add issue assignee name to Slack

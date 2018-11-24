@@ -34,9 +34,6 @@ app = celery.Celery('tasks', broker='redis://'+REDIS_ADDRESS)
 ES = Elasticsearch([ES_ADDRESS], ca_certs=certifi.where())
 REDIS = redis.StrictRedis(host=REDIS_ADDRESS)
 
-# add tracing
-tracer = tracing.initialize_tracer()
-
 logger = logging.getLogger()
 
 

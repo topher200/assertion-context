@@ -72,12 +72,6 @@ KVSessionExtension(prefixed_store, app)
 # config
 DEBUG_TIMING = True
 
-# add tracing
-tracing.initialize_tracer()
-
-# add route to /healthz healthchecks
-healthz.add_healthcheck_endpoint(app, ES, REDIS)
-
 FILTERS = ['All Tracebacks', 'Has Ticket', 'Has Open Ticket', 'No Ticket', 'No Recent Ticket']
 
 
@@ -490,6 +484,15 @@ def admin():
     )
 
 
+@app.before_first_request
+def before_first_request():
+    # add tracing
+    tracing.initialize_tracer()
+
+    # add route to /healthz healthchecks
+    healthz.add_healthcheck_endpoint(app, ES, REDIS)
+
+
 @app.before_request
 def start_request():
     # log the request
@@ -505,16 +508,18 @@ def start_request():
 
     # start an opentracing span
     headers = {}
+    endpoint = flask.request.endpoint
     for k, v in flask.request.headers:
         headers[k.lower()] = v
     try:
         tracer = opentracing.tracer
         span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
-        span = tracer.start_span(operation_name='server', child_of=span_ctx)
+        span = tracer.start_span(operation_name=endpoint, child_of=span_ctx)
     except (opentracing.InvalidCarrierException, opentracing.SpanContextCorruptedException) as e:
-        span = tracer.start_span(operation_name='server', tags={"Extract failed": str(e)})
+        span = tracer.start_span(operation_name=endpoint, tags={"Extract failed": str(e)})
     span.set_tag('path', flask.request.full_path)
     span.set_tag('method', flask.request.method)
+    span.set_tag('healthz', 'healthz' in flask.request.full_path)
     flask.g.tracer_root_span = span
 
     # record the start time so we can calculate timing info after the request is done
@@ -565,4 +570,4 @@ def exceptions(_):
 
 if __name__ == "__main__":
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, use_reloader=False, host='0.0.0.0', port=8000)
