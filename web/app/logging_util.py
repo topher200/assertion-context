@@ -52,3 +52,4 @@ def setup_logging():
         logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
         logging.getLogger('botocore').setLevel(logging.WARNING)
         logging.getLogger('boto3').setLevel(logging.WARNING)
+        logging.getLogger('jaeger_tracing').setLevel(logging.WARNING)
