@@ -519,6 +519,7 @@ def start_request():
         span = tracer.start_span(operation_name=endpoint, tags={"Extract failed": str(e)})
     span.set_tag('path', flask.request.full_path)
     span.set_tag('method', flask.request.method)
+    span.set_tag('healthz', 'healthz' in flask.request.full_path)
     flask.g.tracer_root_span = span
 
     # record the start time so we can calculate timing info after the request is done
