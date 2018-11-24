@@ -19,8 +19,8 @@ machine previous to the offending line.
 
 # Getting it set up
 ## Server installation instructions
-We run everything in kubernetes. Please set up a kubernetes cluster. Then, on
-your development machine...
+We run everything in kubernetes. Please set up kubectl locally and connect to a 
+kubernetes cluster. Then, on your development machine...
  - install kubernetes-helm
  - clone this repo
  - fill out .env with config variables. requires these fields:
