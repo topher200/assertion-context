@@ -18,7 +18,6 @@ from app import (
     realtime_updater,
     s3,
     traceback_database,
-    tracing,
 )
 from app.ddl import api_call_db
 from .services import (
