@@ -69,6 +69,9 @@ store = RedisStore(REDIS)
 prefixed_store = PrefixDecorator('sessions_', store)
 KVSessionExtension(prefixed_store, app)
 
+# add route to /healthz healthchecks
+healthz.add_healthcheck_endpoint(app, ES, REDIS)
+
 # config
 DEBUG_TIMING = True
 
@@ -488,9 +491,6 @@ def admin():
 def before_first_request():
     # add tracing
     tracing.initialize_tracer()
-
-    # add route to /healthz healthchecks
-    healthz.add_healthcheck_endpoint(app, ES, REDIS)
 
 
 @app.before_request
