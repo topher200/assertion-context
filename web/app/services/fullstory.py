@@ -1,4 +1,9 @@
-from typing import Optional
+from typing import (
+    cast,
+    Dict,
+    Optional,
+    Union,
+)
 import logging
 
 import requests
@@ -53,7 +58,7 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
 
     # figure out which session was the most recent before our error
     epoch_timestamp_seconds = t.origin_timestamp.timestamp()
-    most_recent_session = {}
+    most_recent_session: Dict[str, Union[int, str]] = {}
     for session in __get_sessions(t.profile_name):
         if session['CreatedTime'] < epoch_timestamp_seconds:
             # this session started before our timestamp; it could include our timestamp
@@ -68,7 +73,8 @@ def get_link_to_session_at_traceback_time(t:Traceback) -> Optional[str]:
         logger.info('No eligible sessions found')
         return None # unable to find a qualified session
 
-    if epoch_timestamp_seconds - most_recent_session['CreatedTime'] > __ONE_HOUR_IN_SECONDS:
+    session_start_time = cast(int, most_recent_session['CreatedTime'])
+    if epoch_timestamp_seconds - session_start_time > __ONE_HOUR_IN_SECONDS:
         logger.info(
             'The closest session start time (%s) was too far in the past of traceback time (%s)',
             most_recent_session['CreatedTime'],
