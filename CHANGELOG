@@ -1,3 +1,6 @@
+Version 5.4.z
+  - bump flask version
+
 Version 5.3.z
   - add jaeger opentracing implementation
 
