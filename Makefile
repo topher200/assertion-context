@@ -1,5 +1,5 @@
 .PHONY: deploy-k8s
-deploy-k8s: push-to-docker deploy-current-version
+deploy-k8s: push-to-docker
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx  nginx=topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web    web=topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy celery celery=topher200/assertion-context:{}
