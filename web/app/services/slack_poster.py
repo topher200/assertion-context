@@ -4,7 +4,6 @@ import json
 
 import requests
 
-
 from .. import (
     config_util,
     jira_issue_aservice,
@@ -12,6 +11,7 @@ from .. import (
 )
 from ..jira_issue import JiraIssue
 from ..traceback import Traceback
+
 
 WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
 SLACK_REAL_USER_TOKEN = config_util.get('SLACK_REAL_USER_TOKEN')
