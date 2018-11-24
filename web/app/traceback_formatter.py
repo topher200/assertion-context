@@ -106,12 +106,11 @@ def jira_formatted_string(t: Traceback, include_profile_link: bool, include_user
 
     # link to fullstory
     fullstory_link = fullstory.get_link_to_session_at_traceback_time(t)
+    fullstory_str = None
     if fullstory_link:
         fullstory_str = FULLSTORY_LINK_JIRA_TEMPLATE.format(
             fullstory_link=fullstory_link,
         )
-    else:
-        fullstory_str = None
 
     # put it all together
     combined_str = ', '.join(
@@ -165,12 +164,11 @@ def slack_formatted_string(t: Traceback, include_profile_link: bool, include_use
 
     # link to fullstory
     fullstory_link = fullstory.get_link_to_session_at_traceback_time(t)
+    fullstory_str = None
     if fullstory_link:
         fullstory_str = FULLSTORY_LINK_SLACK_TEMPLATE.format(
             fullstory_link=fullstory_link,
         )
-    else:
-        fullstory_str = None
 
     # put it all together
     combined_str = ', '.join(
