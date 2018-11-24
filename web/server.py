@@ -39,9 +39,6 @@ from app import (
     traceback_formatter,
     tracing,
 )
-from app.services import (
-    slack_poster,
-)
 
 
 # create app
@@ -358,37 +355,28 @@ def slack_callback():
         if action == 'create_ticket':
             origin_papertrail_id = payload['callback_id']
             assign_to = payload['actions'][0]['selected_options'][0]['value']
-            try:
-                new_ticket_id = api_aservice.create_ticket(
-                    ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
-                )
-
-                # replace the slack message's CTA with a "done!" message
-                original_message = payload['original_message']
-                original_message['attachments'].pop() # destructive!
-                original_message['attachments'].append(
-                    {
-                        "text": "%s created!" % new_ticket_id
-                    }
-                )
-                return flask.jsonify(original_message)
-            except api_aservice.IssueAlreadyExistsError as e:
-                # we must post the message as a real user so Jirabot picks it up
-                slack_poster.post_message_to_slack_as_real_user(str(e))
-        elif action == 'add_to_existing_ticket':
-            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
-            origin_papertrail_id = payload['callback_id']
-            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
-            api_aservice.create_comment_on_existing_ticket(
-                ES, selected_ticket_key, origin_papertrail_id
-            )
+            tasks.create_jira_ticket.delay(origin_papertrail_id, assign_to)
 
             # replace the slack message's CTA with a "done!" message
             original_message = payload['original_message']
             original_message['attachments'].pop() # destructive!
             original_message['attachments'].append(
                 {
-                    "text": "%s updated!" % selected_ticket_key
+                    "text": "Creating ticket..."
+                }
+            )
+            return flask.jsonify(original_message)
+        elif action == 'add_to_existing_ticket':
+            origin_papertrail_id = payload['callback_id']
+            selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
+            tasks.create_comment_on_existing_ticket(selected_ticket_key, origin_papertrail_id)
+
+            # replace the slack message's CTA with a "done!" message
+            original_message = payload['original_message']
+            original_message['attachments'].pop() # destructive!
+            original_message['attachments'].append(
+                {
+                    "text": "Updating %s..." % selected_ticket_key
                 }
             )
             return flask.jsonify(original_message)
