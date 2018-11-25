@@ -7,9 +7,9 @@ def get(traceback:Traceback):
 
         We look in the traceback's text for certain trigger words.
     """
-    if 'facebook' in traceback.traceback_text:
+    if 'facebook' in traceback.traceback_text.lower():
         return 'tracebacks-social'
-    elif 'adwords' in traceback.traceback_text:
+    elif 'adwords' in traceback.traceback_text.lower():
         return 'tracebacks-adwords'
     else:
         return 'tracebacks'
