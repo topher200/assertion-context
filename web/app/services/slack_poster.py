@@ -58,7 +58,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
             issue_link=jira_issue_aservice.get_link_to_issue(issue.key),
             issue_key=issue.key,
             issue_status=issue.status.upper(),
-            issue_assignee=issue.assignee,
+            issue_assignee=issue.assignee if issue.assignee else 'Unassigned',
             issue_summary=issue.summary,
         ) for issue in jira_issues
     )
