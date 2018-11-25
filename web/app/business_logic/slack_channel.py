@@ -1,4 +1,11 @@
 from ..traceback import Traceback
+from .. import (
+    config_util,
+)
+
+SLACK_WEBHOOK_TRACEBACKS = config_util.get('SLACK_WEBHOOK_TRACEBACKS')
+SLACK_WEBHOOK_TRACEBACKS_ADWORDS = config_util.get('SLACK_WEBHOOK_TRACEBACKS_ADWORDS')
+SLACK_WEBHOOK_TRACEBACKS_SOCIAL = config_util.get('SLACK_WEBHOOK_TRACEBACKS_SOCIAL')
 
 
 def get(traceback:Traceback):
@@ -8,8 +15,8 @@ def get(traceback:Traceback):
         We look in the traceback's text for certain trigger words.
     """
     if 'facebook' in traceback.traceback_text.lower():
-        return 'tracebacks-social'
+        return SLACK_WEBHOOK_TRACEBACKS_SOCIAL
     elif 'adwords' in traceback.traceback_text.lower():
-        return 'tracebacks-adwords'
+        return SLACK_WEBHOOK_TRACEBACKS_ADWORDS
     else:
-        return 'tracebacks'
+        return SLACK_WEBHOOK_TRACEBACKS

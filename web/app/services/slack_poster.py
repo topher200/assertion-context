@@ -14,7 +14,6 @@ from ..traceback import Traceback
 from ..business_logic import slack_channel
 
 
-WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
 SLACK_REAL_USER_TOKEN = config_util.get('SLACK_REAL_USER_TOKEN')
 
 logger = logging.getLogger()
@@ -63,11 +62,8 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
         ) for issue in jira_issues
     )
 
-    channel = slack_channel.get(traceback)
-    logger.info('posting traceback to "%s"', channel)
     slack_data = {
         "text": traceback_text,
-        "channel": channel,
         "attachments": [
             {
                 "text": MESSAGE_TEMPLATE.format(
@@ -133,21 +129,15 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
         ]
     }
 
-    return __send_message_to_slack(slack_data)
+    webhook_url = slack_channel.get(traceback)
+    return __send_message_to_slack(slack_data, webhook_url)
 
 
-def post_message_to_slack(message:str):
-    slack_data = {
-        'text': message,
-    }
-    __send_message_to_slack(slack_data)
-
-
-def __send_message_to_slack(slack_data:dict):
+def __send_message_to_slack(slack_data:dict, webhook_url:str):
     logger.debug('sending message to slack: %s', json.dumps(slack_data))
 
     response = requests.post(
-        WEBHOOK_URL,
+        webhook_url,
         data=json.dumps(slack_data),
         headers={'Content-Type': 'application/json'}
     )
