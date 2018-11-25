@@ -1,6 +1,5 @@
 # initial setup
 FROM nginx:1.11.3
-MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1

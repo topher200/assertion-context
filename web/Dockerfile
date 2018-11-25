@@ -1,6 +1,5 @@
 # initial setup
 FROM python:3.6
-MAINTAINER Topher <topher200@gmail.com>
 WORKDIR /code
 RUN echo 'set -o vi\nalias ll="ls -al"' >> /root/.bashrc
 ENV PYTHONUNBUFFERED=1
