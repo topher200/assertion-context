@@ -41,6 +41,15 @@ NUM_PREVIOUS_LOG_LINES_TO_SAVE = 100
     I'm purposely going high with this number since it's easier to ignore data than re-query for it
 """
 
+MAX_TRACEBACK_TEXT_SIZE = 5000
+"""
+    Max number of characters for a single traceback. Larger ones are ignored.
+
+    Enormous tracebacks tend to overload Elasticsearch.
+
+    This number was decided on randomly and may need to be adjusted up or down.
+"""
+
 logger = logging.getLogger()
 
 
@@ -131,6 +140,9 @@ class Parser():
         traceback_text, traceback_plus_context_text = Parser.__get_last_traceback_text(parsed_text)
         if traceback_text is None or traceback_plus_context_text is None:
             logger.warning("unable to parse out Traceback. id: %s", origin_logline.papertrail_id)
+            return None
+        if len(traceback_text) > MAX_TRACEBACK_TEXT_SIZE:
+            logger.warning("traceback text too large. id: %s", origin_logline.papertrail_id)
             return None
 
         return Traceback(
