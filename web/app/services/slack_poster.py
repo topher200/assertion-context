@@ -176,7 +176,9 @@ def post_message_to_slack_as_real_user(channel:str, message:str):
         url,
         params=params,
     )
-    if response.status_code != 200:
+    if response.status_code == 200:
+        logger.info('posted to slack channel %s', channel)
+    else:
         logger.error(
             'Request to slack returned an error %s, the response is:\n%s',
             response.status_code, response.text
