@@ -41,9 +41,15 @@ NUM_LINES_TO_POST = 5
     How many lines of the traceback to post. Do too many and slack splits up the message.
 """
 
+MAX_CHARS_PER_LINE = 200
+"""
+    How many chars of each traceback line to post. Do too many and slack splits up the message.
+"""
+
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:List[JiraIssue]):
     last_N_lines = "\n".join(
+        text[:MAX_CHARS_PER_LINE] for text in
         traceback.traceback_plus_context_text.splitlines()[-NUM_LINES_TO_POST:]
     )
     traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_N_lines)
