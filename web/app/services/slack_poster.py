@@ -56,7 +56,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
     hits = traceback_formatter.create_hits_list(
         similar_tracebacks,
         traceback_formatter.slack_formatted_string,
-        max_number_hits=50
+        max_number_hits=40
     )
     jira_issue_text = '\n'.join(
         JIRA_ISSUE_TEMPLATE.format(
