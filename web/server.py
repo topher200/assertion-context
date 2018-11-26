@@ -355,6 +355,7 @@ def slack_callback():
     if 'actions' in payload:
         # it's a request to do an action
         action = payload['actions'][0]['name']
+        logger.info('received action request for %s', action)
         if action == 'create_ticket':
             origin_papertrail_id = payload['callback_id']
             assign_to = payload['actions'][0]['selected_options'][0]['value']
@@ -389,6 +390,7 @@ def slack_callback():
     elif 'name' in payload:
         # it's a request to get more info for a dropdown menu
         action = payload['name']
+        logger.info('received dropdown request for %s', action)
         if action == 'add_to_existing_ticket':
             search_phrase = payload['value']
             options = {
