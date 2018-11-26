@@ -135,7 +135,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
         ]
     }
 
-    webhook_url = slack_channel.get(traceback)
+    webhook_url = slack_channel.get_webhook_url(traceback)
     return __send_message_to_slack(slack_data, webhook_url)
 
 
