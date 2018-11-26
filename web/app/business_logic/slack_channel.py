@@ -24,6 +24,7 @@ def get_webhook_url(traceback:Traceback):
         return SLACK_WEBHOOK_TRACEBACKS_SOCIAL
     else:
         assert False, 'unknown channel %s' % channel_name
+        return None
 
 
 def get_channel_name(traceback:Traceback):
