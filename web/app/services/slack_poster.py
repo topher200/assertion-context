@@ -11,9 +11,9 @@ from .. import (
 )
 from ..jira_issue import JiraIssue
 from ..traceback import Traceback
+from ..business_logic import slack_channel
 
 
-WEBHOOK_URL = config_util.get('SLACK_WEBHOOK')
 SLACK_REAL_USER_TOKEN = config_util.get('SLACK_REAL_USER_TOKEN')
 
 logger = logging.getLogger()
@@ -41,9 +41,15 @@ NUM_LINES_TO_POST = 5
     How many lines of the traceback to post. Do too many and slack splits up the message.
 """
 
+MAX_CHARS_PER_LINE = 200
+"""
+    How many chars of each traceback line to post. Do too many and slack splits up the message.
+"""
+
 
 def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:List[JiraIssue]):
     last_N_lines = "\n".join(
+        text[:MAX_CHARS_PER_LINE] for text in
         traceback.traceback_plus_context_text.splitlines()[-NUM_LINES_TO_POST:]
     )
     traceback_text = MESSAGE_TEMPLATE.format(traceback_text=last_N_lines)
@@ -57,7 +63,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
             issue_link=jira_issue_aservice.get_link_to_issue(issue.key),
             issue_key=issue.key,
             issue_status=issue.status.upper(),
-            issue_assignee=issue.assignee,
+            issue_assignee=issue.assignee if issue.assignee else 'Unassigned',
             issue_summary=issue.summary,
         ) for issue in jira_issues
     )
@@ -129,21 +135,15 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
         ]
     }
 
-    return __send_message_to_slack(slack_data)
+    webhook_url = slack_channel.get(traceback)
+    return __send_message_to_slack(slack_data, webhook_url)
 
 
-def post_message_to_slack(message:str):
-    slack_data = {
-        'text': message,
-    }
-    __send_message_to_slack(slack_data)
-
-
-def __send_message_to_slack(slack_data:dict):
+def __send_message_to_slack(slack_data:dict, webhook_url:str):
     logger.debug('sending message to slack: %s', json.dumps(slack_data))
 
     response = requests.post(
-        WEBHOOK_URL,
+        webhook_url,
         data=json.dumps(slack_data),
         headers={'Content-Type': 'application/json'}
     )
@@ -156,7 +156,7 @@ def __send_message_to_slack(slack_data:dict):
     return response
 
 
-def post_message_to_slack_as_real_user(message:str):
+def post_message_to_slack_as_real_user(channel:str, message:str):
     """
         Normal messages are posted as a bot user.
 
@@ -168,7 +168,7 @@ def post_message_to_slack_as_real_user(message:str):
     url = 'https://slack.com/api/chat.postMessage'
     params = {
         'token': SLACK_REAL_USER_TOKEN,
-        'channel': 'tracebacks',
+        'channel': channel,
         'as_user': True,
         'text': message,
     }

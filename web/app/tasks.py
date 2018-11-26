@@ -154,15 +154,39 @@ def post_unticketed_tracebacks_to_slack():
 
 
 @app.task
-def tell_slack_about_new_jira_ticket(ticket_id:str):
-    # we must post this message as a real user so that Jirabot picks up on it
-    slack_poster.post_message_to_slack_as_real_user('Created %s' % ticket_id)
+def create_jira_ticket(origin_papertrail_id:int, assign_to:str):
+    """
+        Given a traceback id and a Jira user, create a new Jira ticket and assign it to that user.
+    """
+    api_aservice.create_ticket(
+        ES, origin_papertrail_id, assign_to, reject_if_ticket_exists=True
+    )
 
 
 @app.task
-def tell_slack_about_updated_jira_ticket(ticket_id:str):
+def create_comment_on_existing_ticket(selected_ticket_key:str, origin_papertrail_id:int):
+    """
+        Given a Jira ticket key and a traceback id, update the ticket with that traceback.
+    """
+    api_aservice.create_comment_on_existing_ticket(ES, selected_ticket_key, origin_papertrail_id)
+
+
+@app.task
+def tell_slack_about_new_jira_ticket(channel:str, ticket_id:str):
     # we must post this message as a real user so that Jirabot picks up on it
-    slack_poster.post_message_to_slack_as_real_user('Updated %s' % ticket_id)
+    slack_poster.post_message_to_slack_as_real_user(channel, 'Created %s' % ticket_id)
+
+
+@app.task
+def tell_slack_about_updated_jira_ticket(channel:str, ticket_id:str):
+    # we must post this message as a real user so that Jirabot picks up on it
+    slack_poster.post_message_to_slack_as_real_user(channel, 'Updated %s' % ticket_id)
+
+
+@app.task
+def tell_slack_about_error(channel:str, error):
+    # we must post this message as a real user so that Jirabot picks up on it
+    slack_poster.post_message_to_slack_as_real_user(channel, error)
 
 
 @celery.signals.setup_logging.connect
