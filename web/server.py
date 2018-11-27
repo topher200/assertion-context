@@ -373,7 +373,7 @@ def slack_callback():
         elif action == 'add_to_existing_ticket':
             origin_papertrail_id = payload['callback_id']
             selected_ticket_key = payload['actions'][0]['selected_options'][0]['value']
-            tasks.create_comment_on_existing_ticket(selected_ticket_key, origin_papertrail_id)
+            tasks.create_comment_on_existing_ticket.delay(selected_ticket_key, origin_papertrail_id)
 
             # replace the slack message's CTA with a "done!" message
             original_message = payload['original_message']
