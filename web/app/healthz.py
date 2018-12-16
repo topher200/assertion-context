@@ -15,19 +15,13 @@ def add_healthcheck_endpoint(app, ES, REDIS):
     )
 
     def elasticsearch_available():
-        try:
-            ES.info()
-            return True, 'elasticsearch ok'
-        except Exception:
-            return False, 'elasticsearch unavailable'
+        ES.info()
+        return True, 'elasticsearch ok'
     health.add_check(elasticsearch_available)
 
     def redis_available():
-        try:
-            REDIS.info()
-            return True, 'redis ok'
-        except Exception:
-            return False, 'redis unavailable'
+        REDIS.info()
+        return True, 'redis ok'
     health.add_check(redis_available)
 
     def main_page_renders():
