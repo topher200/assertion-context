@@ -9,7 +9,7 @@ from . import api_aservice
 def add_healthcheck_endpoint(app, ES, REDIS):
     health = healthcheck.HealthCheck(app, "/healthz")
 
-    ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where())
+    ES = Elasticsearch([app.config['ES_ADDRESS']], ca_certs=certifi.where(), timeout=1.0)
     REDIS = redis.StrictRedis(
         host=app.config['REDIS_ADDRESS'], socket_connect_timeout=1, socket_timeout=1
     )
