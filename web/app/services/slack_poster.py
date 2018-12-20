@@ -100,7 +100,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
                                 "value": "UNASSIGNED"
                             },
                             {
-                                "text": "Adwords (assign to Al)",
+                                "text": "Adwords (assign to Joe)",
                                 "value": "ADWORDS"
                             },
                             {
