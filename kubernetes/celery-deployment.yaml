@@ -37,7 +37,7 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - web
+                        - celery
                 topologyKey: kubernetes.io/hostname
       restartPolicy: Always
 status: {}
