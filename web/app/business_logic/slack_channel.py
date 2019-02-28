@@ -33,6 +33,9 @@ def get_channel_name(traceback:Traceback):
 
         We look in the traceback's text for certain trigger words.
     """
+    # TEMP: send everything to my channel, to not spam other users
+    return TRACEBACKS_CHANNEL_NAME
+
     if 'facebook' in traceback.traceback_text.lower():
         return TRACEBACKS_CHANNEL_NAME_SOCIAL
     elif 'adwords' in traceback.traceback_text.lower():
