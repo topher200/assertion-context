@@ -116,6 +116,7 @@ def get_tracebacks_for_day(
     with tracer.start_span('for each traceback, get similar tracebacks', child_of=root_span) as span:
         with span_in_context(span):
             for tb in tb_meta:
+                tb.similar_tracebacks = []
                 tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
                     ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
                 )
