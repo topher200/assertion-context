@@ -30,6 +30,8 @@ def add_healthcheck_endpoint(app, ES, REDIS):
             return True, 'site ok'
         else:
             return False, 'render failed'
-    health.add_check(main_page_renders)
+
+    # removing for now due to it taking too long with many Traceback errors in the system
+    # health.add_check(main_page_renders)
 
     _ = healthcheck.EnvironmentDump(app, "/environment")
