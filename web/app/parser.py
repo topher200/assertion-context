@@ -32,6 +32,23 @@ VALUE_ERROR_REGEX_NEGATIVE = re.compile(
             OR (ValueError)
             OR (AttributeError)
             OR (LockFailed)
+
+    The NEGATIVE regexes are used to remove tracebacks which we do not want to track. These are a
+    combination of tracebacks which we purposely avoid in Papertrail and also some spammy ones
+    we've seen emperically that we don't want to track.
+
+    The NEGATIVE regexes are only checked against the final line in the traceback (the
+    AssertionError line).
+"""
+
+TRACEBACK_TEXT_REGEX_NEGATIVE = re.compile(
+    '''vendor_textad_criterion_id'''
+)
+"""
+    If any of these phrases are found in the traceback text, the traceback is discarded.
+
+    This NEGATIVE is special because it looks at the entire traceback; the other ones above only
+    look at the final line.
 """
 
 NUM_PREVIOUS_LOG_LINES_TO_SAVE = 100
@@ -143,6 +160,10 @@ class Parser():
             return None
         if len(traceback_text) > MAX_TRACEBACK_TEXT_SIZE:
             logger.warning("traceback text too large. id: %s", origin_logline.papertrail_id)
+            return None
+        if re.search(TRACEBACK_TEXT_REGEX_NEGATIVE, traceback_text) is not None:
+            logger.warning("ignoring traceback due to TRACEBACK_TEXT_REGEX_NEGATIVE rules. id: %s",
+                           origin_logline.papertrail_id)
             return None
 
         return Traceback(
