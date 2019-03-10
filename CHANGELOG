@@ -1,3 +1,6 @@
+Version 6.1.z
+  - ignore certain tracebacks, more powerfully
+
 Version 6.0.z
   - messages are posted to a more specific slack channel
 
