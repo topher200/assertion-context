@@ -16,7 +16,7 @@ from .traceback import Traceback
 
 ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError|LockFailed)(?:$|:)')
 ASSERTION_ERROR_REGEX_NEGATIVE = re.compile(
-    '''can only join a child process|DEBUG|can only test a child process|vendor_textad_criterion_id'''
+    '''can only join a child process|DEBUG|can only test a child process'''
 )
 KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\[|Process worker'''
