@@ -108,7 +108,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
                                 "value": "BING"
                             },
                             {
-                                "text": "Social (assign to Jay)",
+                                "text": "Social (assign to Sam G.)",
                                 "value": "SOCIAL"
                             },
                             {
