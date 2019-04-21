@@ -18,7 +18,7 @@ install:
 	pip install -r requirements.txt --quiet
 	pip install -r web/requirements.txt --quiet
 	pip install -r src/badcorp/requirements.txt --quiet
-	command -v papertrail || gem install papertrail-cli --user
+	command -v papertrail || sudo gem install papertrail-cli
 
 .PHONY: test
 test: install
