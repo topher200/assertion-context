@@ -22,7 +22,7 @@ def get(key):
     # If all else fails, just keep it a string
     # stolen from https://github.com/brettlangdon/flask-env/blob/master/flask_env.py (MIT license)
     if value.lower() in ('true', 'false'):
-        value = True if value.lower() == 'true' else False
+        value = value.lower() == 'true'
     elif '.' in value:
         try:
             value = float(value)

@@ -3,8 +3,6 @@ from elasticsearch import Elasticsearch
 import certifi
 import redis
 
-from . import api_aservice
-
 
 def add_healthcheck_endpoint(app, ES, REDIS):
     health = healthcheck.HealthCheck(app, "/healthz")
@@ -24,13 +22,13 @@ def add_healthcheck_endpoint(app, ES, REDIS):
         return True, 'redis ok'
     health.add_check(redis_available)
 
-    def main_page_renders():
-        res = api_aservice.render_main_page(ES, None, 0, 'No Ticket', set())
-        if res:
-            return True, 'site ok'
-        else:
-            return False, 'render failed'
-
+    # def main_page_renders():
+    #     res = api_aservice.render_main_page(ES, None, 0, 'No Ticket', set())
+    #     if res:
+    #         return True, 'site ok'
+    #     else:
+    #         return False, 'render failed'
+    #
     # removing for now due to it taking too long with many Traceback errors in the system
     # health.add_check(main_page_renders)
 
