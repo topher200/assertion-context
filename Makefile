@@ -17,6 +17,7 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 install:
 	pip install -r requirements.txt --quiet
 	pip install -r web/requirements.txt --quiet
+	pip install -r src/badcorp/requirements.txt --quiet
 
 .PHONY: test
 test: install
