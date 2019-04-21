@@ -1,6 +1,5 @@
 .DS_Store
 .env
-.papertrail.yml
 *.pyc
 run-populate-db.sh
 differ/diff1.txt

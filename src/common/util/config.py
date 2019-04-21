@@ -1,4 +1,3 @@
-#@deprecated: moved to new project structure
 import os
 
 from cachetools import cached

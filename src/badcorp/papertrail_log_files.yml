@@ -1,0 +1,7 @@
+files: 
+  - /tmp/badcorp.log
+destination:
+  # our opensource BadCorp CI environment, not a secret
+  host: logs.papertrailapp.com
+  port: 40115
+  protocol: tls

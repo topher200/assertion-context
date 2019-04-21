@@ -17,12 +17,17 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 install:
 	pip install -r requirements.txt --quiet
 	pip install -r web/requirements.txt --quiet
+	pip install -r src/badcorp/requirements.txt --quiet
+	command -v papertrail || sudo gem install papertrail-cli
 
 .PHONY: test
 test: install
 	nosetests --py3where web --quiet
 	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
+	nosetests --py3where src
+	mypy --config-file src/mypy.ini src
+	pylint src --reports n
 
 .PHONY: fresh-deploy-to-kubernetes
 fresh-deploy-to-k8s: cleanup-kubernetes
@@ -65,3 +70,8 @@ push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
+
+.PHONY: run-badcorp
+run-badcorp:
+	docker build . -f Dockerfile-badcorp -t badcorp
+	docker run badcorp
