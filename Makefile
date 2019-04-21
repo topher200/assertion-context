@@ -65,3 +65,7 @@ push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
+
+.PHONY: run-badcorp
+run-badcorp:
+	python src/run_badcorp.py

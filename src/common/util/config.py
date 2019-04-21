@@ -1,4 +1,3 @@
-#@deprecated: moved to new project structure
 import os
 
 from cachetools import cached
@@ -23,7 +22,7 @@ def get(key):
     # If all else fails, just keep it a string
     # stolen from https://github.com/brettlangdon/flask-env/blob/master/flask_env.py (MIT license)
     if value.lower() in ('true', 'false'):
-        value = value.lower() == 'true'
+        value = True if value.lower() == 'true' else False
     elif '.' in value:
         try:
             value = float(value)
