@@ -68,4 +68,4 @@ push-to-docker:
 
 .PHONY: run-badcorp
 run-badcorp:
-	python src/run_badcorp.py
+	python src/run_badcorp.py .env.badcorp
