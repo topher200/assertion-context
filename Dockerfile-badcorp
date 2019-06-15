@@ -28,4 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src /code
 COPY src/badcorp/papertrail_log_files.yml /etc/log_files.yml
 
+# the 15 second sleep is required to ensure that the logs are saved to
+# Papertrail before the container exits. this value was determined through
+# emperical testing
 CMD ["sh", "-c", "remote_syslog && sleep 2 && python run_badcorp.py && sleep 15"]
