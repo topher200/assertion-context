@@ -76,6 +76,6 @@ run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
 	docker run badcorp
 
-.PHONY: integration-tests
-integration-tests:
+.PHONY: integration-test
+integration-test:
 	./scripts/run-integration-tests.sh
