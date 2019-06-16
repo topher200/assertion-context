@@ -4,8 +4,10 @@ python:
 cache: pip
 jobs:
   include:
-    install:
-        - make install
-    script:
-        - make test
-        - make integration-tests
+    - stage: "Install"
+      script: make install
+    - stage: "Tests"
+      name: "Static tests"
+      script: make test
+    - name: "Integration tests"
+      script: make integration-test
