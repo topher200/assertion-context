@@ -25,7 +25,7 @@ test: install
 	nosetests --py3where web --quiet
 	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
-	nosetests --py3where src
+	pytest src
 	mypy --config-file src/mypy.ini src
 	pylint src --reports n
 
