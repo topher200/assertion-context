@@ -6,4 +6,5 @@ differ/diff1.txt
 differ/diff2.txt
 .mypy_cache
 .env.papertrail
+.badcorp.env
 web/.mypy_cache
