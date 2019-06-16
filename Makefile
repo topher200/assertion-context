@@ -17,7 +17,6 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 install:
 	pip install -r requirements.txt --quiet
 	pip install -r web/requirements.txt --quiet
-	pip install -r src/badcorp/requirements.txt --quiet
 	command -v papertrail || sudo gem install papertrail-cli
 
 .PHONY: test
