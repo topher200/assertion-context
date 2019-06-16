@@ -2,7 +2,7 @@ language: python
 python:
     - 3.6
 cache: pip
-install:
-    - make install
+install: make install
 script:
-    - make test
+  - make test
+  - make integration-test

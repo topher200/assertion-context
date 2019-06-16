@@ -22,7 +22,7 @@ RUN tar xzf ./remote_syslog.tar.gz
 RUN ls
 RUN cp ./remote_syslog/remote_syslog /usr/local/bin
 
-COPY src/badcorp/requirements.txt ./requirements.txt
+COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src /code

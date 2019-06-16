@@ -17,7 +17,6 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 install:
 	pip install -r requirements.txt --quiet
 	pip install -r web/requirements.txt --quiet
-	pip install -r src/badcorp/requirements.txt --quiet
 	command -v papertrail || sudo gem install papertrail-cli
 
 .PHONY: test
@@ -25,7 +24,6 @@ test: install
 	nosetests --py3where web --quiet
 	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
-	nosetests --py3where src
 	mypy --config-file src/mypy.ini src
 	pylint src --reports n
 
@@ -75,3 +73,7 @@ push-to-docker:
 run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
 	docker run badcorp
+
+.PHONY: integration-test
+integration-test:
+	./scripts/run-integration-tests.sh
