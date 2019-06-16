@@ -5,5 +5,7 @@ set -a
 source .badcorp.env
 set +a
 
+# add src to PYTHONPATH
+
 # run the tests
-python -m unittest src/test/test_bad_corp_to_papertrail.py
+PYTHONPATH=src pytest tests/test_bad_corp_to_papertrail.py

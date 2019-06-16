@@ -8,7 +8,7 @@ from common.util import config
 BADCORP_PAPERTRAIL_API_KEY = config.get('BADCORP_PAPERTRAIL_API_KEY')
 assert BADCORP_PAPERTRAIL_API_KEY
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAKEFILE_PATH = os.path.join(ROOT_DIR, 'Makefile')
 PAPERTRAIL_API_CONFIG = os.path.join(ROOT_DIR, '.papertrail.yml')
 
