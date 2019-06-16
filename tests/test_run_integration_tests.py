@@ -44,22 +44,19 @@ def setup_server_daemon(request):
     res = subprocess.check_output('make run-server-daemon', cwd=ROOT_DIR, shell=True, universal_newlines=True)
     container_id = res.strip().splitlines()[-1]
 
-    docker_ps_output = str(subprocess.check_output('docker ps -a --no-trunc | grep {}'.format(container_id),
-                                                   shell=True,
-                                                   universal_newlines=True))
-    server_logs = str(subprocess.check_output('docker logs {}'.format(container_id),
-                                              shell=True,
-                                              universal_newlines=True))
-    assert 'Up' in docker_ps_output, server_logs
+    def check_server_is_running():
+        docker_ps_output = str(subprocess.check_output('docker ps -a --no-trunc | grep {}'.format(container_id),
+                                                       shell=True,
+                                                       universal_newlines=True))
+        server_logs = str(subprocess.check_output('docker logs {}'.format(container_id),
+                                                  shell=True,
+                                                  universal_newlines=True))
+        assert 'Up' in docker_ps_output, server_logs
 
+    check_server_is_running()
     time.sleep(1)
-    docker_ps_output = str(subprocess.check_output('docker ps -a --no-trunc | grep {}'.format(container_id),
-                                                   shell=True,
-                                                   universal_newlines=True))
-    server_logs = str(subprocess.check_output('docker logs {}'.format(container_id),
-                                              shell=True,
-                                              universal_newlines=True))
-    assert 'Up' in docker_ps_output, server_logs
+    # still running after sleeping for a second?
+    check_server_is_running()
 
     def teardown_server_daemon():
         subprocess.call('docker kill {}'.format(container_id), shell=True, universal_newlines=True)
