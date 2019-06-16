@@ -8,4 +8,4 @@ set +a
 # add src to PYTHONPATH
 
 # run the tests
-PYTHONPATH=src pytest tests/test_bad_corp_to_papertrail.py
+PYTHONPATH=src pytest tests/test_run_integration_tests.py

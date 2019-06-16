@@ -35,5 +35,9 @@ AWS_EXTRA_SECURITY_GROUP="NO_DEFAULT_SET"
 
 [development]
 
+[testing]
+
+[ci-testing]
+
 [production]
 USE_DOGPILE_CACHE=true

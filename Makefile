@@ -69,6 +69,11 @@ push-to-docker:
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
 
+.PHONY: run-server-daemon
+run-server-daemon:
+	docker build web/ -t server
+	docker run --detach server
+
 .PHONY: run-badcorp
 run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
