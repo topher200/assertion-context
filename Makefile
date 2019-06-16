@@ -75,3 +75,7 @@ push-to-docker:
 run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
 	docker run badcorp
+
+.PHONY: integration-tests
+integration-tests:
+	./scripts/run-integration-tests.sh
