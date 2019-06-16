@@ -2,12 +2,7 @@ language: python
 python:
     - 3.6
 cache: pip
-jobs:
-  include:
-    - stage: "Install"
-      script: make install
-    - stage: "Tests"
-      name: "Static tests"
-      script: make test
-    - name: "Integration tests"
-      script: make integration-test
+install: make install
+script:
+  - make test
+  - make integration-test
