@@ -4,6 +4,7 @@ import tempfile
 import time
 
 import pytest
+import requests
 
 from common.util import config
 
@@ -16,7 +17,7 @@ MAKEFILE_PATH = os.path.join(ROOT_DIR, 'Makefile')
 PAPERTRAIL_API_CONFIG = os.path.join(ROOT_DIR, '.papertrail.yml')
 
 
-def asdf_test_badcorp_logs_get_saved_to_papertrail():
+def test_papertrail_to_elasticsearch_integration(setup_server_daemon):
     # run our Badcorp, saving tracebacks to papertrail
     # TODO: do we want to pass a uuid here and make sure we receive it on the other side? OR we
     # could use the box ID from the docker machine
@@ -30,13 +31,13 @@ def asdf_test_badcorp_logs_get_saved_to_papertrail():
         res = subprocess.check_output('papertrail -c {}'.format(papertrail_creds_file.name),
                                       shell=True,
                                       universal_newlines=True)
-
-    # check that we see the Traceback that was thrown
     result_string = str(res)
     assert 'KeyError' in result_string
 
-def test_papertrail_to_elasticsearch_integration(setup_server_daemon):
-    pass
+    # run the realtime updater from server.py
+    res = requests.post('http://localhost:8000/realtime_update')
+    assert res.ok, res
+
 
 @pytest.fixture(scope='module')
 def setup_server_daemon(request):
@@ -54,8 +55,8 @@ def setup_server_daemon(request):
         assert 'Up' in docker_ps_output, server_logs
 
     check_server_is_running()
-    time.sleep(1)
     # still running after sleeping for a second?
+    time.sleep(1)
     check_server_is_running()
 
     def teardown_server_daemon():

@@ -72,7 +72,7 @@ push-to-docker:
 .PHONY: run-server-daemon
 run-server-daemon:
 	docker build web/ -t server
-	docker run --detach server
+	docker run --detach --env-file .env -p 8000:8000 server
 
 .PHONY: run-badcorp
 run-badcorp:
@@ -81,4 +81,5 @@ run-badcorp:
 
 .PHONY: integration-test
 integration-test:
+	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/run-integration-tests.sh
