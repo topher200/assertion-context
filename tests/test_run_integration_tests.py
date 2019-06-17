@@ -34,9 +34,13 @@ def test_papertrail_to_elasticsearch_integration(setup_server_daemon):
     result_string = str(res)
     assert 'KeyError' in result_string
 
-    # run the realtime updater from server.py
-    res = requests.post('http://localhost:8000/realtime_update')
+    # run healthcheck to make sure server is up
+    res = requests.get('http://localhost:8000/healthz')
     assert res.ok, res
+
+    # # run the realtime updater from server.py
+    # res = requests.post('http://localhost:8000/realtime_update')
+    # assert res.ok, res
 
 
 @pytest.fixture(scope='module')
