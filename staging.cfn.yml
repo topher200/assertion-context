@@ -17,11 +17,13 @@ Parameters:
     Description: The first availability zone in the region
     Type: AWS::EC2::AvailabilityZone::Name
     ConstraintDescription: Must be a valid availability zone
+    Default: us-east-1a
 
   AvailabilityZone2:
     Description: The second availability zone in the region
     Type: AWS::EC2::AvailabilityZone::Name
     ConstraintDescription: Must be a valid availability zone
+    Default: us-east-1b
 
   SSHFrom:
     Description: Limit SSH access to bastion hosts to a CIDR IP block
