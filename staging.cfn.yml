@@ -2,7 +2,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 
-Description: SASKV5 VPC + ElastiCache
+Description: assertion-context staging. requires VPC
 
 
 Parameters:
@@ -110,12 +110,12 @@ Parameters:
   GitSourceRepo:
     Type: String
     Description: CodeCommit or GitHub source repository - must contain a Dockerfile in the base
-    Default: https://github.com/topher200/assertion-context
+    Default: assertion-context
 
   GitBranch:
     Type: String
-    Default: fargate
     Description: CodeCommit or GitHub git repository branch - change triggers a new build
+    Default: fargate
 
   GitHubToken:
     Type: String
@@ -125,6 +125,7 @@ Parameters:
   GitHubUser:
     Type: String
     Description: GitHub username or organization - leave blank if using CodeCommit
+    Default: topher200
 
   CodeBuildDockerImage:
     Type: String
