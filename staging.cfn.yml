@@ -12,41 +12,12 @@ Parameters:
     Default: awslabs-startup-kit-templates-deploy-v5
     Description: The template bucket for the CloudFormation templates
 
-  # vpc.cfn.yml parameters
-  AvailabilityZone1:
-    Description: The first availability zone in the region
-    Type: AWS::EC2::AvailabilityZone::Name
-    ConstraintDescription: Must be a valid availability zone
-    Default: us-east-1a
-
-  AvailabilityZone2:
-    Description: The second availability zone in the region
-    Type: AWS::EC2::AvailabilityZone::Name
-    ConstraintDescription: Must be a valid availability zone
-    Default: us-east-1b
-
-  SSHFrom:
-    Description: Limit SSH access to bastion hosts to a CIDR IP block
+  NetworkStackName:
     Type: String
-    MinLength: 9
-    MaxLength: 18
-    Default: 0.0.0.0/0
-
-  ELBIngressPort:
-    Description: The ELB ingress port used by security groups
-    Type: Number
-    MinValue: 0
-    MaxValue: 65535
-    ConstraintDescription: TCP ports must be between 0 - 65535
-    Default: 80
-
-  AppIngressPort:
-    Description: The application ingress port used by security groups
-    Type: Number
-    MinValue: 0
-    MaxValue: 65535
-    ConstraintDescription: TCP ports must be between 0 - 65535
-    Default: 80
+    Description: Name of an active Startup Kit CloudFormation stack that contains networking resources
+    MinLength: 1
+    MaxLength: 255
+    AllowedPattern: "^[a-zA-Z][-a-zA-Z0-9]*$"
 
   # bastion.cfn.yml parameters
   KeyName:
@@ -301,39 +272,15 @@ Parameters:
       - true
       - false
 
-  EnvironmentName:
-    Type: String
-    Description: Environment name - dev or prod
-    Default: dev
-    AllowedValues:
-      - dev
-      - prod
-    ConstraintDescription: Specify either dev or prod
-
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      - Label:
-          default: Environment
-        Parameters:
-          - EnvironmentName
-      - Label:
-          default: Region Availability Zones
-        Parameters:
-          - AvailabilityZone1
-          - AvailabilityZone2
       - Label:
           default: Bastion
         Parameters:
           - KeyName
           - LogRetentionInDays
           - MFA
-          - SSHFrom
-      - Label:
-          default: Application Global
-        Parameters:
-          - AppIngressPort
-          - AppProtocol
       - Label:
           default: Initial Service
         Parameters:
@@ -372,14 +319,6 @@ Metadata:
           - MaxTaggedContainerImagesToRetain
           - DaysToRetainUntaggedContainerImages
     ParameterLabels:
-      AvailabilityZone1:
-        default: Availability Zone 1
-      AvailabilityZone2:
-        default: Availability Zone 2
-      ELBIngressPort:
-        default: Port
-      AppIngressPort:
-        default: Port
       AppProtocol:
         default: Protocol
       KeyName:
@@ -388,12 +327,8 @@ Metadata:
         default: Log Retention
       MFA:
         default: Multi-Factor
-      SSHFrom:
-        default: SSH Whitelist
       TemplateBucket:
         default: CloudFormation Bucket
-      EnvironmentName:
-        default: Environment
       MaxTaggedContainerImagesToRetain:
         default: Tagged Images Max
       DaysToRetainUntaggedContainerImages:
@@ -443,50 +378,32 @@ Metadata:
       LoadBalancerLatencySeconds:
         default: LB Latency Threshold
 
-Conditions:
-
-   IsProd: !Equals [ !Ref EnvironmentName, prod ]
-
 Resources:
-
-  VpcStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/vpc.cfn.yml
-      Parameters:
-        AvailabilityZone1: !Ref AvailabilityZone1
-        AvailabilityZone2: !Ref AvailabilityZone2
-        SSHFrom: !Ref SSHFrom
-        ELBIngressPort: !Ref ELBIngressPort
-        AppIngressPort: !Ref AppIngressPort
-        SingleNatGateway: !If [ IsProd, false, true ]
 
   BastionStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/bastion.cfn.yml
       Parameters:
-        NetworkStackName: !GetAtt VpcStack.Outputs.Name
+        NetworkStackName: !Ref NetworkStackName
         KeyName: !Ref KeyName
         LogRetentionInDays: !Ref LogRetentionInDays
         MFA: !Ref MFA
-    DependsOn: VpcStack
 
   ElastiCacheStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/elasticache.cfn.yml
       Parameters:
-        NetworkStackName: !GetAtt VpcStack.Outputs.Name
+        NetworkStackName: !Ref NetworkStackName
         ClusterName: !Ref ClusterName
-    DependsOn: VpcStack
 
   FargateStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/fargate.cfn.yml
       Parameters:
-        NetworkStackName: !GetAtt VpcStack.Outputs.Name
+        NetworkStackName: !Ref NetworkStackName
         HostedZoneName: !Ref HostedZoneName
         LoadBalancerDomainName: !Ref LoadBalancerDomainName
         AppProtocol: !Ref AppProtocol
@@ -513,14 +430,8 @@ Resources:
         LoadBalancerLatencySeconds: !Ref LoadBalancerLatencySeconds
         LoadBalancerAlarmEvaluationPeriodSeconds: !Ref LoadBalancerAlarmEvaluationPeriodSeconds
         LoadBalancerAlarmEvaluationPeriods: !Ref LoadBalancerAlarmEvaluationPeriods
-    DependsOn: VpcStack
 
 Outputs:
-
-  VpcStackName:
-    Value: !GetAtt VpcStack.Outputs.Name
-    Export:
-      Name: !Sub ${AWS::StackName}-VpcStackName
 
   BastionStackName:
     Value: !GetAtt BastionStack.Outputs.Name
