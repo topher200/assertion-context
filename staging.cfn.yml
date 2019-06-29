@@ -115,15 +115,6 @@ Parameters:
     Default: fargate
     Description: CodeCommit or GitHub git repository branch - change triggers a new build
 
-  GitHubToken:
-    Type: String
-    NoEcho: true
-    Description: "GitHub API token - leave blank if using CodeCommit - see: https://github.com/blog/1509-personal-api-tokens"
-
-  GitHubUser:
-    Type: String
-    Description: GitHub username or organization - leave blank if using CodeCommit
-
   CodeBuildDockerImage:
     Type: String
     Default: aws/codebuild/docker:17.09.0
@@ -361,8 +352,6 @@ Metadata:
           - SeedDockerImage
           - GitSourceRepo
           - GitBranch
-          - GitHubUser
-          - GitHubToken
       - Label:
           default: Elastic Container Registry
         Parameters:
@@ -399,10 +388,6 @@ Metadata:
         default: Git Repo
       GitBranch:
         default: Git Branch
-      GitHubUser:
-        default: GitHub User
-      GitHubToken:
-        default: GitHub Token
       HealthCheckPath:
         default: Health Check Path
       DefaultContainerCpu:
@@ -491,8 +476,6 @@ Resources:
         HealthCheckPath: !Ref HealthCheckPath
         GitSourceRepo: !Ref GitSourceRepo
         GitBranch: !Ref GitBranch
-        GitHubToken: !Ref GitHubToken
-        GitHubUser: !Ref GitHubUser
         CodeBuildDockerImage: !Ref CodeBuildDockerImage
         SeedDockerImage: !Ref SeedDockerImage
         DefaultContainerCpu: !Ref DefaultContainerCpu
