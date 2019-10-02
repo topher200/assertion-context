@@ -21,7 +21,8 @@ install:
 
 .PHONY: test
 test: install
-	nosetests --py3where web --quiet
+	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
+	./scripts/run-unit-tests.sh
 	mypy --config-file web/mypy.ini web/server.py
 	pylint web --reports n
 	mypy --config-file src/mypy.ini src
