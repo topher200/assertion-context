@@ -69,6 +69,11 @@ push-to-docker:
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
 	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
 
+.PHONY: run-server-daemon
+run-server-daemon:
+	docker build web/ -t server
+	docker run --detach --env-file .env -p 8000:8000 server
+
 .PHONY: run-badcorp
 run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
@@ -76,4 +81,5 @@ run-badcorp:
 
 .PHONY: integration-test
 integration-test:
+	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/run-integration-tests.sh

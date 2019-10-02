@@ -1,5 +1,6 @@
 .DS_Store
 .env
+.secrets.toml
 *.pyc
 run-populate-db.sh
 differ/diff1.txt
