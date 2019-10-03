@@ -23,7 +23,5 @@ from web.app import jira_issue_aservice
 
 class TestJiraIssueAService(unittest.TestCase):
     def test_jira_api_object_to_JiraIssue(self):
-        i = jira_issue_aservice.get_issue('PPC-12345')
-        assert False, (dir(i), vars(i))
-
-        # jira_object = jira.resources.Issue
+        i = jira_issue_aservice.JiraClient().issue('PPC-39719')
+        assert False, i.raw['fields']['labels']
