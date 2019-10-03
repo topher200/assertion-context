@@ -294,6 +294,7 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
     comments_text = COMMENT_SEPARATOR.join(comments)
 
     description = jira_object.fields.description
+    labels = jira_object.raw['fields']['labels']
     description_filtered = __strip_papertrail_metadata(description)
     comments_filtered = __strip_papertrail_metadata(comments_text)
 
@@ -322,6 +323,7 @@ def jira_api_object_to_JiraIssue(jira_object:jira.resources.Issue) -> JiraIssue:
         jira_object.fields.status.name,
         jira_object.fields.created,
         jira_object.fields.updated,
+        labels,
     )
 
 
