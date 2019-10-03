@@ -1,3 +1,4 @@
+from typing import List
 import datetime
 
 
@@ -19,6 +20,7 @@ class JiraIssue():
         - the current status of the issue
         - the created datetime of the issue
         - the last updated datetime of the issue
+        - a list of the labels applied to the ticket
     """
     def __init__(
             self,
@@ -34,6 +36,7 @@ class JiraIssue():
             status,
             created,
             updated,
+            labels,
     ):
         self._key = key
         self._url = url
@@ -47,6 +50,7 @@ class JiraIssue():
         self._status = status
         self._created = created
         self._updated = updated
+        self._labels = labels
 
     def __repr__(self):
         return str(self.document())
@@ -99,6 +103,10 @@ class JiraIssue():
     def updated(self) -> datetime.datetime:
         return self._updated
 
+    @property
+    def labels(self) -> List[str]:
+        return self._labels
+
     def document(self) -> dict:
         """
             Returns the document form of this object for ElasticSearch.
@@ -118,6 +126,7 @@ class JiraIssue():
             "status": self._status,
             "created": self._created,
             "updated": self._updated,
+            "labels": self._labels,
         }
 
 
@@ -150,4 +159,5 @@ def generate_from_source(source:dict) -> JiraIssue:
         source["status"],
         created,
         updated,
+        source["labels"] if "labels" in source else [],
     )

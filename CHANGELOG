@@ -1,3 +1,6 @@
+Version 6.2.z
+  - add 'labels' to JiraIssues
+
 Version 6.1.z
   - ignore certain tracebacks, more powerfully
 
