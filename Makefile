@@ -81,6 +81,6 @@ run-badcorp:
 	docker run badcorp
 
 .PHONY: integration-test
-integration-test:
+integration-test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/run-integration-tests.sh
