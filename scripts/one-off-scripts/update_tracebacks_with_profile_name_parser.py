@@ -1,3 +1,9 @@
+"""
+    One-off script used to apply profile_name to older Tracebacks.
+
+    Loaded all tracebacks, used our new parser to find the profile_name, and re-saved each updated
+    traceback back to the database.
+"""
 import datetime
 
 from elasticsearch import Elasticsearch
