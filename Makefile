@@ -18,12 +18,11 @@ install:
 	pip install -r requirements.txt --quiet
 	pip install -r src/requirements.txt --quiet
 	command -v papertrail || sudo gem install papertrail
-	./scripts/setup-es-database.sh
 
 .PHONY: test
 test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
-	./scripts/run-tests.sh
+	./scripts/run-tests.sh --skip-integration-tests
 	mypy --config-file src/mypy.ini src/server.py
 	pylint src --reports n
 	mypy --config-file src/mypy.ini src
@@ -84,4 +83,5 @@ run-badcorp:
 .PHONY: integration-test
 integration-test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
+	./scripts/setup-es-database.sh
 	./scripts/run-integration-tests.sh

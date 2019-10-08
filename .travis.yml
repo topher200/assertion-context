@@ -5,4 +5,4 @@ cache: pip
 install: make install
 script:
   - make test
-  # - make integration-test
+  - make integration-test
