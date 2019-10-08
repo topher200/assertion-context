@@ -36,10 +36,13 @@ AWS_EXTRA_SECURITY_GROUP="NO_DEFAULT_SET"
 JAEGER_REPORTING_HOST="NO_DEFAULT_SET"
 
 [development]
+ES_ADDRESS="localhost"
 
 [testing]
+ES_ADDRESS="localhost"
 
 [ci-testing]
+ES_ADDRESS="localhost"
 
 [production]
 USE_DOGPILE_CACHE=true
