@@ -18,6 +18,7 @@ install:
 	pip install -r requirements.txt --quiet
 	pip install -r src/requirements.txt --quiet
 	command -v papertrail || sudo gem install papertrail
+	./scripts/setup-es-database.sh
 
 .PHONY: test
 test: install
