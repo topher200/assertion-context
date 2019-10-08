@@ -6,11 +6,13 @@ import tempfile
 import time
 
 from common_util import (
-    cache_util,
     time_util,
 )
 from lib.api_call import (
     api_call_db,
+)
+from lib.common import (
+    cache_util,
 )
 from lib.papertrail import (
     json_parser,

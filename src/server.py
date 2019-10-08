@@ -24,6 +24,10 @@ from simplekv.decorator import PrefixDecorator
 
 from opentracing_instrumentation.request_context import span_in_context
 
+from common_util import (
+    es_util,
+    logging_util,
+)
 from lib.common import (
     cache_util,
 )
@@ -38,10 +42,6 @@ from lib.papertrail import (
 from lib.traceback import (
     traceback_db,
     traceback_formatter,
-)
-from util import (
-    es_util,
-    logging_util,
 )
 from webapp import (
     api_aservice,

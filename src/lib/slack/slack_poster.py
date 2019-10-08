@@ -6,13 +6,15 @@ import requests
 
 from common_util import (
     config_util,
-    traceback_formatter,
 )
 from lib.jira import (
     jira_issue_aservice,
 )
 from lib.jira.jira_issue import JiraIssue
 from lib.slack import slack_channel
+from lib.traceback import (
+    traceback_formatter,
+)
 from lib.traceback.traceback import Traceback
 
 
