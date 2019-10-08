@@ -10,5 +10,10 @@ set -a
 source .badcorp.env
 set +a
 
-# add src to PYTHONPATH and run the tests
-PYTHONPATH=src pytest tests/test_run_integration_tests.py
+cd src
+if [ "$1" == "--skip-integration-tests" ]
+then
+    python -m pytest --ignore-glob *_integration_test*
+else
+    python -m pytest
+fi

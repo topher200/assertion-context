@@ -22,7 +22,7 @@ install:
 .PHONY: test
 test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
-	./scripts/run-unit-tests.sh
+	./scripts/run-tests.sh
 	mypy --config-file src/mypy.ini src/server.py
 	pylint src --reports n
 	mypy --config-file src/mypy.ini src
