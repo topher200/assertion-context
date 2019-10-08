@@ -11,7 +11,7 @@ source .badcorp.env
 set +a
 
 cd src
-if [ "$1" == "--skip-integration-tests" ]
+if [ "$1" == "--skip-integration-tests" ] || [ "$1" == "-s" ]
 then
     python -m pytest --ignore-glob *_integration_test*
 else
