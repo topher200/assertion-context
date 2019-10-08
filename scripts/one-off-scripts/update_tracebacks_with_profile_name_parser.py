@@ -12,7 +12,7 @@ import certifi
 from app import (
     config_util,
     profile_name_parser,
-    traceback_database,
+    traceback_db,
     tracing,
 )
 
@@ -32,14 +32,14 @@ def main():
             except Exception:
                 print('date does not exist: %s' % date_)
                 continue
-            tracebacks = traceback_database.get_tracebacks(
+            tracebacks = traceback_db.get_tracebacks(
                 ES, tracer, date_, date_, 10000
             )
             print('found %s tracebacks' % len(tracebacks))
             for traceback in tracebacks:
                 new_traceback = profile_name_parser.parse(traceback)
                 if new_traceback:
-                    traceback_database.save_traceback(ES, new_traceback)
+                    traceback_db.save_traceback(ES, new_traceback)
 
 
 if __name__ == '__main__':

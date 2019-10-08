@@ -8,20 +8,32 @@ from elasticsearch import Elasticsearch
 import celery
 import certifi
 
-from app import (
-    api_aservice,
-    cache_util,
+from common_util import (
     config_util,
+    logging_util,
+)
+from lib.api_call import api_call_db
+from lib.common import (
+    cache_util,
+)
+from lib.jira import (
     jira_issue_aservice,
     jira_issue_db,
-    logging_util,
-    realtime_updater,
-    s3,
-    traceback_database,
 )
-from app.ddl import api_call_db
-from .services import (
+from lib.papertrail import (
+    realtime_updater,
+)
+from lib.parser import (
+    s3,
+)
+from lib.slack import (
     slack_poster,
+)
+from lib.traceback import (
+    traceback_db,
+)
+from webapp import (
+    api_aservice,
 )
 
 REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')
@@ -90,7 +102,7 @@ def parse_log_file(bucket, key):
     count = 0
     for tb in tracebacks:
         count += 1
-        traceback_database.save_traceback(ES, tb)
+        traceback_db.save_traceback(ES, tb)
     logger.info("saved %s tracebacks. bucket: %s, key: %s", count, bucket, key)
     cache_util.invalidate_cache('traceback')
 

@@ -1,14 +1,14 @@
 .PHONY: deploy-k8s
 deploy-k8s: push-to-docker
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} kubectl set image deploy nginx  nginx=topher200/assertion-context-nginx:{}
-	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web    web=topher200/assertion-context:{}
-	cat web/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy celery celery=topher200/assertion-context:{}
+	cat src/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy web    web=topher200/assertion-context:{}
+	cat src/VERSION   | tr -d '\n' | xargs -I {} kubectl set image deploy celery celery=topher200/assertion-context:{}
 
-VERSION := $(shell cat web/VERSION)
+VERSION := $(shell cat src/VERSION)
 .PHONY: bump-web-patch-version
 bump-web-patch-version:
-	bumpversion --allow-dirty --current-version $(VERSION) patch web/VERSION
-	git commit -m 'version bump' -o web/VERSION
+	bumpversion --allow-dirty --current-version $(VERSION) patch src/VERSION
+	git commit -m 'version bump' -o src/VERSION
 
 .PHONY: bump-and-deploy
 bump-and-deploy: bump-web-patch-version deploy-k8s
@@ -16,15 +16,15 @@ bump-and-deploy: bump-web-patch-version deploy-k8s
 .PHONY: install
 install:
 	pip install -r requirements.txt --quiet
-	pip install -r web/requirements.txt --quiet
+	pip install -r src/requirements.txt --quiet
 	command -v papertrail || sudo gem install papertrail
 
 .PHONY: test
 test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/run-unit-tests.sh
-	mypy --config-file web/mypy.ini web/server.py
-	pylint web --reports n
+	mypy --config-file src/mypy.ini src/server.py
+	pylint src --reports n
 	mypy --config-file src/mypy.ini src
 	pylint src --reports n
 
@@ -67,12 +67,12 @@ cleanup-kubernetes:
 push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
-	cat web/VERSION   | tr -d '\n' | xargs -I {} docker build web/   --tag topher200/assertion-context:{}
-	cat web/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
+	cat src/VERSION   | tr -d '\n' | xargs -I {} docker build src/   --tag topher200/assertion-context:{}
+	cat src/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
 
 .PHONY: run-server-daemon
 run-server-daemon:
-	docker build web/ -t server
+	docker build src/ -t server
 	docker run --detach --env-file .env -p 8000:8000 server
 
 .PHONY: run-badcorp

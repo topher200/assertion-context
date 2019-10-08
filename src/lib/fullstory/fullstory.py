@@ -8,11 +8,12 @@ import logging
 
 import requests
 
-from ..traceback import Traceback
-from .. import (
+from common_util import (
     config_util,
     redis_util,
 )
+from lib.traceback.traceback import Traceback
+
 
 REGION_PREFIX = 'dogpile:fullstory'
 DOGPILE_REGION = redis_util.make_dogpile_region(REGION_PREFIX)

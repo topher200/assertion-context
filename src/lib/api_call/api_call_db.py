@@ -9,7 +9,7 @@ import logging
 import elasticsearch
 import elasticsearch.helpers
 
-from app import retry
+from common_util import retry
 
 
 INDEX_TEMPLATE = 'api-call-%04d-%02d'

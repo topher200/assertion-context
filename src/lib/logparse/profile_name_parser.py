@@ -4,7 +4,7 @@ import logging
 import re
 import typing
 
-from .traceback import Traceback
+from lib.traceback.traceback import Traceback
 
 
 logger = logging.getLogger()

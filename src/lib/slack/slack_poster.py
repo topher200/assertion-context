@@ -4,14 +4,16 @@ import json
 
 import requests
 
-from .. import (
+from common_util import (
     config_util,
-    jira_issue_aservice,
     traceback_formatter,
 )
-from ..jira_issue import JiraIssue
-from ..traceback import Traceback
-from ..business_logic import slack_channel
+from lib.jira import (
+    jira_issue_aservice,
+)
+from lib.jira.jira_issue import JiraIssue
+from lib.slack import slack_channel
+from lib.traceback.traceback import Traceback
 
 
 SLACK_REAL_USER_TOKEN = config_util.get('SLACK_REAL_USER_TOKEN')

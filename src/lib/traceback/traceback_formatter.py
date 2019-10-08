@@ -1,12 +1,12 @@
 from typing import Optional, Callable, Set
 import logging
 
-from .traceback import Traceback
-
-from . import (
+from common_util import (
     config_util,
 )
-from .services import fullstory
+from lib.fullstory import fullstory
+from lib.traceback.traceback import Traceback
+
 
 logger = logging.getLogger()
 

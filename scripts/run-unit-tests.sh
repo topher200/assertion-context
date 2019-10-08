@@ -11,4 +11,4 @@ source .badcorp.env
 set +a
 
 # run the tests
-nosetests --py3where web --quiet
+nosetests --py3where src --quiet

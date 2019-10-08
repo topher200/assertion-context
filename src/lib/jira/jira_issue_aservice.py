@@ -8,12 +8,17 @@ from typing import (
 
 import jira
 
-from . import (
-    config_util,
+from lib.jira import (
     jira_issue_db,
+)
+from lib.jira.jira_issue import JiraIssue
+from lib.traceback import (
     traceback_formatter,
 )
-from .jira_issue import JiraIssue
+from common_util import (
+    config_util,
+)
+
 
 logger = logging.getLogger()
 

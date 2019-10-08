@@ -1,14 +1,6 @@
-import os
 import unittest
 
-
-# We hack the sys path so our tester can see the app directory
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#pylint: disable=wrong-import-position,wrong-import-order
-import sys
-sys.path.append(ROOT)
-
-from app.file_parser import Parser
+from lib.traceback.parser import Parser
 
 
 LOG_LINES_THAT_SHOULD_MATCH = [

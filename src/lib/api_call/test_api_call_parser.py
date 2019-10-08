@@ -2,8 +2,8 @@ import collections
 import datetime
 import unittest
 
-from web.app.entities.api_call import ApiCall
-from web.app.services.api_call_parser import ApiCallParser
+from lib.api_call.api_call import ApiCall
+from lib.api_call.api_call_parser import ApiCallParser
 
 
 MATCHING_LOG_LINES = frozenset((

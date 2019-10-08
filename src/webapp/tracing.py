@@ -2,7 +2,7 @@ from opentracing_instrumentation.client_hooks import install_all_patches
 import jaeger_client
 from jaeger_client.metrics.prometheus import PrometheusMetricsFactory
 
-from . import config_util
+from common_util import config_util
 
 JAEGER_REPORTING_HOST = config_util.get('JAEGER_REPORTING_HOST')
 

@@ -1,7 +1,7 @@
 import gzip
 
-from app.services.api_call_parser import ApiCallParser
-from .parser import Parser
+from lib.api_call.api_call_parser import ApiCallParser
+from lib.traceback.parser import Parser
 
 
 def parse_gzipped_file(zipped_filename):

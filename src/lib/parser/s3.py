@@ -7,9 +7,11 @@ import tempfile
 import boto3
 import botocore
 
-from . import config_util
-from . import file_parser
-from . import retry
+from common_util import (
+    config_util,
+    retry,
+)
+from lib.papertrail import file_parser
 
 
 logger = logging.getLogger()

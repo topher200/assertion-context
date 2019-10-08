@@ -9,10 +9,13 @@ import elasticsearch
 
 from opentracing_instrumentation.request_context import get_current_span
 
-from app import es_util
-from app import redis_util
-from app import retry
-from .traceback import Traceback, generate_traceback_from_source
+from common_util import (
+    es_util,
+    redis_util,
+    retry,
+)
+from lib.traceback.traceback import Traceback, generate_traceback_from_source
+
 
 logger = logging.getLogger()
 

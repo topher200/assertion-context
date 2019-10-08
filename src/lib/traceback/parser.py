@@ -8,10 +8,12 @@ import itertools
 import logging
 import re
 
-from . import profile_name_parser
-from .logline import LogLine
-from .services.parser_util import ParserUtil
-from .traceback import Traceback
+from common_util.parser_util import ParserUtil
+from lib.logparse import (
+    profile_name_parser,
+    logline,
+)
+from lib.traceback.traceback import Traceback
 
 
 ERROR_REGEX = re.compile('(?:AssertionError|KeyError|NotImplementedError|ValueError|AttributeError|LockFailed)(?:$|:)')
@@ -129,7 +131,7 @@ class Parser():
             formatted_line,
         ) = ParserUtil.parse_papertrail_log_line(raw_log_line)
 
-        return LogLine(
+        return logline.LogLine(
             parsed_log_message,
             formatted_line,
             timestamp,

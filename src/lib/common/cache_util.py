@@ -1,11 +1,13 @@
 from typing import Optional
 import logging
 
-from app import (
+from lib.jira import (
     jira_issue_db,
-    tasks,
-    traceback_database,
 )
+from lib.traceback import (
+    traceback_db,
+)
+import tasks
 
 
 logger = logging.getLogger()
@@ -17,7 +19,7 @@ def invalidate_cache(cache:Optional[str]):
     """
     if cache is None or cache == 'traceback':
         logger.info('invalidating traceback cache')
-        traceback_database.invalidate_cache()
+        traceback_db.invalidate_cache()
     if cache is None or cache == 'jira':
         logger.info('invalidating jira cache')
         jira_issue_db.invalidate_cache()

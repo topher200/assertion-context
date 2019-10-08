@@ -1,8 +1,8 @@
 import logging
 import re
 
-from .parser_util import ParserUtil
-from ..entities.api_call import ApiCall
+from lib.api_call.api_call import ApiCall
+from common_util.parser_util import ParserUtil
 
 
 API_CALL_REGEX = re.compile((

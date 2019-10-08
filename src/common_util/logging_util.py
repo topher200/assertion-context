@@ -1,7 +1,7 @@
 import logging
 import logging.handlers
 
-from . import config_util
+from common_util import config_util
 
 
 logger = logging.getLogger()

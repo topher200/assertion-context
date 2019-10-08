@@ -24,21 +24,32 @@ from simplekv.decorator import PrefixDecorator
 
 from opentracing_instrumentation.request_context import span_in_context
 
-from app import (
-    api_aservice,
+from lib.common import (
     cache_util,
-    es_util,
-    healthz,
+)
+from lib.jira import (
     jira_issue_aservice,
     jira_issue_db,
-    logging_util,
+)
+
+from lib.papertrail import (
     realtime_updater,
-    tasks,
-    text_keys,
-    traceback_database,
+)
+from lib.traceback import (
+    traceback_db,
     traceback_formatter,
+)
+from util import (
+    es_util,
+    logging_util,
+)
+from webapp import (
+    api_aservice,
+    healthz,
+    text_keys,
     tracing,
 )
+import tasks
 
 
 # create app
@@ -102,7 +113,7 @@ def index():
         hidden_traceback_ids = set()
         if flask.session.get(text_keys.HIDDEN_TRACEBACK) is not None:
             for traceback_text in flask.session.get(text_keys.HIDDEN_TRACEBACK):
-                for tb in traceback_database.get_matching_tracebacks(
+                for tb in traceback_db.get_matching_tracebacks(
                         ES, tracer, traceback_text, es_util.EXACT_MATCH, 10000
                 ):
                     hidden_traceback_ids.add(tb.origin_papertrail_id)
@@ -329,10 +340,10 @@ def jira_formatted_list(traceback_origin_id):
         return 'missing traceback id', 400
 
     # get the referenced traceback
-    tb = traceback_database.get_traceback(ES, traceback_id)
+    tb = traceback_db.get_traceback(ES, traceback_id)
 
     # find a list of tracebacks that use the given traceback text
-    tracebacks = traceback_database.get_matching_tracebacks(
+    tracebacks = traceback_db.get_matching_tracebacks(
         ES, opentracing.tracer, tb.traceback_text, es_util.EXACT_MATCH, 100
     )
     tracebacks.sort(key=lambda tb: int(tb.origin_papertrail_id), reverse=True)

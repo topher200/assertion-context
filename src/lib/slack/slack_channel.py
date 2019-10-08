@@ -1,7 +1,8 @@
-from ..traceback import Traceback
-from .. import (
+from lib.traceback.traceback import Traceback
+from common_util import (
     config_util,
 )
+
 
 TRACEBACKS_CHANNEL_NAME = 'tracebacks'
 TRACEBACKS_CHANNEL_NAME_ADWORDS = 'tracebacks-adwords'

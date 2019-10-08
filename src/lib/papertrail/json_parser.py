@@ -1,8 +1,8 @@
 import logging
 import json
 
-from .services.api_call_parser import ApiCallParser
-from .parser import Parser
+from lib.api_call.api_call_parser import ApiCallParser
+from lib.traceback.parser import Parser
 
 
 logger = logging.getLogger()

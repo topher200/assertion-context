@@ -14,12 +14,12 @@ import elasticsearch
 from opentracing_instrumentation.request_context import get_current_span
 import opentracing
 
-from . import (
+from lib.jira.jira_issue import JiraIssue, generate_from_source
+from common_util import (
     es_util,
     redis_util,
     retry,
 )
-from .jira_issue import JiraIssue, generate_from_source
 
 
 DOGPILE_REGION_PREFIX = 'dogpile:jira-issue'

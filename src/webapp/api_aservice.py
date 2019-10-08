@@ -10,15 +10,22 @@ import pytz
 
 from opentracing_instrumentation.request_context import get_current_span, span_in_context
 
-from . import (
+from common_util import (
     es_util,
+)
+from lib.jira import (
     jira_issue_aservice,
     jira_issue_db,
-    tasks,
-    text_keys,
-    traceback_database,
 )
-from .business_logic import slack_channel
+from lib.slack import slack_channel
+from lib.traceback import (
+    traceback_db,
+)
+from webapp import (
+    text_keys,
+)
+import tasks
+
 
 logger = logging.getLogger()
 
@@ -61,7 +68,7 @@ def get_tracebacks_for_day(
     # get all tracebacks
     with tracer.start_span('get all tracebacks', child_of=root_span) as span:
         with span_in_context(span):
-            tracebacks = traceback_database.get_tracebacks(ES, tracer, date_to_analyze, date_to_analyze)
+            tracebacks = traceback_db.get_tracebacks(ES, tracer, date_to_analyze, date_to_analyze)
     logger.debug('found %s tracebacks', len(tracebacks))
 
     # filter out tracebacks the user has hidden. we use a namedlist to store each traceback + some
@@ -117,7 +124,7 @@ def get_tracebacks_for_day(
         with span_in_context(span):
             for tb in tb_meta:
                 tb.similar_tracebacks = []
-                tb.similar_tracebacks = traceback_database.get_matching_tracebacks(
+                tb.similar_tracebacks = traceback_db.get_matching_tracebacks(
                     ES, tracer, tb.traceback.traceback_text, es_util.EXACT_MATCH, 100
                 )
 
@@ -174,7 +181,7 @@ def create_ticket(
     """
         Creates a jira issue for the given traceback id
     """
-    traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+    traceback = traceback_db.get_traceback(ES, origin_papertrail_id)
 
     if reject_if_ticket_exists:
         jira_issues = jira_issue_db.get_matching_jira_issues(
@@ -187,7 +194,7 @@ def create_ticket(
             tasks.tell_slack_about_error(channel, "Issue has already been created as %s" % key)
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = traceback_database.get_matching_tracebacks(
+    similar_tracebacks = traceback_db.get_matching_tracebacks(
         ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
     )
 
@@ -218,10 +225,10 @@ def create_comment_on_existing_ticket(
         Given an existing Jira ticket id, create a comment on that ticket describing a NEW (but
         related) traceback that we've encountered, referenced by L{origin_papertrail_id}.
     """
-    traceback = traceback_database.get_traceback(ES, origin_papertrail_id)
+    traceback = traceback_db.get_traceback(ES, origin_papertrail_id)
 
     # find a list of tracebacks that use that text
-    similar_tracebacks = traceback_database.get_matching_tracebacks(
+    similar_tracebacks = traceback_db.get_matching_tracebacks(
         ES, opentracing.tracer, traceback.traceback_text, es_util.EXACT_MATCH, 50
     )
 

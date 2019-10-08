@@ -3,7 +3,7 @@ import logging
 import dogpile.cache
 import redis
 
-from . import config_util
+from common_util import config_util
 
 USE_DOGPILE_CACHE = config_util.get('USE_DOGPILE_CACHE')
 REDIS_ADDRESS = config_util.get('REDIS_ADDRESS')

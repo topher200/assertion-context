@@ -1,25 +1,24 @@
 import datetime
 import logging
 import math
-import os
 import subprocess
 import tempfile
 import time
 
-# We hack the sys path so our script can see the app directory
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-#pylint: disable=wrong-import-position,wrong-import-order
-import sys
-sys.path.append(ROOT)
-
-from app import (
+from common_util import (
     cache_util,
-    json_parser,
-    tasks,
-    traceback_database,
     time_util,
 )
-from app.ddl import api_call_db
+from lib.api_call import (
+    api_call_db,
+)
+from lib.papertrail import (
+    json_parser,
+)
+from lib.traceback import (
+    traceback_db,
+)
+import tasks
 
 
 logger = logging.getLogger()
@@ -53,7 +52,7 @@ def run(ES, start_time, end_time):
     count = 0
     for tb in tracebacks:
         count += 1
-        traceback_database.save_traceback(ES, tb)
+        traceback_db.save_traceback(ES, tb)
     logger.info("saved %s tracebacks", count)
 
     if count > 0:
