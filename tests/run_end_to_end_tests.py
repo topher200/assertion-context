@@ -6,10 +6,10 @@ import time
 import pytest
 import requests
 
-from common.util import config
+from common_util import config_util
 
 
-BADCORP_PAPERTRAIL_API_KEY = config.get('BADCORP_PAPERTRAIL_API_KEY')
+BADCORP_PAPERTRAIL_API_KEY = config_util.get('BADCORP_PAPERTRAIL_API_KEY')
 assert BADCORP_PAPERTRAIL_API_KEY
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
