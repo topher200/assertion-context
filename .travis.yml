@@ -3,6 +3,9 @@ python:
     - 3.6
 cache: pip
 install: make install
+before-script:
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.4.0-amd64.deb && sudo dpkg -i --force-confnew elasticsearch-7.4.0-amd64.deb && sudo service elasticsearch restart
+  - sleep 10
 script:
   - make test
   - make integration-test
