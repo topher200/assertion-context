@@ -2,7 +2,18 @@ language: python
 python:
     - 3.6
 cache: pip
+
+# elasticsearch install adapted from https://github.com/rubygems/rubygems.org/blob/master/.travis.yml
+addons:
+  apt:
+    sources:
+      - elasticsearch-5.x
+    packages:
+      - elasticsearch
+      - openjdk-8-jre-headless
+services:
+  - elasticsearch
+
 install: make install
 script:
-  - make test
-  # - make integration-test
+  - make integration-test

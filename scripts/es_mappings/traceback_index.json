@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "traceback_filtered": {
+          "type": "custom",
+          "tokenizer": "letter",
+          "char_filter": [
+            "newrelic_and_underscore_filter"
+          ]
+        }
+      },
+      "char_filter": {
+        "newrelic_and_underscore_filter": {
+          "type": "pattern_replace",
+          "pattern": "_|args|File|framework_cherrypy.py|handler_wrapper|hooks|in|kwargs|lib|line|local|newrelic|opt|packages|python2.7|return|site|venv|wordstream_virtualenv|wrapped",
+          "replacement": ""
+        }
+      }
+    }
+  },
+  "mappings": {
+    "traceback": {
+      "properties": {
+        "traceback_text": {
+          "analyzer": "traceback_filtered",
+          "type": "text"
+        }
+      }
+    }
+  }
+}
