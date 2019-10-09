@@ -84,4 +84,4 @@ run-badcorp:
 integration-test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/setup-es-database.sh
-	./scripts/run-integration-tests.sh
+	./scripts/run-tests.sh
