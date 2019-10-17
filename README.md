@@ -69,7 +69,7 @@ Then to start it all up:
 For production, Elasticsearch database must be externally hosted. The IP of the
 host server must be whitelisted.
 
-Set up the mapping for the indexes by running ./scripts/setup-es-database.sh
+Set up the mapping for the indexes by running `./scripts/setup-es-database.sh`
 
 ## Running tests
 ### Setup - install Python locally
