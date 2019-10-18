@@ -20,6 +20,11 @@ push-to-docker:
 	cat src/VERSION   | tr -d '\n' | xargs -I {} docker build src/   --tag topher200/assertion-context:{}
 	cat src/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
 
+.PHONY: run-app-docker-compose
+run-app-docker-compose:
+	dynaconf list -e production | tail -n +2 | sed 's/: /=/' > .env
+	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --detach --remove-orphans
+
 .PHONY: run-badcorp
 run-badcorp:
 	docker build . -f Dockerfile-badcorp -t badcorp
@@ -30,9 +35,3 @@ integration-test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/setup-es-database.sh
 	./scripts/run-tests.sh
-
-.PHONY: install-docker-dependencies-on-amazon-linux
-install-docker-dependencies-on-amazon-linux:
-	sudo yum install -y docker
-	sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$$(uname -s)-$$(uname -m)" -o /usr/local/bin/docker-compose
-	sudo chmod +x /usr/local/bin/docker-compose
