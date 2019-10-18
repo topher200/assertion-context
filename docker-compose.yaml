@@ -3,7 +3,7 @@ version: '3.7'
 services:
   web:
     build:
-      ./web
+      ./src
     image:
       topher200/assertion-context
     env_file:
@@ -13,7 +13,7 @@ services:
 
   celery:
     build:
-      ./web
+      ./src
     image:
       topher200/assertion-context
     env_file:
