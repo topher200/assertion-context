@@ -30,3 +30,9 @@ integration-test: install
 	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
 	./scripts/setup-es-database.sh
 	./scripts/run-tests.sh
+
+.PHONY: install-docker-dependencies-on-amazon-linux
+install-docker-dependencies-on-amazon-linux:
+	sudo yum install -y docker
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	sudo chmod +x /usr/local/bin/docker-compose
