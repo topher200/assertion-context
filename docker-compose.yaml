@@ -2,8 +2,6 @@ version: '3.7'
 
 services:
   web:
-    build:
-      ./src
     image:
       topher200/assertion-context
     env_file:
@@ -12,21 +10,19 @@ services:
       always
 
   celery:
-    build:
-      ./src
     image:
       topher200/assertion-context
     env_file:
       ./.env
-    restart:
-      always
     command:
       [celery, -A, app.tasks, worker]
-
-  nginx:
     restart:
       always
-    build:
-      ./nginx
+
+  nginx:
+    image:
+      topher200/assertion-context-nginx
     ports:
       - "80:80"
+    restart:
+      always
