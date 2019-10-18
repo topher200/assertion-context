@@ -3,7 +3,7 @@ version: '3.7'
 services:
   web:
     image:
-      topher200/assertion-context
+      topher200/assertion-context:latest
     env_file:
       ./.env
     restart:
@@ -11,7 +11,7 @@ services:
 
   celery:
     image:
-      topher200/assertion-context
+      topher200/assertion-context:latest
     env_file:
       ./.env
     command:
@@ -21,7 +21,7 @@ services:
 
   nginx:
     image:
-      topher200/assertion-context-nginx
+      topher200/assertion-context-nginx:latest
     ports:
       - "80:80"
     restart:
