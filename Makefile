@@ -17,9 +17,11 @@ test: install
 push-to-docker:
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker build nginx/ --tag topher200/assertion-context-nginx:{}
 	cat nginx/VERSION | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context-nginx:{}
+	docker build nginx/ --tag topher200/assertion-context-nginx:latest
 	docker push topher200/assertion-context-nginx:latest
 	cat src/VERSION   | tr -d '\n' | xargs -I {} docker build src/   --tag topher200/assertion-context:{}
 	cat src/VERSION   | tr -d '\n' | xargs -I {} docker push               topher200/assertion-context:{}
+	docker build src/ --tag topher200/assertion-context:latest
 	docker push topher200/assertion-context:latest
 
 .PHONY: run-app-docker-compose
