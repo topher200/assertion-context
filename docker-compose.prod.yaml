@@ -3,22 +3,3 @@ version: '3.7'
 services:
   web:
     command: ["gunicorn", "--workers", "6", "--bind", ":8000", "--timeout", "60", "server:app"]
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
-            tag: web
-
-  celery:
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
-            tag: celery
-
-  nginx:
-    logging:
-        driver: syslog
-        options:
-            syslog-address: ${PAPERTRAIL_PRODUCTION_URL}
-            tag: nginx
