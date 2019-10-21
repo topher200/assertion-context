@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # installs the dependencies necessary to run docker-compose from a fresh Amazon
-# Linux box. use this to create a fresh AMI
+# Linux box. use this to create a fresh AMI. NOTE: instance must have an IAM
+# Role with read S3 access.
 
 # install docker (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html#install_docker)
 sudo amazon-linux-extras install -y docker
@@ -15,9 +16,9 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # install papertrail logging
 aws s3 cp s3://tracebacks-configuration/papertrail-logging-destination ./papertrail-logging-destination
-docker run --restart=always -d \
-       -v=/var/run/docker.sock:/var/run/docker.sock gliderlabs/logspout  \
-       syslog+tls://$(cat ./papertrail-logging-destination)
+sudo docker run --restart=always -d \
+     -v=/var/run/docker.sock:/var/run/docker.sock gliderlabs/logspout  \
+     syslog+tls://$(cat ./papertrail-logging-destination)
 
 # install dynaconf, for configuration handling
 sudo yum install -y python3
