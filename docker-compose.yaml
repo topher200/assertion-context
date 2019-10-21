@@ -1,32 +1,28 @@
-version: '2'
+version: '3.7'
 
 services:
   web:
-    build:
-      ./web
     image:
-      topher200/assertion-context
+      topher200/assertion-context:latest
     env_file:
       ./.env
     restart:
       always
 
   celery:
-    build:
-      ./web
     image:
-      topher200/assertion-context
+      topher200/assertion-context:latest
     env_file:
       ./.env
+    command:
+      [celery, -A, tasks, worker]
     restart:
       always
-    command:
-      [celery, -A, app.tasks, worker]
 
   nginx:
-    restart:
-      always
-    build:
-      ./nginx
+    image:
+      topher200/assertion-context-nginx:latest
     ports:
       - "80:80"
+    restart:
+      always

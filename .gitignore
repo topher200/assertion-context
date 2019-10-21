@@ -8,3 +8,5 @@ differ/diff2.txt
 .mypy_cache
 .env.papertrail
 web/.mypy_cache
+settings.local.toml
+papertrail-logging-destination*

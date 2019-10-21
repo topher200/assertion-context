@@ -1,3 +1,6 @@
+Version 7.0.z
+  - drop kubernetes support in favor of docker-compose
+
 Version 6.2.z
   - add 'labels' to JiraIssues
 
