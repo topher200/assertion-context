@@ -6,7 +6,7 @@ install:
 
 .PHONY: test
 test: install
-	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
+	dynaconf list -e testing | tail -n +2 | sed -e 's/: /=/' -e 's/"//g' -e "s/'//g" > .env
 	./scripts/run-tests.sh --skip-integration-tests
 	mypy --config-file src/mypy.ini src/server.py
 	pylint src --reports n
@@ -27,7 +27,7 @@ push-to-docker:
 .PHONY: run-app-docker-compose
 run-app-docker-compose:
 	aws s3 cp s3://tracebacks-configuration/settings.local.toml ./
-	dynaconf list -e production | tail -n +2 | sed 's/: /=/' > .env
+	dynaconf list -e production | tail -n +2 | sed -e 's/: /=/' -e 's/"//g' -e "s/'//g" > .env
 	docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up --detach --remove-orphans
 
 .PHONY: run-badcorp
@@ -37,6 +37,6 @@ run-badcorp:
 
 .PHONY: integration-test
 integration-test: install
-	dynaconf list -e testing | tail -n +2 | sed 's/: /=/' > .env
+	dynaconf list -e testing | tail -n +2 | sed -e 's/: /=/' -e 's/"//g' -e "s/'//g" > .env
 	./scripts/setup-es-database.sh
 	./scripts/run-tests.sh
