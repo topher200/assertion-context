@@ -116,7 +116,7 @@ def post_traceback(traceback, similar_tracebacks:List[Traceback], jira_issues:Li
                                 "value": "SOCIAL"
                             },
                             {
-                                "text": "Grader (assign to Raju)",
+                                "text": "Grader (assign to Gary)",
                                 "value": "GRADER"
                             },
                         ]
