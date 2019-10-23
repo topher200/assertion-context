@@ -24,14 +24,14 @@ KEY_ERROR_REGEX_NEGATIVE = re.compile(
     '''threading.pyc|args:\[|Process worker'''
 )
 VALUE_ERROR_REGEX_NEGATIVE = re.compile(
-    '''raise ValueError|Facebook leads failed due|Facebook report failed due to|InvalidValueError'''
+    '''raise ValueError|Facebook leads failed due|Facebook report failed due to|pageLog'''
 )
 """
     Our regexes are by the Papertrail search we perform against production, which looks like this:
         (AssertionError -"details = AssertionError" -"can only join a child process")
             OR (KeyError -threading.pyc -args:[)
             OR (NotImplementedError)
-            OR (ValueError)
+            OR (ValueError -pageLog)
             OR (AttributeError)
             OR (LockFailed)
 
