@@ -18,5 +18,5 @@ opentracing_instrumentation==2.4.3
 prometheus_client==0.4.2
 pytz
 redis==2.10.5
-requests==2.20.1
+requests==2.31.0
 simplejson==3.10.0
